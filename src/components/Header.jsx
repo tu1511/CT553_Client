@@ -48,7 +48,7 @@ const Header = () => {
 
   return (
     <>
-      <div className="w-full bg-gray-200 py-2 flex justify-center items-center">
+      <div className="w-full bg-secondary py-2 flex justify-center items-center">
         <span
           className={`text-gray-700 text-sm font-medium transition-opacity duration-500 ${
             isFading ? "opacity-0" : "opacity-100"
@@ -65,7 +65,7 @@ const Header = () => {
             <img
               src="/src/assets/logo.png"
               alt="Logo"
-              className="h-12 w-auto"
+              className="h-14 w-auto"
             />
             <span className="font-bold text-2xl text-gray-800 ">
               Silver Charm

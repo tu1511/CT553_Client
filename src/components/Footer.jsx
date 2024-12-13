@@ -1,104 +1,146 @@
+import {
+  Clock,
+  Facebook,
+  Github,
+  Instagram,
+  Mail,
+  MapPin,
+  Phone,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
+  const customerServices = [
+    { label: "Hướng dẫn chọn size", to: "#" },
+    { label: "Chính sách giao hàng", to: "#" },
+    { label: "Chính sách quyền riêng tư", to: "#" },
+    { label: "Hướng dẫn mua hàng online", to: "#" },
+    { label: "Chính sách trả hàng hoàn tiền", to: "#" },
+  ];
+
+  const supportServices = [
+    { label: "Tại sao nên chọn bạc cao cấp?", to: "#" },
+    { label: "Cách làm trang sức bạc tại nhà", to: "#" },
+    { label: "Phân biệt các loại bạc S925, S999,...", to: "#" },
+    { label: "Những tác dụng của bạc", to: "#" },
+    { label: "Cách bảo quản trang sức bạc", to: "#" },
+  ];
+
+  const socialLinks = [
+    { href: "https://www.facebook.com", icon: <Facebook size={24} /> },
+    { href: "https://www.instagram.com", icon: <Instagram size={24} /> },
+    { href: "https://github.com", icon: <Github size={24} /> },
+  ];
+
+  const contactInfo = [
+    {
+      icon: <MapPin className="text-border" />,
+      text: "Đường 3/2, Ninh Kiều, Cần Thơ",
+    },
+    { icon: <Phone className="text-border" />, text: "+84 845 969 757" },
+    { icon: <Mail className="text-border" />, text: "minhtu15112k3@gmail.com" },
+    {
+      icon: <Clock className="text-border" />,
+      text: "Từ 8:00 đến 17:00 hàng ngày",
+    },
+  ];
 
   return (
-    <footer className="bg-teal-900 text-white py-6">
-      <div className="container mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* About Section */}
-        <div>
-          <h2 className="text-lg font-bold text-teal-300">Về Chúng Tôi</h2>
-          <p className="mt-4 ">
-            Chúng tôi là một tổ chức từ thiện với sứ mệnh mang đến những bữa ăn
-            ấm áp và đầy đủ dinh dưỡng cho các em nhỏ có hoàn cảnh khó khăn. Mỗi
-            sự đóng góp của bạn không chỉ là món ăn mà còn là niềm hy vọng, tình
-            yêu và sự sẻ chia dành cho những tâm hồn bé nhỏ cần được chở che.
-          </p>
-        </div>
+    <footer className="bg-white pt-4 shadow-lg border-t-2 border-border">
+      <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Logo and Contact Info */}
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <img src="/src/assets/logo.png" alt="Logo" className="h-12" />
+            <span className="text-2xl font-semibold text-border">
+              Silver Charm
+            </span>
+          </div>
 
-        {/* Quick Links */}
-        <div>
-          <h2 className="text-lg font-bold text-teal-300">Liên Kết Nhanh</h2>
-          <ul className="mt-4 space-y-2">
-            <li>
-              <a href="/" className="hover:text-teal-400 transition">
-                Trang Chủ
-              </a>
-            </li>
-            <li>
-              <a href="/bai-viet" className="hover:text-teal-400 transition">
-                Bài Viết
-              </a>
-            </li>
-            <li>
-              <a
-                href="/ve-chung-toi"
-                className="hover:text-teal-400 transition"
+          {/* Contact info */}
+          <div className="space-y-2">
+            {contactInfo.map((info, index) => (
+              <div
+                key={index}
+                className="flex items-center space-x-2 text-gray-600"
               >
-                Về Chúng Tôi
-              </a>
-            </li>
-            <li>
-              <a href="/lien-he" className="hover:text-teal-400 transition">
-                Liên Hệ
-              </a>
-            </li>
-          </ul>
-        </div>
+                {info.icon}
+                <p>{info.text}</p>
+              </div>
+            ))}
+          </div>
 
-        {/* Map Section */}
-        <div>
-          <h2 className="text-lg font-bold text-teal-300">Bản Đồ</h2>
-          <div className="mt-4">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.8415184425216!2d105.76803500992727!3d10.029933690035627!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31a0895a51d60719%3A0x9d76b0035f6d53d0!2zxJDhuqFpIGjhu41jIEPhuqduIFRoxqE!5e0!3m2!1svi!2s!4v1733930586378!5m2!1svi!2s"
-              width="100%"
-              height="200"
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-              title="Google Map"
-            ></iframe>
+          {/* Social Links */}
+          <div className="flex space-x-6">
+            {socialLinks.map((link, index) => (
+              <Link
+                key={index}
+                to={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border-2 p-2 border-gray-400 hover:border-border rounded-lg transition-all ease-in-out duration-300"
+              >
+                {link.icon}
+              </Link>
+            ))}
           </div>
         </div>
 
-        {/* Contact Info */}
-        <div>
-          <h2 className="text-lg font-bold text-teal-300">Thông Tin Liên Hệ</h2>
-          <ul className="mt-4 space-y-2 text-teal-200">
-            <li>Email: minhtu15112k3@gmail.com</li>
-            <li>Điện thoại: +84 845 969 757</li>
-            <li>Địa chỉ: 89 Trần Hưng Đạo, Ninh Kiều, TP.Cần Thơ</li>
+        {/* General Information */}
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg uppercase text-gray-700">
+            Cẩm nang sử dụng
+          </h3>
+          <ul className="space-y-2">
+            {supportServices.map((service, index) => (
+              <li key={index}>
+                <Link to={service.to} className="text-black hover:text-border">
+                  {service.label}
+                </Link>
+              </li>
+            ))}
           </ul>
-          {/* Social Media */}
-          <div className="mt-4 flex space-x-4">
-            <a
-              href="#"
-              className="text-teal-300 hover:text-teal-400 transition"
-              aria-label="Facebook"
-            >
-              <i className="fab fa-facebook fa-lg"></i>
-            </a>
-            <a
-              href="#"
-              className="text-teal-300 hover:text-teal-400 transition"
-              aria-label="Twitter"
-            >
-              <i className="fab fa-twitter fa-lg"></i>
-            </a>
-            <a
-              href="#"
-              className="text-teal-300 hover:text-teal-400 transition"
-              aria-label="Instagram"
-            >
-              <i className="fab fa-instagram fa-lg"></i>
-            </a>
-          </div>
+        </div>
+
+        {/* Customer Service */}
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg text-gray-700">
+            DỊCH VỤ KHÁCH HÀNG
+          </h3>
+          <ul className="space-y-2">
+            {customerServices.map((service, index) => (
+              <li key={index}>
+                <Link to={service.to} className="text-black hover:text-border">
+                  {service.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Feedback */}
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg text-gray-700">
+            Ý KIẾN ĐÓNG GÓP
+          </h3>
+          <p className="text-black font-base italic">
+            Silver Charm luôn mong nhận được ý kiến đóng góp từ bạn để nâng cấp
+            dịch vụ và sản phẩm tốt hơn. <br /> Nếu bạn có ý kiến, đừng ngần
+            ngại đóng góp cho Silver Charm nhé. Silver Charm xin cảm ơn!
+          </p>
+          <button className="px-4 py-2 bg-border text-white rounded-md hover:bg-red-700 transition">
+            Gửi Ý Kiến
+          </button>
         </div>
       </div>
 
-      {/* Copyright */}
-      <div className="mt-8 border-t border-teal-700 pt-4 text-center text-teal-400">
-        © {currentYear} Bản quyền thuộc về Minh Tứ. Đã đăng ký Bản quyền.
+      {/* Footer Bottom Section */}
+      <div className="py-2 mt-4 bg-secondary">
+        <div className="flex justify-center items-center">
+          <span>
+            © {new Date().getFullYear()} Bản quyền thuộc về Silver Charm.
+          </span>
+        </div>
       </div>
     </footer>
   );
