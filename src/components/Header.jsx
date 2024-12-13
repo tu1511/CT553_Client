@@ -1,6 +1,15 @@
 import Navbar from "@components/Navbar";
-import { Camera, Mic, Search, ShoppingBag } from "lucide-react";
+import {
+  Camera,
+  CircleUser,
+  Mic,
+  Search,
+  ShoppingBag,
+  ShoppingCart,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { Menu, Dropdown } from "antd";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const categories = [
@@ -16,7 +25,6 @@ const Header = () => {
     { name: "Sản Phẩm Mới", link: "/san-pham-moi" },
   ];
 
-  // Mảng thông tin cần hiển thị
   const messages = useMemo(
     () => [
       "Đổi trả hàng trong vòng 7 ngày",
@@ -27,24 +35,49 @@ const Header = () => {
     []
   );
 
-  // Sử dụng useState để theo dõi thông điệp đang hiển thị
   const [currentMessage, setCurrentMessage] = useState(messages[0]);
   const [isFading, setIsFading] = useState(false);
 
-  // Tự động chuyển đổi thông điệp sau mỗi 5 giây
   useEffect(() => {
     let messageIndex = 0;
     const interval = setInterval(() => {
-      setIsFading(true); // Bắt đầu hiệu ứng mờ dần
+      setIsFading(true);
       setTimeout(() => {
         messageIndex = (messageIndex + 1) % messages.length;
         setCurrentMessage(messages[messageIndex]);
-        setIsFading(false); // Kết thúc hiệu ứng mờ dần
-      }, 500); // Thời gian mờ dần (500ms)
-    }, 5000); // Đổi sau mỗi 5 giây
+        setIsFading(false);
+      }, 500); // Fade duration
+    }, 5000); // Change message every 5 seconds
 
-    return () => clearInterval(interval); // Dọn dẹp khi component bị unmount
+    return () => clearInterval(interval); // Cleanup interval on component unmount
   }, [messages]);
+
+  const menuItems = [
+    {
+      label: (
+        <Link
+          to="/register"
+          className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
+        >
+          Đăng ký tài khoản
+        </Link>
+      ),
+      key: "register",
+    },
+    {
+      label: (
+        <Link
+          to="/login"
+          className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
+        >
+          Đăng nhập
+        </Link>
+      ),
+      key: "login",
+    },
+  ];
+
+  const menu = <Menu items={menuItems} />;
 
   return (
     <>
@@ -57,8 +90,8 @@ const Header = () => {
           {currentMessage}
         </span>
       </div>
+
       <header className="border-b border-border bg-white shadow-lg sticky top-0 z-50">
-        {/* Top Header */}
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-3">
           {/* Logo */}
           <div className="flex items-center space-x-3">
@@ -67,7 +100,7 @@ const Header = () => {
               alt="Logo"
               className="h-14 w-auto"
             />
-            <span className="font-bold text-2xl text-gray-800 ">
+            <span className="font-bold text-2xl text-gray-800">
               Silver Charm
             </span>
           </div>
@@ -75,42 +108,39 @@ const Header = () => {
           {/* Search Bar */}
           <div className="flex-grow flex items-center justify-center mt-4 md:mt-0">
             <div className="relative w-full max-w-xl">
-              {/* Input Search */}
               <input
                 type="text"
                 placeholder="Tìm kiếm sản phẩm..."
                 className="w-full rounded-full border border-gray-300 py-2 pl-4 pr-36 text-gray-700 shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
-
-              {/* Search Icon */}
               <button className="absolute top-1/2 right-5 -translate-y-1/2 p-2">
                 <Search size={20} className="text-gray-600" />
               </button>
-
-              {/* Camera Icon */}
-              <button className="absolute top-1/2 right-14 -translate-y-1/2 p-2 ">
+              <button className="absolute top-1/2 right-14 -translate-y-1/2 p-2">
                 <Camera size={20} className="text-gray-600" />
               </button>
-
-              {/* Mic Icon */}
-              <button className="absolute top-1/2 right-24 -translate-y-1/2 p-2 ">
+              <button className="absolute top-1/2 right-24 -translate-y-1/2 p-2">
                 <Mic size={20} className="text-gray-600" />
               </button>
             </div>
           </div>
 
-          {/* Account and Cart */}
+          {/* Account, Cart, and Product View */}
           <div className="flex items-center space-x-6 mt-4 md:mt-0">
-            <button className="flex items-center border-2 border-black rounded-lg py-2 px-4  text-sm text-gray-700 hover:text-gray-900">
-              <span className="hidden md:inline font-bold">Tài khoản</span>
-            </button>
-            <button className="flex items-center border-2 border-black rounded-lg py-2 px-4  text-sm text-gray-700 hover:text-gray-900">
-              <span className="hidden md:inline  font-bold">
+            <Dropdown overlay={menu}>
+              <button className="ant-dropdown-link flex items-center space-x-1 border-2 border-black rounded-lg py-2 px-4 text-sm text-gray-700 hover:text-gray-900">
+                <CircleUser size={20} />
+                <span className="hidden md:inline font-bold">Tài khoản</span>
+              </button>
+            </Dropdown>
+            <button className="flex items-center space-x-1 border-2 border-black rounded-lg py-2 px-4 text-sm text-gray-700 hover:text-gray-900">
+              <ShoppingBag size={20} />
+              <span className="hidden md:inline font-bold">
                 Sản phẩm đã xem
               </span>
             </button>
             <button className="relative text-sm text-gray-700 hover:text-gray-900">
-              <ShoppingBag size={30} />
+              <ShoppingCart size={30} />
               <span className="absolute -top-2 -right-2 bg-border text-xs rounded-full px-2 py-1 text-white">
                 0
               </span>
