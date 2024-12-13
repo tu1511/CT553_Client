@@ -2,30 +2,31 @@ import { Link } from "react-router-dom";
 
 const NotFoundPage = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white">
-      <div className="text-center px-4">
-        <p className="text-2xl font-medium text-teal-900 mt-2">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+      {/* Title */}
+      <div className="text-center">
+        <p className="text-4xl font-bold text-gray-900 mt-2">
           Trang bạn đang tìm kiếm không tồn tại.
         </p>
-        <p className="text-lg text-teal-600 mt-2">
+        <p className="text-lg text-primary mt-2">
           Có thể bạn đã nhập sai địa chỉ, hoặc trang đã bị xóa.
         </p>
       </div>
 
       {/* Illustration */}
-      <div className="mt-2">
+      <div className="mt-8 max-w-xs mx-auto">
         <img
-          src="./src/assets/404-illustration.png" // Thay đường dẫn bằng hình ảnh minh họa phù hợp
+          src="./src/assets/404-illustration.png" // Đảm bảo sử dụng đúng đường dẫn
           alt="404 Illustration"
-          className="w-full max-w-md mx-auto"
+          className="w-full h-auto"
         />
       </div>
 
       {/* Back to Home Button */}
-      <div className="mt-2">
+      <div className="mt-8">
         <Link
           to="/"
-          className="bg-teal-700 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:bg-teal-600 transition"
+          className="inline-block bg-primary text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-red-700 transition duration-300"
         >
           Quay Lại Trang Chủ
         </Link>

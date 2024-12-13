@@ -2,12 +2,24 @@ import HomePage from "@pages/HomePage";
 import ArticlePage from "@pages/ArticlePage";
 import AboutUsPage from "@pages/AboutUsPage";
 import ContactUsPage from "@pages/ContactUsPage";
+import SignUpPage from "@pages/SignUpPage";
+import LoginPage from "@pages/LoginPage";
 
 const routes = [
   {
     id: "trangchu",
     path: "/",
     element: <HomePage />,
+  },
+  {
+    id: "dangky",
+    path: "/dang-ky",
+    element: <SignUpPage />,
+  },
+  {
+    id: "dangnhap",
+    path: "/dang-nhap",
+    element: <LoginPage />,
   },
   {
     id: "baiviet",

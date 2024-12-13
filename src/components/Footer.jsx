@@ -34,25 +34,32 @@ const Footer = () => {
 
   const contactInfo = [
     {
-      icon: <MapPin className="text-border" />,
+      icon: <MapPin className="text-primary" />,
       text: "Đường 3/2, Ninh Kiều, Cần Thơ",
     },
-    { icon: <Phone className="text-border" />, text: "+84 845 969 757" },
-    { icon: <Mail className="text-border" />, text: "minhtu15112k3@gmail.com" },
+    { icon: <Phone className="text-primary" />, text: "+84 845 969 757" },
     {
-      icon: <Clock className="text-border" />,
+      icon: <Mail className="text-primary" />,
+      text: "minhtu15112k3@gmail.com",
+    },
+    {
+      icon: <Clock className="text-primary" />,
       text: "Từ 8:00 đến 17:00 hàng ngày",
     },
   ];
 
   return (
-    <footer className="bg-white pt-4 shadow-lg border-t-2 border-border">
+    <footer className="bg-white pt-4 shadow-lg border-t-2 border-primary">
       <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Logo and Contact Info */}
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
-            <img src="/src/assets/logo.png" alt="Logo" className="h-12" />
-            <span className="text-2xl font-semibold text-border">
+            <img
+              src="/src/assets/logo.png"
+              alt="Logo"
+              className="h-12 rounded-xl"
+            />
+            <span className="text-2xl font-semibold text-primary">
               Silver Charm
             </span>
           </div>
@@ -78,7 +85,7 @@ const Footer = () => {
                 to={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border-2 p-2 border-gray-400 hover:border-border rounded-lg transition-all ease-in-out duration-300"
+                className="border-2 p-2 border-gray-400 hover:border-primary rounded-lg transition-all ease-in-out duration-300"
               >
                 {link.icon}
               </Link>
@@ -94,7 +101,7 @@ const Footer = () => {
           <ul className="space-y-2">
             {supportServices.map((service, index) => (
               <li key={index}>
-                <Link to={service.to} className="text-black hover:text-border">
+                <Link to={service.to} className="text-black hover:text-primary">
                   {service.label}
                 </Link>
               </li>
@@ -110,7 +117,7 @@ const Footer = () => {
           <ul className="space-y-2">
             {customerServices.map((service, index) => (
               <li key={index}>
-                <Link to={service.to} className="text-black hover:text-border">
+                <Link to={service.to} className="text-black hover:text-primary">
                   {service.label}
                 </Link>
               </li>
@@ -128,7 +135,7 @@ const Footer = () => {
             dịch vụ và sản phẩm tốt hơn. <br /> Nếu bạn có ý kiến, đừng ngần
             ngại đóng góp cho Silver Charm nhé. Silver Charm xin cảm ơn!
           </p>
-          <button className="px-4 py-2 bg-border text-white rounded-md hover:bg-red-700 transition">
+          <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-red-700 transition">
             Gửi Ý Kiến
           </button>
         </div>

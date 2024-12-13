@@ -56,7 +56,7 @@ const Header = () => {
     {
       label: (
         <Link
-          to="/register"
+          to="/dang-ky"
           className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
         >
           Đăng ký tài khoản
@@ -67,7 +67,7 @@ const Header = () => {
     {
       label: (
         <Link
-          to="/login"
+          to="/dang-nhap"
           className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
         >
           Đăng nhập
@@ -91,7 +91,7 @@ const Header = () => {
         </span>
       </div>
 
-      <header className="border-b border-border bg-white shadow-lg sticky top-0 z-50">
+      <header className="primary-b primary-primary bg-white shadow-lg sticky top-0 z-50">
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-3">
           {/* Logo */}
           <div className="flex items-center space-x-3">
@@ -111,7 +111,7 @@ const Header = () => {
               <input
                 type="text"
                 placeholder="Tìm kiếm sản phẩm..."
-                className="w-full rounded-full border border-gray-300 py-2 pl-4 pr-36 text-gray-700 shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full rounded-full primary primary-gray-300 py-2 pl-4 pr-36 text-gray-700 shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               <button className="absolute top-1/2 right-5 -translate-y-1/2 p-2">
                 <Search size={20} className="text-gray-600" />
@@ -128,12 +128,12 @@ const Header = () => {
           {/* Account, Cart, and Product View */}
           <div className="flex items-center space-x-6 mt-4 md:mt-0">
             <Dropdown overlay={menu}>
-              <button className="ant-dropdown-link flex items-center space-x-1 border-2 border-black rounded-lg py-2 px-4 text-sm text-gray-700 hover:text-gray-900">
+              <button className="ant-dropdown-link flex items-center space-x-1 primary-2 primary-black rounded-lg py-2 px-4 text-sm text-gray-700 hover:text-gray-900">
                 <CircleUser size={20} />
                 <span className="hidden md:inline font-bold">Tài khoản</span>
               </button>
             </Dropdown>
-            <button className="flex items-center space-x-1 border-2 border-black rounded-lg py-2 px-4 text-sm text-gray-700 hover:text-gray-900">
+            <button className="flex items-center space-x-1 primary-2 primary-black rounded-lg py-2 px-4 text-sm text-gray-700 hover:text-gray-900">
               <ShoppingBag size={20} />
               <span className="hidden md:inline font-bold">
                 Sản phẩm đã xem
@@ -141,7 +141,7 @@ const Header = () => {
             </button>
             <button className="relative text-sm text-gray-700 hover:text-gray-900">
               <ShoppingCart size={30} />
-              <span className="absolute -top-2 -right-2 bg-border text-xs rounded-full px-2 py-1 text-white">
+              <span className="absolute -top-2 -right-2 bg-primary text-xs rounded-full px-2 py-1 text-white">
                 0
               </span>
             </button>
