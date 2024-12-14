@@ -19,7 +19,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className=" flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="flex max-w-4xl w-full bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Hình minh họa */}
         <div className="hidden lg:block w-1/2 bg-secondary p-6">

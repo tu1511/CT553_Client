@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "@components/Navbar";
 import {
   Camera,
@@ -7,24 +9,9 @@ import {
   ShoppingBag,
   ShoppingCart,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { Menu, Dropdown } from "antd";
-import { Link } from "react-router-dom";
+import DropdownMenu from "@components/DropdownMenu";
 
 const Header = () => {
-  const categories = [
-    { name: "Vòng - Lắc", link: "/vong-lac" },
-    { name: "Nhẫn", link: "/nhan" },
-    { name: "Dây Chuyền", link: "/day-chuyen" },
-    { name: "Bông Tai", link: "/bong-tai" },
-    { name: "Khuyên Xỏ", link: "/khuyen-xo" },
-    { name: "Trang Sức Bộ", link: "/trang-suc-bo" },
-    { name: "Phong Thủy", link: "/phong-thuy" },
-    { name: "Quà Tặng", link: "/qua-tang" },
-    { name: "Phụ Kiện", link: "/phu-kien" },
-    { name: "Sản Phẩm Mới", link: "/san-pham-moi" },
-  ];
-
   const messages = useMemo(
     () => [
       "Đổi trả hàng trong vòng 7 ngày",
@@ -52,7 +39,7 @@ const Header = () => {
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, [messages]);
 
-  const menuItems = [
+  const accountMenuItems = [
     {
       label: (
         <Link
@@ -62,7 +49,7 @@ const Header = () => {
           Đăng ký tài khoản
         </Link>
       ),
-      key: "register",
+      key: "dang-ky",
     },
     {
       label: (
@@ -73,11 +60,9 @@ const Header = () => {
           Đăng nhập
         </Link>
       ),
-      key: "login",
+      key: "dang-nhap",
     },
   ];
-
-  const menu = <Menu items={menuItems} />;
 
   return (
     <>
@@ -91,9 +76,8 @@ const Header = () => {
         </span>
       </div>
 
-      <header className="primary-b primary-primary bg-white shadow-lg sticky top-0 z-50">
+      <header className="border-b border-primary bg-white shadow-lg sticky top-0 z-50">
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-3">
-          {/* Logo */}
           <div className="flex items-center space-x-3">
             <img
               src="/src/assets/logo.png"
@@ -105,13 +89,12 @@ const Header = () => {
             </span>
           </div>
 
-          {/* Search Bar */}
           <div className="flex-grow flex items-center justify-center mt-4 md:mt-0">
             <div className="relative w-full max-w-xl">
               <input
                 type="text"
                 placeholder="Tìm kiếm sản phẩm..."
-                className="w-full rounded-full primary primary-gray-300 py-2 pl-4 pr-36 text-gray-700 shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full rounded-full border border-gray-300 py-2 pl-4 pr-36 text-gray-700 shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               <button className="absolute top-1/2 right-5 -translate-y-1/2 p-2">
                 <Search size={20} className="text-gray-600" />
@@ -125,15 +108,13 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Account, Cart, and Product View */}
           <div className="flex items-center space-x-6 mt-4 md:mt-0">
-            <Dropdown overlay={menu}>
-              <button className="ant-dropdown-link flex items-center space-x-1 primary-2 primary-black rounded-lg py-2 px-4 text-sm text-gray-700 hover:text-gray-900">
-                <CircleUser size={20} />
-                <span className="hidden md:inline font-bold">Tài khoản</span>
-              </button>
-            </Dropdown>
-            <button className="flex items-center space-x-1 primary-2 primary-black rounded-lg py-2 px-4 text-sm text-gray-700 hover:text-gray-900">
+            <DropdownMenu
+              menuItems={accountMenuItems}
+              label="Tài khoản"
+              icon={<CircleUser size={20} />}
+            />
+            <button className="flex items-center space-x-1 border-2 border-black rounded-lg py-2 px-4 text-sm text-gray-700 hover:text-gray-900">
               <ShoppingBag size={20} />
               <span className="hidden md:inline font-bold">
                 Sản phẩm đã xem
@@ -148,8 +129,7 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Navbar */}
-        <Navbar categories={categories} />
+        <Navbar />
       </header>
     </>
   );
