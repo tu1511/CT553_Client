@@ -76,7 +76,7 @@ const Header = () => {
         </span>
       </div>
 
-      <header className="border-b border-primary bg-white shadow-lg sticky top-0 z-50">
+      <header className="border-b-1 border-primary bg-white shadow-lg sticky top-0 z-50">
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-3">
             <img

@@ -33,7 +33,10 @@ function ProductCard({
       {/* Nội dung sản phẩm */}
       <div className="px-2 py-4 flex flex-col">
         {/* Tên sản phẩm */}
-        <h5 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors duration-300">
+        <h5
+          className="mb-2 text-lg line-clamp-2 font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors duration-300 h-[50px]"
+          title={name} // Hiển thị tooltip khi hover để xem toàn bộ tên
+        >
           {name}
         </h5>
 

@@ -1,11 +1,16 @@
+import FeatureCards from "@components/FeatureCards";
 import {
+  ArchiveRestore,
   Clock,
   Facebook,
   Github,
+  Headset,
   Instagram,
   Mail,
   MapPin,
+  Medal,
   Phone,
+  Smile,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -47,109 +52,151 @@ const Footer = () => {
       text: "Từ 8:00 đến 17:00 hàng ngày",
     },
   ];
+  const features = [
+    {
+      id: 1,
+      icon: <Smile size={48} />,
+      title: "Khách Hàng Hài Lòng",
+      description:
+        "Khách hàng là trung tâm của mọi hoạt động của Silver Charm. Chúng tôi luôn lắng nghe và phục vụ khách hàng tốt nhất",
+    },
+    {
+      id: 2,
+      icon: <Medal size={48} />,
+      title: "chất lượng cao cấp",
+      description:
+        "Silver Charm cam kết cung cấp Mọi sản phẩm đều được thiết kế và chế tác bởi các nghệ nhân hàng đầu",
+    },
+    {
+      id: 3,
+      icon: <ArchiveRestore size={48} />,
+      title: "đổi trả dễ dàng",
+      description:
+        "Đổi trả hàng trong vòng 7 ngày kể từ ngày nhận hàng. Đổi trả hàng dễ dàng và nhanh chóng",
+    },
+    {
+      id: 4,
+      icon: <Headset size={48} />,
+      title: "hỗ trợ nhiệt tình",
+      description:
+        "Tất cả câu hỏi đều được các chuyên viên của Silver Charm tư vấn, giải đáp kỹ càng",
+    },
+  ];
 
   return (
-    <footer className="bg-white pt-4 shadow-lg border-t-2 border-primary">
-      <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Logo and Contact Info */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <img
-              src="/src/assets/logo.png"
-              alt="Logo"
-              className="h-12 rounded-xl"
-            />
-            <span className="text-2xl font-semibold text-primary">
-              Silver Charm
+    <>
+      <footer className="bg-white shadow-lg border-t-2 border-primary">
+        <FeatureCards features={features} />
+        <div className="border-t-2 pt-4">
+          <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Logo and Contact Info */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <img
+                  src="/src/assets/logo.png"
+                  alt="Logo"
+                  className="h-12 rounded-xl"
+                />
+                <span className="text-2xl font-semibold text-primary">
+                  Silver Charm
+                </span>
+              </div>
+
+              {/* Contact info */}
+              <div className="space-y-2">
+                {contactInfo.map((info, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center space-x-2 text-gray-600"
+                  >
+                    {info.icon}
+                    <p>{info.text}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Social Links */}
+              <div className="flex space-x-6">
+                {socialLinks.map((link, index) => (
+                  <Link
+                    key={index}
+                    to={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="border-2 p-2 border-gray-400 hover:border-primary rounded-lg transition-all ease-in-out duration-300"
+                  >
+                    {link.icon}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* General Information */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg uppercase text-gray-700">
+                Cẩm nang sử dụng
+              </h3>
+              <ul className="space-y-2">
+                {supportServices.map((service, index) => (
+                  <li key={index}>
+                    <Link
+                      to={service.to}
+                      className="text-black hover:text-primary"
+                    >
+                      {service.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Customer Service */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg text-gray-700">
+                DỊCH VỤ KHÁCH HÀNG
+              </h3>
+              <ul className="space-y-2">
+                {customerServices.map((service, index) => (
+                  <li key={index}>
+                    <Link
+                      to={service.to}
+                      className="text-black hover:text-primary"
+                    >
+                      {service.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Feedback */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg text-gray-700">
+                Ý KIẾN ĐÓNG GÓP
+              </h3>
+              <p className="text-black font-base italic">
+                Silver Charm luôn mong nhận được ý kiến đóng góp từ bạn để nâng
+                cấp dịch vụ và sản phẩm tốt hơn. <br /> Nếu bạn có ý kiến, đừng
+                ngần ngại đóng góp cho Silver Charm nhé. Silver Charm xin cảm
+                ơn!
+              </p>
+              <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-red-700 transition">
+                Gửi Ý Kiến
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Bottom Section */}
+        <div className="py-2 mt-4 bg-secondary">
+          <div className="flex justify-center items-center">
+            <span>
+              © {new Date().getFullYear()} Bản quyền thuộc về Silver Charm.
             </span>
           </div>
-
-          {/* Contact info */}
-          <div className="space-y-2">
-            {contactInfo.map((info, index) => (
-              <div
-                key={index}
-                className="flex items-center space-x-2 text-gray-600"
-              >
-                {info.icon}
-                <p>{info.text}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Social Links */}
-          <div className="flex space-x-6">
-            {socialLinks.map((link, index) => (
-              <Link
-                key={index}
-                to={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border-2 p-2 border-gray-400 hover:border-primary rounded-lg transition-all ease-in-out duration-300"
-              >
-                {link.icon}
-              </Link>
-            ))}
-          </div>
         </div>
-
-        {/* General Information */}
-        <div className="space-y-4">
-          <h3 className="font-semibold text-lg uppercase text-gray-700">
-            Cẩm nang sử dụng
-          </h3>
-          <ul className="space-y-2">
-            {supportServices.map((service, index) => (
-              <li key={index}>
-                <Link to={service.to} className="text-black hover:text-primary">
-                  {service.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Customer Service */}
-        <div className="space-y-4">
-          <h3 className="font-semibold text-lg text-gray-700">
-            DỊCH VỤ KHÁCH HÀNG
-          </h3>
-          <ul className="space-y-2">
-            {customerServices.map((service, index) => (
-              <li key={index}>
-                <Link to={service.to} className="text-black hover:text-primary">
-                  {service.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Feedback */}
-        <div className="space-y-4">
-          <h3 className="font-semibold text-lg text-gray-700">
-            Ý KIẾN ĐÓNG GÓP
-          </h3>
-          <p className="text-black font-base italic">
-            Silver Charm luôn mong nhận được ý kiến đóng góp từ bạn để nâng cấp
-            dịch vụ và sản phẩm tốt hơn. <br /> Nếu bạn có ý kiến, đừng ngần
-            ngại đóng góp cho Silver Charm nhé. Silver Charm xin cảm ơn!
-          </p>
-          <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-red-700 transition">
-            Gửi Ý Kiến
-          </button>
-        </div>
-      </div>
-
-      {/* Footer Bottom Section */}
-      <div className="py-2 mt-4 bg-secondary">
-        <div className="flex justify-center items-center">
-          <span>
-            © {new Date().getFullYear()} Bản quyền thuộc về Silver Charm.
-          </span>
-        </div>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 };
 
