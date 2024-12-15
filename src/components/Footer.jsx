@@ -85,7 +85,7 @@ const Footer = () => {
 
   return (
     <>
-      <footer className="bg-white shadow-lg border-t-2 border-primary">
+      <footer className="bg-white shadow-lg border-t-2 border-primary mt-10">
         <FeatureCards features={features} />
         <div className="border-t-2 pt-4">
           <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

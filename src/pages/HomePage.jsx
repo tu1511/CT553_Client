@@ -2,6 +2,7 @@ import CarouselComponent from "@components/CarouselComponent";
 import FeatureCards from "@components/FeatureCards";
 import ProductList from "@components/ProductList";
 import TrendingSearch from "@components/TrendingSearch";
+import UserReview from "@components/UserReview";
 import { BadgeCheck, Gift, Share2, ThumbsUp } from "lucide-react";
 
 function HomePage() {
@@ -98,6 +99,30 @@ function HomePage() {
     },
   ];
 
+  const reviews = [
+    {
+      name: "Nguyễn Văn A",
+      avatar: "https://i.pravatar.cc/150?img=3",
+      rating: 5,
+      content: "Sản phẩm rất đẹp và chất lượng. Tôi rất hài lòng với dịch vụ!",
+      date: "2024-06-15",
+    },
+    {
+      name: "Trần Thị B",
+      avatar: "https://i.pravatar.cc/150?img=8",
+      rating: 4,
+      content: "Đóng gói chắc chắn, giao hàng nhanh. Chất lượng khá tốt!",
+      date: "2024-06-10",
+    },
+    {
+      name: "Phạm Văn C",
+      avatar: "https://i.pravatar.cc/150?img=10",
+      rating: 5,
+      content: "Rất tuyệt vời, đáng để mua. Sẽ giới thiệu cho bạn bè!",
+      date: "2024-06-05",
+    },
+  ];
+
   return (
     <div className="bg-white">
       {/* carousel section */}
@@ -116,19 +141,39 @@ function HomePage() {
 
       <ProductList title="Sản phẩm khuyến mãi" products={products} />
 
-      {/* Contact section */}
-      <section className="contact py-16 bg-white">
-        <div className="container mx-auto text-center px-4">
-          <h2 className="text-4xl font-bold text-gray-800 mb-8">Liên hệ</h2>
-          <p className="text-lg md:text-xl text-gray-600 mb-8">
-            Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ với
-            chúng tôi để cùng nhau thực hiện các dự án vì một môi trường xanh.
+      {/* hero banner section */}
+      <section
+        className="mt-4 relative w-full h-[250px] bg-cover bg-center"
+        style={{ backgroundImage: `url('/src/assets/banner/hero.png')` }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-white bg-opacity-20"></div>
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center md:px-8">
+          {/* Title */}
+          <h1 className="text-2xl md:text-4xl font-bold text-black mb-4">
+            Silver Charm - Trang Sức Cao Cấp
+          </h1>
+
+          {/* Description */}
+          <p className="text-sm md:text-lg text-black max-w-3xl leading-relaxed mb-6">
+            Đến với Silver Charm, trang sức không chỉ là một phụ kiện - đó là
+            hiện thân của niềm đam mê, tình yêu của chúng tôi, và cuối cùng, là
+            món quà của Silver Charm dành cho bạn.
           </p>
-          <button className="btn btn-primary py-4 px-8 text-lg rounded-lg shadow-xl hover:bg-green-600 transition ease-in-out duration-300 transform hover:scale-105">
-            Gửi yêu cầu
-          </button>
+
+          {/* Button */}
+          <a
+            href="#about-us"
+            className="bg-white uppercase font-semibold border-black border-2 rounded-xl text-black hover:bg-black hover:text-white py-2 px-4 transition duration-300 ease-in-out"
+          >
+            VỀ CHÚNG TÔI
+          </a>
         </div>
       </section>
+
+      <UserReview reviews={reviews} />
     </div>
   );
 }
