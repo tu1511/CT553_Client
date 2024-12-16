@@ -25,8 +25,27 @@ const Navbar = () => {
     },
     { name: "Trang sức đôi", link: "/trang-suc-doi", menuItems: [] },
     { name: "Bộ sưu tập", link: "/bo-sieu-tap", menuItems: [] },
-    { name: "Chính sách", link: "/chinh-sach", menuItems: [] },
-    { name: "Liên hệ", link: "/lien-he", menuItems: [] },
+    {
+      name: "Chính sách",
+      link: "/chinh-sach",
+      menuItems: [
+        {
+          label: "Chính sách bảo mật",
+          key: "privacy",
+          link: "/chinh-sach-bao-mat",
+        },
+        {
+          label: "Chính sách đổi trả",
+          key: "return-policy",
+          link: "/chinh-sach-doi-tra",
+        },
+        {
+          label: "Chính sách vận chuyển",
+          key: "shipping-policy",
+          link: "/chinh-sach-van-chuyen",
+        },
+      ],
+    },
   ];
 
   const formatMenuItems = (menuItems) =>

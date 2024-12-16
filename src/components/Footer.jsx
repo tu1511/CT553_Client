@@ -1,4 +1,5 @@
 import FeatureCards from "@components/FeatureCards";
+import FeedbackModal from "@components/FeedbackModal";
 import {
   ArchiveRestore,
   Clock,
@@ -12,14 +13,35 @@ import {
   Phone,
   Smile,
 } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Button, message } from "antd";
 
 const Footer = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  // Hiển thị modal
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  // Đóng modal
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  // Xử lý khi submit form
+  const handleSubmit = (data) => {
+    console.log("Phản hồi:", data);
+    message.success("Phản hồi đã được gửi thành công!");
+    setIsModalVisible(false);
+  };
+
   const customerServices = [
     { label: "Hướng dẫn chọn size", to: "#" },
+    { label: "Hướng dẫn mua hàng online", to: "#" },
     { label: "Chính sách giao hàng", to: "#" },
     { label: "Chính sách quyền riêng tư", to: "#" },
-    { label: "Hướng dẫn mua hàng online", to: "#" },
     { label: "Chính sách trả hàng hoàn tiền", to: "#" },
   ];
 
@@ -180,9 +202,24 @@ const Footer = () => {
                 ngần ngại đóng góp cho Silver Charm nhé. Silver Charm xin cảm
                 ơn!
               </p>
-              <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-red-700 transition">
-                Gửi Ý Kiến
-              </button>
+
+              <Button
+                type="primary"
+                onClick={showModal}
+                style={{
+                  backgroundColor: "#c60018",
+                  borderColor: "#ffffff",
+                  color: "white",
+                }}
+              >
+                Gửi ý kiến
+              </Button>
+              {/* Feedback Modal */}
+              <FeedbackModal
+                visible={isModalVisible}
+                onCancel={handleCancel}
+                onSubmit={handleSubmit}
+              />
             </div>
           </div>
         </div>

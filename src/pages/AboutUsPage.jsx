@@ -1,3 +1,5 @@
+import HeaderLine from "@components/HeaderLine";
+
 const SectionWithImage = ({
   title,
   description,
@@ -7,7 +9,7 @@ const SectionWithImage = ({
 }) => {
   return (
     <div
-      className={`container mx-auto px-8 py-6 flex flex-col ${
+      className={`container mx-auto px-8 py-4 flex flex-col ${
         imagePosition === "left" ? "lg:flex-row" : "lg:flex-row-reverse"
       } items-center relative`}
     >
@@ -48,11 +50,7 @@ const AboutUsPage = () => {
     <>
       {/* Section 1: Giới thiệu */}
       <div className="container mx-auto px-8 py-6 mt-10">
-        <h1 className="flex items-center uppercase justify-center text-3xl font-semibold mb-6">
-          <span className="w-[30vw] border-t-2 border-black mr-4"></span>
-          Về chúng tôi
-          <span className="w-[30vw] border-t-2 border-black ml-4"></span>
-        </h1>
+        <HeaderLine title={"Về chúng tôi"} />
         <p className="font-normal text-lg text-justify leading-relaxed text-gray-700">
           Đến với Silver Charm, trang sức không chỉ là một phụ kiện – nó còn
           mang một ý nghĩa lớn lao hơn rất nhiều. Thông qua đồ trang sức, chúng
@@ -84,16 +82,14 @@ const AboutUsPage = () => {
       {/* Section 3, 4, 5 - Reusable Sections */}
       <SectionWithImage
         title="Bạn có thể tự tạo nét đẹp cho riêng mình"
-        description="Do phương pháp tiếp cận theo yêu cầu riêng của chúng tôi, mỗi thiết kế
-        đều được mang một nét riêng để gợi lên sự kết nối cảm xúc..."
+        description="Do phương pháp tiếp cận theo yêu cầu riêng của chúng tôi, mỗi thiết kế đều được mang một nét riêng để gợi lên sự kết nối cảm xúc đồng thời đảm bảo rằng đó là sự đại diện của bất kỳ ai đang đeo nó. Từ truyền thống đến hiện tại, chúng tôi cung cấp vô số lựa chọn trang sức với mức giá phù hợp để đáp ứng nhu cầu và thị hiếu của tất cả mọi người."
         image1="https://lili.vn/wp-content/uploads/2021/02/Bo-trang-suc-bac-ma-vang-Cay-o-liu-LILI_561446-01.jpg"
         image2="https://lili.vn/wp-content/uploads/2021/02/Bo-trang-suc-bac-ma-vang-dinh-da-Citrine-hinh-chu-ong-vang-LILI_379148-13.jpg"
       />
 
       <SectionWithImage
         title="Vật liệu thân thiện với môi trường và chất lượng cao"
-        description="Hơn nữa, chúng tôi cực kỳ tự hào về nghề thủ công của mình và do đó,
-        việc sử dụng các vật liệu có ý thức về môi trường..."
+        description="Hơn nữa, chúng tôi cực kỳ tự hào về nghề thủ công của mình và do đó, việc sử dụng các vật liệu có ý thức về môi trường cũng quan trọng như sản phẩm cuối cùng. Mỗi sản phẩm của Silver Charm đều được phát triển chu đáo từ đầu đến cuối để bạn có thể cảm thấy thoải mái, tự tin khi mua hàng."
         image1="https://lili.vn/wp-content/uploads/2021/01/Day-chuyen-bac-ma-vang-o-luc-to-ong-LILI_596971-8.jpg"
         image2="https://lili.vn/wp-content/uploads/2021/02/Bo-trang-suc-bac-ma-vang-Cay-o-liu-LILI_561446-01.jpg"
         imagePosition="right"
@@ -101,8 +97,7 @@ const AboutUsPage = () => {
 
       <SectionWithImage
         title="Nhiệm vụ của chúng tôi"
-        description="Đội ngũ các nhà thiết kế và thợ thủ công tài năng của chúng tôi làm việc
-        song song để mang từng sáng tạo trở nên sống động..."
+        description="Đội ngũ các nhà thiết kế và thợ thủ công tài năng của chúng tôi làm việc song song để mang từng sáng tạo trở nên sống động – từ trái tim của chúng tôi đến trái tim của bạn, chúng tôi hứa sẽ tiếp tục tạo ra những bộ sưu tập trang sức vượt trội hàng ngày đến những dịp đặc biệt để đem đến cho bạn những sản phẩm trang sức tốt nhất hiện nay."
         image1="https://lili.vn/wp-content/uploads/2021/02/Bo-trang-suc-bac-ma-vang-Cay-o-liu-LILI_561446-01.jpg"
         image2="https://lili.vn/wp-content/uploads/2021/01/Day-chuyen-bac-ma-vang-o-luc-to-ong-LILI_596971-8.jpg"
       />
