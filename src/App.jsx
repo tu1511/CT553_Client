@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LoadingPage from "@pages/LoadingPage";
 import NotFoundPage from "@pages/NotFoundPage";
 import routes from "@routers"; // Đảm bảo rằng bạn đã tạo routes chính xác
+import ScrollToTop from "@helpers/ScrollToTop";
 
 const MainLayout = lazy(() => import("@layouts/MainLayout"));
 
@@ -10,6 +11,7 @@ const App = () => {
   return (
     <Suspense fallback={<LoadingPage />}>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           {routes.map(({ id, path, element }) => (
             <Route

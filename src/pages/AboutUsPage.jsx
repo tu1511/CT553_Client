@@ -1,111 +1,113 @@
-import React from "react";
-
-function AboutUsPage() {
+const SectionWithImage = ({
+  title,
+  description,
+  image1,
+  image2,
+  imagePosition = "left",
+}) => {
   return (
-    <div className="bg-gradient-to-r from-blue-100 to-teal-200 py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto text-center">
-        <h2 className="text-4xl font-extrabold text-gray-900 mb-6">
-          Về Quỹ Từ Thiện "Nấu Ăn Cho Em"
+    <div
+      className={`container mx-auto px-8 py-6 flex flex-col ${
+        imagePosition === "left" ? "lg:flex-row" : "lg:flex-row-reverse"
+      } items-center relative`}
+    >
+      {/* Hình ảnh */}
+      <div className="w-full lg:w-1/2 relative">
+        <img
+          src={image1}
+          alt={title}
+          className="rounded-lg shadow-lg border-4 border-white z-10"
+        />
+        <img
+          src={image2}
+          alt="Overlay Image"
+          className="rounded-lg shadow-lg border-4 border-white absolute top-12 w-2/3 z-0"
+          style={{ [imagePosition === "left" ? "left" : "right"]: "3rem" }}
+        />
+      </div>
+
+      {/* Nội dung */}
+      <div
+        className={`w-full lg:w-1/2 mt-6 lg:mt-0 ${
+          imagePosition === "left" ? "lg:pl-12" : "lg:pr-12"
+        }`}
+      >
+        <h2 className="text-2xl font-semibold mb-4 uppercase text-gray-800">
+          {title}
         </h2>
-        <p className="text-lg text-gray-700 mb-8 max-w-3xl mx-auto">
-          Quỹ "Nấu Ăn Cho Em" được thành lập với sứ mệnh giúp đỡ các trẻ em
-          nghèo tại miền núi, cung cấp bữa ăn đầy đủ dinh dưỡng để các em có thể
-          phát triển khỏe mạnh, vui chơi và học tập. Chúng tôi mong muốn mang
-          lại một tương lai sáng hơn cho những đứa trẻ đang thiếu thốn.
+        <p className="text-lg leading-relaxed text-justify text-gray-700">
+          {description}
         </p>
-
-        {/* Lý do chúng tôi bắt đầu */}
-        <section className="mb-12">
-          <h3 className="text-3xl font-semibold text-gray-800 mb-4">
-            Tại Sao Chúng Tôi Bắt Đầu?
-          </h3>
-          <p className="text-lg text-gray-600 max-w-4xl mx-auto">
-            Trẻ em miền núi phải đối mặt với nhiều khó khăn trong cuộc sống, từ
-            điều kiện sinh hoạt không đầy đủ đến việc thiếu dinh dưỡng hàng
-            ngày. Quỹ "Nấu Ăn Cho Em" ra đời với hy vọng có thể cải thiện bữa ăn
-            và chăm sóc sức khỏe cho các em, giúp các em có cơ hội phát triển
-            tốt nhất.
-          </p>
-        </section>
-
-        {/* Mục tiêu của chúng tôi */}
-        <section className="mb-12">
-          <h3 className="text-3xl font-semibold text-gray-800 mb-4">
-            Mục Tiêu Của Chúng Tôi
-          </h3>
-          <ul className="list-inside space-y-4 text-lg text-gray-600 max-w-4xl mx-auto">
-            <li className="flex items-center">
-              <span className="text-blue-500 font-bold">✅</span> Đảm bảo các
-              trẻ em miền núi được ăn đủ chất dinh dưỡng mỗi ngày.
-            </li>
-            <li className="flex items-center">
-              <span className="text-blue-500 font-bold">✅</span> Tạo điều kiện
-              cho các em có một môi trường học tập tốt và phát triển toàn diện.
-            </li>
-            <li className="flex items-center">
-              <span className="text-blue-500 font-bold">✅</span> Khuyến khích
-              cộng đồng chung tay vào công tác từ thiện để giúp đỡ những em nhỏ
-              gặp khó khăn.
-            </li>
-          </ul>
-        </section>
-
-        {/* Cách chúng tôi làm */}
-        <section className="mb-12">
-          <h3 className="text-3xl font-semibold text-gray-800 mb-4">
-            Cách Chúng Tôi Làm
-          </h3>
-          <p className="text-lg text-gray-600 max-w-4xl mx-auto">
-            Chúng tôi tổ chức các bữa ăn miễn phí cho trẻ em tại các khu vực
-            miền núi khó khăn. Các tình nguyện viên của chúng tôi nấu ăn tại các
-            điểm trường hoặc nhà trẻ, đảm bảo thực phẩm luôn tươi ngon và đầy đủ
-            dưỡng chất. Chúng tôi cũng phối hợp với các tổ chức từ thiện khác để
-            tối ưu hóa hiệu quả công tác từ thiện.
-          </p>
-        </section>
-
-        {/* Hình ảnh về hoạt động */}
-        <section className="mb-12">
-          <h3 className="text-3xl font-semibold text-gray-800 mb-6">
-            Hình Ảnh Hoạt Động
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div
-              className="w-full h-64 bg-cover bg-center rounded-lg shadow-lg"
-              style={{ backgroundImage: "url('/path/to/your/image1.jpg')" }}
-            ></div>
-            <div
-              className="w-full h-64 bg-cover bg-center rounded-lg shadow-lg"
-              style={{ backgroundImage: "url('/path/to/your/image2.jpg')" }}
-            ></div>
-            <div
-              className="w-full h-64 bg-cover bg-center rounded-lg shadow-lg"
-              style={{ backgroundImage: "url('/path/to/your/image3.jpg')" }}
-            ></div>
-          </div>
-        </section>
-
-        {/* Kêu gọi hành động */}
-        <section>
-          <h3 className="text-3xl font-semibold text-gray-800 mb-6">
-            Hãy Cùng Chung Tay
-          </h3>
-          <p className="text-lg text-gray-600 mb-6 max-w-3xl mx-auto">
-            Chúng tôi luôn cần sự hỗ trợ từ cộng đồng để tiếp tục công tác giúp
-            đỡ các em nhỏ tại miền núi. Hãy tham gia và đóng góp cho quỹ từ
-            thiện của chúng tôi để những đứa trẻ này có một tương lai tươi sáng
-            hơn.
-          </p>
-          <a
-            href="#donate"
-            className="inline-block px-8 py-3 bg-blue-600 text-white font-bold rounded-full hover:bg-blue-700 transition duration-300 transform hover:scale-105"
-          >
-            Tham gia ngay
-          </a>
-        </section>
       </div>
     </div>
   );
-}
+};
+
+const AboutUsPage = () => {
+  return (
+    <>
+      {/* Section 1: Giới thiệu */}
+      <div className="container mx-auto px-8 py-6 mt-10">
+        <h1 className="flex items-center uppercase justify-center text-3xl font-semibold mb-6">
+          <span className="w-[30vw] border-t-2 border-black mr-4"></span>
+          Về chúng tôi
+          <span className="w-[30vw] border-t-2 border-black ml-4"></span>
+        </h1>
+        <p className="font-normal text-lg text-justify leading-relaxed text-gray-700">
+          Đến với Silver Charm, trang sức không chỉ là một phụ kiện – nó còn
+          mang một ý nghĩa lớn lao hơn rất nhiều. Thông qua đồ trang sức, chúng
+          ta có khả năng không chỉ cá nhân hóa vẻ ngoài mà còn khơi gợi cảm xúc
+          và tạo ra những kỷ niệm đẹp đáng nhớ. Đây chính là lý do mà Silver
+          Charm được hình thành. Chúng tôi tạo ra đồ trang sức thủ công, cao cấp
+          thể hiện cả con người bạn và những gì bạn đại diện. Trang sức là hiện
+          thân của niềm đam mê, tình yêu của chúng tôi, và cuối cùng, là món quà
+          của Silver Charm dành cho bạn.
+        </p>
+      </div>
+
+      {/* Section 2: Đồ thủ công */}
+      <div className="bg-black py-8">
+        <div className="container mx-auto px-8 text-center">
+          <h2 className="text-3xl font-semibold uppercase text-white mb-4">
+            100% Đồ trang sức thủ công
+          </h2>
+          <p className="text-lg text-white leading-relaxed">
+            Được thiết kế và làm thủ công bởi những nghệ nhân hàng đầu tại
+            studio hiện đại của chúng tôi, mỗi tác phẩm tuyệt đẹp đều được làm
+            theo yêu cầu để trở nên độc đáo và chân thực như chính bạn. Đó là lý
+            do tại sao Silver Charm luôn đặt chất lượng và quan trọng hơn là bạn
+            – lên hàng đầu.
+          </p>
+        </div>
+      </div>
+
+      {/* Section 3, 4, 5 - Reusable Sections */}
+      <SectionWithImage
+        title="Bạn có thể tự tạo nét đẹp cho riêng mình"
+        description="Do phương pháp tiếp cận theo yêu cầu riêng của chúng tôi, mỗi thiết kế
+        đều được mang một nét riêng để gợi lên sự kết nối cảm xúc..."
+        image1="https://lili.vn/wp-content/uploads/2021/02/Bo-trang-suc-bac-ma-vang-Cay-o-liu-LILI_561446-01.jpg"
+        image2="https://lili.vn/wp-content/uploads/2021/02/Bo-trang-suc-bac-ma-vang-dinh-da-Citrine-hinh-chu-ong-vang-LILI_379148-13.jpg"
+      />
+
+      <SectionWithImage
+        title="Vật liệu thân thiện với môi trường và chất lượng cao"
+        description="Hơn nữa, chúng tôi cực kỳ tự hào về nghề thủ công của mình và do đó,
+        việc sử dụng các vật liệu có ý thức về môi trường..."
+        image1="https://lili.vn/wp-content/uploads/2021/01/Day-chuyen-bac-ma-vang-o-luc-to-ong-LILI_596971-8.jpg"
+        image2="https://lili.vn/wp-content/uploads/2021/02/Bo-trang-suc-bac-ma-vang-Cay-o-liu-LILI_561446-01.jpg"
+        imagePosition="right"
+      />
+
+      <SectionWithImage
+        title="Nhiệm vụ của chúng tôi"
+        description="Đội ngũ các nhà thiết kế và thợ thủ công tài năng của chúng tôi làm việc
+        song song để mang từng sáng tạo trở nên sống động..."
+        image1="https://lili.vn/wp-content/uploads/2021/02/Bo-trang-suc-bac-ma-vang-Cay-o-liu-LILI_561446-01.jpg"
+        image2="https://lili.vn/wp-content/uploads/2021/01/Day-chuyen-bac-ma-vang-o-luc-to-ong-LILI_596971-8.jpg"
+      />
+    </>
+  );
+};
 
 export default AboutUsPage;

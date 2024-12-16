@@ -9,7 +9,8 @@
       "@routers/*": ["routers/*"],
       "@utils/*": ["utils/*"],
       "@services/*": ["services/*"],
-      "@config/*": ["config/*"]
+      "@config/*": ["config/*"],
+      "@helpers/*": ["helpers/*"]
     }
   },
   "include": ["src"]

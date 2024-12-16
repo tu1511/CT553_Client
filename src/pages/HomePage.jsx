@@ -4,6 +4,7 @@ import ProductList from "@components/ProductList";
 import TrendingSearch from "@components/TrendingSearch";
 import UserReview from "@components/UserReview";
 import { BadgeCheck, Gift, Share2, ThumbsUp } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function HomePage() {
   const products = [
@@ -164,12 +165,12 @@ function HomePage() {
           </p>
 
           {/* Button */}
-          <a
-            href="#about-us"
+          <Link
+            to="/ve-chung-toi"
             className="bg-white uppercase font-semibold border-black border-2 rounded-xl text-black hover:bg-black hover:text-white py-2 px-4 transition duration-300 ease-in-out"
           >
             VỀ CHÚNG TÔI
-          </a>
+          </Link>
         </div>
       </section>
 
