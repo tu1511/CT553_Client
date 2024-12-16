@@ -1,4 +1,4 @@
-import ProductCard from "@components/ProductCard";
+import ProductCard from "@components/common/ProductCard";
 
 // eslint-disable-next-line react/prop-types
 function ProductList({ title = "", products = [] }) {

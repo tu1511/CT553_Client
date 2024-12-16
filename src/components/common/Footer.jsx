@@ -1,5 +1,5 @@
-import FeatureCards from "@components/FeatureCards";
-import FeedbackModal from "@components/FeedbackModal";
+import FeatureCards from "@components/common/FeatureCards";
+import FeedbackModal from "@components/common/FeedbackModal";
 import {
   ArchiveRestore,
   Clock,

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import Navbar from "@components/Navbar";
+import Navbar from "@components/common/Navbar";
 import {
   Camera,
   CircleUser,
@@ -9,7 +9,7 @@ import {
   ShoppingBag,
   ShoppingCart,
 } from "lucide-react";
-import DropdownMenu from "@components/DropdownMenu";
+import DropdownMenu from "@components/common/DropdownMenu";
 
 const Header = () => {
   const messages = useMemo(
@@ -58,6 +58,17 @@ const Header = () => {
           className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
         >
           Đăng nhập
+        </Link>
+      ),
+      key: "dang-nhap",
+    },
+    {
+      label: (
+        <Link
+          to="/tai-khoan"
+          className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
+        >
+          Thông tin tài khoản
         </Link>
       ),
       key: "dang-nhap",

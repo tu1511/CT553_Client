@@ -1,8 +1,8 @@
-import CarouselComponent from "@components/CarouselComponent";
-import FeatureCards from "@components/FeatureCards";
-import ProductList from "@components/ProductList";
-import TrendingSearch from "@components/TrendingSearch";
-import UserReview from "@components/UserReview";
+import CarouselComponent from "@components/HomePage/CarouselComponent";
+import FeatureCards from "@components/common/FeatureCards";
+import ProductList from "@components/HomePage/ProductList";
+import TrendingSearch from "@components/HomePage/TrendingSearch";
+import UserReview from "@components/HomePage/UserReview";
 import { BadgeCheck, Gift, Share2, ThumbsUp } from "lucide-react";
 import { Link } from "react-router-dom";
 

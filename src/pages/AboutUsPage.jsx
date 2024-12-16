@@ -1,4 +1,4 @@
-import HeaderLine from "@components/HeaderLine";
+import HeaderLine from "@components/common/HeaderLine";
 
 const SectionWithImage = ({
   title,

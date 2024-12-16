@@ -1,4 +1,4 @@
-import DropdownMenu from "@components/DropdownMenu";
+import DropdownMenu from "@components/common/DropdownMenu";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {

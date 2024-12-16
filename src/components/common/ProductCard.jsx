@@ -1,5 +1,5 @@
 import { Rate } from "antd";
-import { toVietnamCurrencyFormat } from "../helpers/ConvertCurrency";
+import { toVietnamCurrencyFormat } from "../../helpers/ConvertCurrency";
 import { ShoppingCart } from "lucide-react";
 
 // eslint-disable-next-line react/prop-types
