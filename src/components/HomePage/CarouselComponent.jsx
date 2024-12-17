@@ -3,11 +3,13 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import banner1 from "/src/assets/banner/1.jpg"; // Import ảnh trực tiếp
 import banner2 from "/src/assets/banner/2.jpg";
 import banner3 from "/src/assets/banner/3.jpg";
+import banner4 from "/src/assets/banner/4.jpg";
 
 const images = [
   { id: 1, src: banner1, alt: "Elegant Jewelry" },
   { id: 2, src: banner2, alt: "Stylish Collection" },
   { id: 3, src: banner3, alt: "Premium Quality" },
+  { id: 4, src: banner4, alt: "Exclusive Design" },
 ];
 
 // eslint-disable-next-line react/prop-types

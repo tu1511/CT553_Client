@@ -1,4 +1,6 @@
+import Breadcrumbs from "@components/common/Breadcrumbs";
 import HeaderLine from "@components/common/HeaderLine";
+import { Home } from "lucide-react";
 
 const SectionWithImage = ({
   title,
@@ -46,10 +48,15 @@ const SectionWithImage = ({
 };
 
 const AboutUsPage = () => {
+  const breadcrumbItems = [
+    { label: "Trang chủ", path: "/" },
+    { label: "Về chúng tôi", path: "/ve-chung-toi" },
+  ];
   return (
     <>
+      <Breadcrumbs items={breadcrumbItems} />
       {/* Section 1: Giới thiệu */}
-      <div className="container mx-auto px-8 py-6 mt-10">
+      <div className="container mx-auto px-8 py-6 ">
         <HeaderLine title={"Về chúng tôi"} />
         <p className="font-normal text-lg text-justify leading-relaxed text-gray-700">
           Đến với Silver Charm, trang sức không chỉ là một phụ kiện – nó còn
