@@ -1,6 +1,7 @@
 import AddressSection from "@components/ProfilePage/AddressSection";
 import PasswordChangeForm from "@components/ProfilePage/PasswordChangeForm";
 import UserProfileForm from "@components/ProfilePage/UserProfileForm";
+import VoucherManagement from "@components/ProfilePage/VoucherManagement";
 import {
   CircleUser,
   Gift,
@@ -46,8 +47,8 @@ const ProfilePage = () => {
         return <PasswordChangeForm />;
       // case "orders":
       //   return <OrderHistory />;
-      // case "vouchers":
-      //   return <VoucherManager />;
+      case "vouchers":
+        return <VoucherManagement />;
       default:
         return <UserProfileForm />;
     }
