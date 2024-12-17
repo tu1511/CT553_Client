@@ -51,7 +51,7 @@ const AddressSection = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-8">
       {/* Nút Thêm địa chỉ mới */}
       <button
         className="bg-primary hover:bg-red-600 text-white font-bold py-2 px-4 rounded shadow-md hover:shadow-lg transition duration-300"

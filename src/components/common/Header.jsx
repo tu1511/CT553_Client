@@ -71,7 +71,18 @@ const Header = () => {
           Thông tin tài khoản
         </Link>
       ),
-      key: "dang-nhap",
+      key: "thong-tin-tai-khoan",
+    },
+    {
+      label: (
+        <Link
+          to="/"
+          className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
+        >
+          Đăng xuất
+        </Link>
+      ),
+      key: "dang-xuat",
     },
   ];
 
@@ -89,7 +100,7 @@ const Header = () => {
 
       <header className="border-b-1 border-primary bg-white shadow-lg sticky top-0 z-50">
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-3">
-          <div className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-3">
             <img
               src="/src/assets/logo.png"
               alt="Logo"
@@ -98,7 +109,7 @@ const Header = () => {
             <span className="font-bold text-2xl text-gray-800">
               Silver Charm
             </span>
-          </div>
+          </Link>
 
           <div className="flex-grow flex items-center justify-center mt-4 md:mt-0">
             <div className="relative w-full max-w-xl">

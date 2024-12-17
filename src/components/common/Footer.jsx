@@ -15,7 +15,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Button, message } from "antd";
+import { Button } from "antd";
+import { toast } from "react-toastify";
 
 const Footer = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -33,7 +34,7 @@ const Footer = () => {
   // Xử lý khi submit form
   const handleSubmit = (data) => {
     console.log("Phản hồi:", data);
-    message.success("Phản hồi đã được gửi thành công!");
+    toast.success("Phản hồi đã được gửi thành công!");
     setIsModalVisible(false);
   };
 

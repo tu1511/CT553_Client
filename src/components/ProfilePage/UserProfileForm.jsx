@@ -39,7 +39,7 @@ const UserProfileForm = () => {
   };
 
   return (
-    <div className="bg-white ">
+    <div className="bg-white p-8">
       <div className="flex gap-8 items-start">
         {/* Avatar */}
         <div className="w-1/3 flex flex-col items-center">

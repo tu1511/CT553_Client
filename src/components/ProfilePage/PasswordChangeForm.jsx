@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Form, Input, Button, message } from "antd";
+import { Form, Input, Button } from "antd";
+import { toast } from "react-toastify";
 
 // eslint-disable-next-line react/prop-types
 const PasswordChangeForm = () => {
@@ -21,23 +22,19 @@ const PasswordChangeForm = () => {
 
   // eslint-disable-next-line no-unused-vars
   const handlePasswordChange = (values) => {
-    if (isGoogleLogin) {
-      message.warning(
-        "Bạn không thể thay đổi mật khẩu khi đăng nhập bằng Google."
-      );
-      return;
-    }
-    message.success("Mật khẩu đã được thay đổi thành công!");
+    toast.success("Mật khẩu đã được thay đổi thành công!");
   };
 
   return (
     <>
       {isGoogleLogin ? (
-        <p style={{ color: "red" }}>
-          Bạn không thể thay đổi mật khẩu khi đăng nhập bằng Google.
-        </p>
+        <div className="p-8">
+          <p className="text-gray-800">
+            Bạn không thể thay đổi mật khẩu khi đăng nhập bằng Google.
+          </p>
+        </div>
       ) : (
-        <div>
+        <div className="p-8">
           <h2 className="text-2xl font-bold mb-2 text-gray-800 text-center">
             Thay Đổi Mật Khẩu
           </h2>
