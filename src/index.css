@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Ghi đè style cho nút BackTop */
+.custom-backtop .ant-float-btn-body {
+  background-color: #c60018 !important;
+}

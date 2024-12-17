@@ -1,4 +1,5 @@
 import AddressSection from "@components/ProfilePage/AddressSection";
+import OrderHistory from "@components/ProfilePage/OrderHistory";
 import PasswordChangeForm from "@components/ProfilePage/PasswordChangeForm";
 import UserProfileForm from "@components/ProfilePage/UserProfileForm";
 import VoucherManagement from "@components/ProfilePage/VoucherManagement";
@@ -45,8 +46,8 @@ const ProfilePage = () => {
         return <AddressSection />;
       case "change-password":
         return <PasswordChangeForm />;
-      // case "orders":
-      //   return <OrderHistory />;
+      case "orders":
+        return <OrderHistory />;
       case "vouchers":
         return <VoucherManagement />;
       default:
