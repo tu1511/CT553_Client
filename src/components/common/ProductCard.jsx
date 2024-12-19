@@ -1,6 +1,7 @@
 import { Rate } from "antd";
 import { toVietnamCurrencyFormat } from "../../helpers/ConvertCurrency";
 import { ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
 function ProductCard({
@@ -31,7 +32,7 @@ function ProductCard({
       </div>
 
       {/* Nội dung sản phẩm */}
-      <div className="px-2 py-4 flex flex-col">
+      <Link to={`/san-pham/1`} className="px-2 py-4 flex flex-col">
         {/* Tên sản phẩm */}
         <h5
           className="mb-2 text-lg line-clamp-2 font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors duration-300 h-[50px]"
@@ -65,7 +66,7 @@ function ProductCard({
             className="cursor-pointer text-gray-700 dark:text-gray-400 hover:text-primary transition-colors duration-300"
           />
         </div>
-      </div>
+      </Link>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import AboutUsPage from "@pages/AboutUsPage";
 import SignUpPage from "@pages/SignUpPage";
 import LoginPage from "@pages/LoginPage";
 import ProfilePage from "@pages/ProfilePage";
+import ProductDetail from "@pages/ProductDetail";
 
 const routes = [
   {
@@ -35,6 +36,11 @@ const routes = [
     id: "taikhoan",
     path: "/tai-khoan",
     element: <ProfilePage />,
+  },
+  {
+    id: "chitietsanpham",
+    path: "/san-pham/1",
+    element: <ProductDetail />,
   },
 ];
 

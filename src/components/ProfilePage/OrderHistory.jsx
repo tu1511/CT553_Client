@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import TableComponent from "@components/common/TableComponent";
 import { Button, Select } from "antd";
 import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency"; // Hàm format tiền tệ
 
-// Component nút trạng thái
+// eslint-disable-next-line react/prop-types
 const StatusFilterButtons = ({ filterStatus, handleStatusChange }) => {
   const statusList = [
     { label: "Tất cả", value: "all", color: "blue" },
@@ -18,9 +18,9 @@ const StatusFilterButtons = ({ filterStatus, handleStatusChange }) => {
       {statusList.map((status) => (
         <Button
           key={status.value}
-          onClick={() => handleStatusChange(status.value)}
+          onClick={() => handleStatusChange(status?.value)}
           className={`${
-            filterStatus === status.value
+            filterStatus === status?.value
               ? `bg-${status?.color}-500 text-white`
               : "bg-white text-black"
           } px-4 py-2 rounded transition duration-200`}
