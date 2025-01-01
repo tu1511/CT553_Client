@@ -142,12 +142,14 @@ const Header = () => {
                 Sản phẩm đã xem
               </span>
             </button>
-            <button className="relative text-sm text-gray-700 hover:text-gray-900">
-              <ShoppingCart size={30} />
-              <span className="absolute -top-2 -right-2 bg-primary text-xs rounded-full px-2 py-1 text-white">
-                0
-              </span>
-            </button>
+            <Link to="/gio-hang">
+              <button className="relative text-sm text-gray-700 hover:text-gray-900">
+                <ShoppingCart size={30} />
+                <span className="absolute -top-2 -right-2 bg-primary text-xs rounded-full px-2 py-1 text-white">
+                  0
+                </span>
+              </button>
+            </Link>
           </div>
         </div>
 

@@ -5,6 +5,8 @@ import SignUpPage from "@pages/SignUpPage";
 import LoginPage from "@pages/LoginPage";
 import ProfilePage from "@pages/ProfilePage";
 import ProductDetail from "@pages/ProductDetail";
+import { element } from "prop-types";
+import CartPage from "@pages/CartPage";
 
 const routes = [
   {
@@ -41,6 +43,11 @@ const routes = [
     id: "chitietsanpham",
     path: "/san-pham/1",
     element: <ProductDetail />,
+  },
+  {
+    id: "giohang",
+    path: "gio-hang",
+    element: <CartPage />,
   },
 ];
 
