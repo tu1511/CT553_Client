@@ -1,18 +1,18 @@
+import RatingSection from "@components/ProductPage/RatingSection";
 import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
-import { Rate } from "antd";
 import { Star } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 
 // Dữ liệu mới
 const productData = {
   productName: "Dây chuyền bạc nữ khắc tên hình trái tim DCN0460",
   productImagePath: [
-    "https://tnj.vn/16938-small_default/day-chuyen-bac-nu-khac-ten-hinh-trai-tim-dcn0460.jpg",
-    "https://tnj.vn/16939-small_default/day-chuyen-bac-nu-khac-ten-hinh-trai-tim-dcn0460.jpg",
-    "https://tnj.vn/16940-small_default/day-chuyen-bac-nu-khac-ten-hinh-trai-tim-dcn0460.jpg",
-    "https://tnj.vn/16936-small_default/day-chuyen-bac-nu-khac-ten-hinh-trai-tim-dcn0460.jpg",
-    "https://tnj.vn/16941-small_default/day-chuyen-bac-nu-khac-ten-hinh-trai-tim-dcn0460.jpg",
-    "https://tnj.vn/11492-small_default/day-chuyen-bac-nu-khac-ten-hinh-trai-tim-dcn0460.jpg",
+    "https://tnj.vn/16938-large_default/day-chuyen-bac-nu-khac-ten-hinh-trai-tim-dcn0460.jpg",
+    "https://tnj.vn/16939-large_default/day-chuyen-bac-nu-khac-ten-hinh-trai-tim-dcn0460.jpg",
+    "https://tnj.vn/16940-large_default/day-chuyen-bac-nu-khac-ten-hinh-trai-tim-dcn0460.jpg",
+    "https://tnj.vn/16936-large_default/day-chuyen-bac-nu-khac-ten-hinh-trai-tim-dcn0460.jpg",
+    "https://tnj.vn/16941-large_default/day-chuyen-bac-nu-khac-ten-hinh-trai-tim-dcn0460.jpg",
+    "https://tnj.vn/11492-large_default/day-chuyen-bac-nu-khac-ten-hinh-trai-tim-dcn0460.jpg",
   ],
   price: "480000",
   productType: "Dây chuyền bạc nữ",
@@ -37,6 +37,12 @@ const ProductDetail = () => {
     productData.productImagePath[0]
   );
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState(null);
+
+  const handleSelectSize = (size) => {
+    setSelectedSize(size);
+    alert(`Kích thước được chọn: ${size}`);
+  };
 
   const handleImageClick = (image) => setCurrentImage(image);
   const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
@@ -44,114 +50,184 @@ const ProductDetail = () => {
   const handleBuyNow = () => alert("Mua ngay!");
   const handleAddToCart = () => alert("Thêm vào giỏ hàng!");
 
+  const sizes = ["S", "M", "L", "XL"];
+
   return (
-    <div className="container mx-auto py-8 px-4">
-      {/* Product top */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <div className="flex flex-col items-center p-2">
-            <img
-              src={currentImage}
-              alt={productData.productName}
-              className="w-96 h-96 object-contain"
-            />
-            <div className="flex space-x-4 mt-4 overflow-x-auto no-scrollbar">
-              {productData.productImagePath.slice(0, 5).map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`Image ${index + 1}`}
-                  className={`w-20 h-24 cursor-pointer object-contain border rounded-lg ${
-                    currentImage === image
-                      ? "border-primary"
-                      : "border-gray-300"
-                  } hover:border-primary`}
-                  onClick={() => handleImageClick(image)}
-                />
-              ))}
+    <>
+      <div className="container mx-auto py-8 px-8">
+        {/* Product top */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <div className="flex flex-col items-center p-2">
+              <img
+                src={currentImage}
+                alt={productData.productName}
+                className="h-96 w-96 rounded-lg border border-black object-cover aspect-auto"
+              />
+
+              <div className="flex space-x-4 mt-4 overflow-x-auto no-scrollbar">
+                {productData.productImagePath
+                  .slice(0, 5)
+                  .map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`Image ${index + 1}`}
+                      className={`w-20 h-20 cursor-pointer object-contain border rounded-lg ${
+                        currentImage === image
+                          ? "border-primary"
+                          : "border-gray-300"
+                      } hover:border-primary`}
+                      onClick={() => handleImageClick(image)}
+                    />
+                  ))}
+              </div>
+            </div>
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold mb-2">
+              {productData.productName}
+            </h1>
+            <p className="mb-2">
+              Loại sản phẩm:{" "}
+              <span className="text-primary">{productData.productType}</span>
+            </p>
+            <div className="flex items-center space-x-1 mb-4">
+              Đánh giá: {productData.rating}{" "}
+              <Star size={20} className="text-yellow-400" /> / 1 lượt đánh giá
+            </div>
+            <div className="flex items-center gap-3 mb-1">
+              {/* Kiểm tra có giảm giá không */}
+              {productData.discountPrice > 0 ? (
+                <>
+                  <p className="text-2xl font-bold text-primary">
+                    {toVietnamCurrencyFormat(
+                      productData.price -
+                        (productData.price * productData.discountPrice) / 100
+                    )}
+                  </p>
+                  <p className="text-lg text-gray-500 line-through">
+                    {toVietnamCurrencyFormat(productData.price)}
+                  </p>
+                  <p className="px-2 py-1 bg-primary text-white rounded-xl">
+                    -{productData.discountPrice}%
+                  </p>
+                </>
+              ) : (
+                <p className="text-2xl font-bold text-primary">
+                  {toVietnamCurrencyFormat(productData.price)}
+                </p>
+              )}
+            </div>
+            <div
+              className="mt-4 text-gray-700"
+              dangerouslySetInnerHTML={{ __html: productData.overview }}
+            ></div>
+
+            <div className="flex flex-wrap gap-5 items-center mt-5">
+              {/* Quantity */}
+              <div className="flex items-center gap-2">
+                <button
+                  className="bg-primary text-white py-2 px-3 rounded-full hover:bg-primary-dark transition duration-300"
+                  onClick={decrement}
+                >
+                  -
+                </button>
+                <span className="w-16 text-center border border-gray-300 py-2 rounded-lg">
+                  {quantity}
+                </span>
+                <button
+                  className="bg-primary text-white py-2 px-3 rounded-full hover:bg-primary-dark transition duration-300"
+                  onClick={increment}
+                >
+                  +
+                </button>
+              </div>
+              {/* Select Size */}
+              <div className="flex items-center gap-2">
+                <label htmlFor="size" className="text-gray-700 font-medium">
+                  Kích thước:
+                </label>
+                <select
+                  id="size"
+                  className="border border-gray-300 rounded-lg py-2 px-3 focus:ring-primary focus:border-primary"
+                  onChange={handleSelectSize} // Hàm xử lý chọn size
+                >
+                  <option value="">Chọn size</option>
+                  {sizes.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            {/* Actions */}
+            <div className="flex flex-1 items-center justify-around gap-3 mt-4">
+              <button
+                className="bg-primary text-white py-3 px-5 rounded-lg w-full max-w-xs hover:bg-primary-dark shadow-md transition duration-300"
+                onClick={handleBuyNow}
+              >
+                MUA NGAY
+              </button>
+              <button
+                className="bg-orange-500 text-white py-3 px-5 rounded-lg w-full max-w-xs hover:bg-orange-600 shadow-md transition duration-300"
+                onClick={handleAddToCart}
+              >
+                THÊM VÀO GIỎ HÀNG
+              </button>
             </div>
           </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold mb-2">{productData.productName}</h1>
-          <p className="mb-2">
-            Loại sản phẩm:{" "}
-            <span className="text-primary">{productData.productType}</span>
-          </p>
-          <div className="flex items-center space-x-1 mb-4">
-            Đánh giá: {productData.rating}{" "}
-            <Star size={20} className="text-yellow-400" /> / 1 lượt đánh giá
-          </div>
-          <div className="flex items-center gap-3 mb-1">
-            {/* Kiểm tra có giảm giá không */}
-            {productData.discountPrice > 0 ? (
-              <>
-                <p className="text-2xl font-bold text-primary">
-                  {toVietnamCurrencyFormat(
-                    productData.price -
-                      (productData.price * productData.discountPrice) / 100
-                  )}
-                </p>
-                <p className="text-lg text-gray-500 line-through">
-                  {toVietnamCurrencyFormat(productData.price)}
-                </p>
-                <p>-{productData.discountPrice}%</p>
-              </>
-            ) : (
-              <p className="text-2xl font-bold text-primary">
-                {toVietnamCurrencyFormat(productData.price)}
-              </p>
-            )}
-          </div>
+        {/* Product bottom */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Thông tin sản phẩm</h2>
+          {/* <div
+            className="mt-4 w-[50vw]"
+            dangerouslySetInnerHTML={{ __html: productData.description }}
+          ></div> */}
+        </div>
+        <div className=" mt-10 p-5">
+          <h2 className="text-2xl font-bold text-center mb-6 border-t-2 border-b-2 py-2">
+            THÔNG SỐ SẢN PHẨM
+          </h2>
+          <div className="grid grid-cols-2 gap-4 border-t-2 border-b-2">
+            {/* Cột trái */}
+            <div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="font-semibold">Loại:</span>
+                <span>Dây chuyền</span>
+              </div>
+              <div className="flex justify-between py-2 border-b bg-gray-100">
+                <span className="font-semibold">Màu sắc:</span>
+                <span>Trắng</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="font-semibold">Chất liệu:</span>
+                <span>Bạc S925</span>
+              </div>
+            </div>
 
-          <div
-            className="mt-4 text-gray-700"
-            dangerouslySetInnerHTML={{ __html: productData.overview }}
-          ></div>
-          {/* Quantity */}
-          <div className="flex items-center mt-5">
-            <button
-              className="bg-primary text-white py-2 px-3 rounded-full"
-              onClick={decrement}
-            >
-              -
-            </button>
-            <span className="w-16 text-center border mx-1 py-2">
-              {quantity}
-            </span>
-            <button
-              className="bg-primary text-white py-2 px-3 rounded-full"
-              onClick={increment}
-            >
-              +
-            </button>
-          </div>
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row mt-4 gap-2">
-            <button
-              className="bg-primary text-white py-3 rounded-lg w-full"
-              onClick={handleBuyNow}
-            >
-              MUA NGAY
-            </button>
-            <button
-              className="bg-orange-500 text-white py-3 rounded-lg w-full"
-              onClick={handleAddToCart}
-            >
-              THÊM VÀO GIỎ HÀNG
-            </button>
+            {/* Cột phải */}
+            <div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="font-semibold">Đá:</span>
+                <span>Cubic Zirconia</span>
+              </div>
+              <div className="flex justify-between py-2 border-b bg-gray-100">
+                <span className="font-semibold">Giới tính:</span>
+                <span>Nam</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="font-semibold">Độ hoàn thiện:</span>
+                <span>Xuất sắc</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      {/* Product bottom */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Thông tin sản phẩm</h2>
-        <div
-          className="mt-4 text-gray-700 w-[50vw]"
-          dangerouslySetInnerHTML={{ __html: productData.description }}
-        ></div>
-      </div>
-    </div>
+      <RatingSection />
+    </>
   );
 };
 
