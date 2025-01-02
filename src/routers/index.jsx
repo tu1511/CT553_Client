@@ -7,6 +7,7 @@ import ProfilePage from "@pages/ProfilePage";
 import ProductDetail from "@pages/ProductDetail";
 import { element } from "prop-types";
 import CartPage from "@pages/CartPage";
+import ProductPage from "@pages/ProductPage";
 
 const routes = [
   {
@@ -43,6 +44,11 @@ const routes = [
     id: "chitietsanpham",
     path: "/san-pham/1",
     element: <ProductDetail />,
+  },
+  {
+    id: "sanpham",
+    path: "/san-pham",
+    element: <ProductPage />,
   },
   {
     id: "giohang",
