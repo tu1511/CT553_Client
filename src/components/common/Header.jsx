@@ -10,6 +10,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import DropdownMenu from "@components/common/DropdownMenu";
+import ImageSearchModal from "@components/HomePage/ImageSearchModal";
 
 const Header = () => {
   const messages = useMemo(
@@ -24,6 +25,8 @@ const Header = () => {
 
   const [currentMessage, setCurrentMessage] = useState(messages[0]);
   const [isFading, setIsFading] = useState(false);
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
     let messageIndex = 0;
@@ -121,7 +124,10 @@ const Header = () => {
               <button className="absolute top-1/2 right-5 -translate-y-1/2 p-2">
                 <Search size={20} className="text-gray-600" />
               </button>
-              <button className="absolute top-1/2 right-14 -translate-y-1/2 p-2">
+              <button
+                className="absolute top-1/2 right-14 -translate-y-1/2 p-2"
+                onClick={() => setIsModalVisible(true)}
+              >
                 <Camera size={20} className="text-gray-600" />
               </button>
               <button className="absolute top-1/2 right-24 -translate-y-1/2 p-2">
@@ -155,6 +161,10 @@ const Header = () => {
 
         <Navbar />
       </header>
+      <ImageSearchModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+      />
     </>
   );
 };
