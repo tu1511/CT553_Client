@@ -1,29 +1,28 @@
 import { useState, useEffect } from "react";
 import TableComponent from "@components/common/TableComponent";
 import { Button, Select } from "antd";
-import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency"; // Hàm format tiền tệ
+import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
+import { formatDate } from "@helpers/FormatDate";
+
+const { Option } = Select;
 
 // eslint-disable-next-line react/prop-types
 const StatusFilterButtons = ({ filterStatus, handleStatusChange }) => {
   const statusList = [
-    { label: "Tất cả", value: "all", color: "blue" },
-    { label: "Chờ xử lý", value: "processing", color: "yellow" },
-    { label: "Đang vận chuyển", value: "shipping", color: "blue" },
-    { label: "Đã giao hàng", value: "delivered", color: "green" },
-    { label: "Đã hủy", value: "cancelled", color: "red" },
+    { label: "Tất cả", value: "all" },
+    { label: "Chờ xử lý", value: "processing" },
+    { label: "Đang vận chuyển", value: "shipping" },
+    { label: "Đã giao hàng", value: "delivered" },
+    { label: "Đã hủy", value: "cancelled" },
   ];
 
   return (
-    <div className="flex space-x-2">
+    <div className="flex flex-wrap gap-2">
       {statusList.map((status) => (
         <Button
           key={status.value}
-          onClick={() => handleStatusChange(status?.value)}
-          className={`${
-            filterStatus === status?.value
-              ? `bg-${status?.color}-500 text-white`
-              : "bg-white text-black"
-          } px-4 py-2 rounded transition duration-200`}
+          type={filterStatus === status.value ? "primary" : "default"}
+          onClick={() => handleStatusChange(status.value)}
         >
           {status.label}
         </Button>
@@ -32,14 +31,14 @@ const StatusFilterButtons = ({ filterStatus, handleStatusChange }) => {
   );
 };
 
-// Component chính
 const OrderHistory = () => {
   const [ordersData, setOrdersData] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [ordersPerPage, setOrdersPerPage] = useState(5); // Số dòng mỗi trang
   const [filterStatus, setFilterStatus] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
+  const [paginationModel, setPaginationModel] = useState({
+    current: 1,
+    pageSize: 5,
+  });
 
   // Giả lập dữ liệu đơn hàng
   useEffect(() => {
@@ -86,16 +85,20 @@ const OrderHistory = () => {
         total: 90000,
         date: "2024-11-20",
       },
-      // Thêm đơn hàng tại đây
     ];
     setOrdersData(fakeOrdersData);
   }, []);
 
-  // Xử lý thay đổi trạng thái lọc
+  // Xử lý lọc trạng thái
   const handleStatusChange = (status) => setFilterStatus(status);
 
-  // Xử lý sắp xếp đơn hàng
+  // Xử lý sắp xếp
   const handleSortChange = (order) => setSortOrder(order);
+
+  // Xử lý phân trang
+  const handlePaginationChange = ({ current, pageSize }) => {
+    setPaginationModel({ current, pageSize });
+  };
 
   // Lọc và sắp xếp dữ liệu
   const filteredData = ordersData.filter((order) =>
@@ -109,52 +112,73 @@ const OrderHistory = () => {
   );
 
   const columns = [
-    { title: "Mã Đơn Hàng", dataIndex: "orderCode", key: "orderCode" },
-    { title: "Trạng Thái", dataIndex: "status", key: "status" },
+    {
+      title: "Mã Đơn Hàng",
+      dataIndex: "orderCode",
+      key: "orderCode",
+    },
+    {
+      title: "Trạng Thái",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => {
+        const statusClasses = {
+          processing: "text-yellow-500 bg-yellow-100 px-2 py-1 rounded-full",
+          shipping: "text-blue-500 bg-blue-100 px-2 py-1 rounded-full",
+          delivered: "text-green-500 bg-green-100 px-2 py-1 rounded-full",
+          cancelled: "text-red-500 bg-red-100 px-2 py-1 rounded-full",
+        };
+
+        return (
+          <span className={`${statusClasses[status] || "text-black"}`}>
+            {status}
+          </span>
+        );
+      },
+    },
     {
       title: "Tổng Tiền",
       dataIndex: "total",
       key: "total",
-      render: (text) => toVietnamCurrencyFormat(text),
+      render: (total) => toVietnamCurrencyFormat(total),
     },
-    { title: "Ngày Đặt Hàng", dataIndex: "date", key: "date" },
+    {
+      title: "Ngày Đặt Hàng",
+      dataIndex: "date",
+      key: "date",
+      render: (date) => formatDate(date),
+    },
   ];
 
   return (
     <div className="container mx-auto p-8">
       {/* Thanh công cụ */}
-      <div className="flex justify-between items-center mb-4">
-        {/* Lọc trạng thái */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        {/* Bộ lọc trạng thái */}
         <StatusFilterButtons
           filterStatus={filterStatus}
           handleStatusChange={handleStatusChange}
         />
 
-        {/* Lọc theo ngày */}
+        {/* Sắp xếp theo ngày */}
         <Select
           defaultValue="newest"
-          style={{ width: 150 }}
+          style={{ width: 200 }}
           onChange={handleSortChange}
         >
-          <Select.Option value="newest">Mới nhất</Select.Option>
-          <Select.Option value="oldest">Cũ nhất</Select.Option>
+          <Option value="newest">Mới nhất</Option>
+          <Option value="oldest">Cũ nhất</Option>
         </Select>
       </div>
 
-      {/* Bảng dữ liệu */}
+      {/* Bảng đơn hàng */}
       <TableComponent
-        dataSource={sortedData}
+        loading={false}
+        rows={sortedData}
         columns={columns}
-        currentPage={currentPage}
-        ordersPerPage={ordersPerPage}
-        totalOrders={sortedData.length}
-        onPageChange={setCurrentPage}
-        searchValue={searchValue}
-        onSearchChange={setSearchValue}
-        filterStatus={filterStatus}
-        showSearch={true}
-        showPagination={true}
-        showRowsPerPage={true}
+        paginationModel={paginationModel}
+        onPaginationChange={handlePaginationChange}
+        checkbox={false} // Ẩn checkbox chọn dòng
       />
     </div>
   );

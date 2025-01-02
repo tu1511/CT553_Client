@@ -9,9 +9,9 @@ function ProductList({ title = "", products = [] }) {
         {title}
         <span className="w-[30vw] border-t-2 border-black ml-4"></span>
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-        {/* Hiển thị tối đa 5 sản phẩm */}
-        {products.slice(0, 5).map((product) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {/* Hiển thị tối đa 4 sản phẩm */}
+        {products.slice(0, 4).map((product) => (
           <ProductCard
             key={product.id}
             image={product.image}

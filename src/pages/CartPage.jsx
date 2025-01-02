@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Table,
   Checkbox,
   Button,
   InputNumber,
@@ -11,8 +10,9 @@ import {
 import { DeleteOutlined } from "@ant-design/icons";
 import HeaderLine from "@components/common/HeaderLine";
 import Breadcrumbs from "@components/common/Breadcrumbs";
+import TableComponent from "@components/common/TableComponent"; // Import TableComponent
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 // Fake dữ liệu
 const fakeCart = [
@@ -203,14 +203,14 @@ const CartPage = () => {
           </div>
         ) : (
           <>
-            <Table
+            <TableComponent
+              loading={false}
+              rows={cartItems}
               columns={columns}
-              dataSource={cartItems}
-              rowKey="id"
-              pagination={false}
-              className="mb-8"
+              paginationModel={{ current: 1, pageSize: 5 }}
+              checkbox={false} // Không cần checkbox tích hợp
             />
-            <div className="flex justify-end items-center">
+            <div className="flex justify-end items-center mt-6">
               <div className="mr-4">
                 <Text className="text-lg font-semibold">
                   Tổng cộng:{" "}

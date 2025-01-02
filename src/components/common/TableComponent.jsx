@@ -1,126 +1,121 @@
-import { useState, useEffect } from "react";
-import { Table, Pagination, Input, Select } from "antd";
+import { useState } from "react";
 import PropTypes from "prop-types";
-import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency"; // Giả sử bạn có hàm formatCurrency
-import { formatDate } from "@helpers/FormatDate";
+import { Table, Input, Skeleton } from "antd";
+
+const { Search } = Input;
 
 const TableComponent = ({
-  dataSource,
+  loading,
+  rows,
   columns,
-  currentPage,
-  ordersPerPage,
-  onPageChange,
-  onSearchChange,
-  searchValue,
-  showPagination = true,
-  showSearch = false,
-  showRowsPerPage = false, // Hiển thị lựa chọn số dòng trên mỗi trang
+  paginationModel,
+  checkbox = true,
+  handleSelected = () => {},
+  onPaginationChange = () => {}, // Callback khi phân trang thay đổi
 }) => {
-  const [rowsPerPage, setRowsPerPage] = useState(ordersPerPage); // Quản lý số dòng hiển thị mỗi trang
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [searchValue, setSearchValue] = useState(""); // Giá trị tìm kiếm
 
-  // Hàm thay đổi số lượng dòng mỗi trang
-  const handleRowsPerPageChange = (value) => {
-    setRowsPerPage(value);
-    onPageChange(1); // Quay lại trang 1 sau khi thay đổi số dòng
-  };
+  const rowSelection = checkbox
+    ? {
+        selectedRowKeys,
+        onChange: (keys) => {
+          setSelectedRowKeys(keys);
+          handleSelected(keys);
+        },
+      }
+    : undefined;
 
-  // Thêm tính năng tìm kiếm vào dữ liệu
-  const filteredData = dataSource.filter((item) => {
-    return Object.values(item).some((value) =>
-      value.toString().toLowerCase().includes(searchValue.toLowerCase())
-    );
-  });
-
-  // Cập nhật dataSource sau khi phân trang và lọc
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
+  // Lọc dữ liệu dựa trên giá trị tìm kiếm
+  const filteredRows = rows.filter((row) =>
+    Object.values(row).some((value) =>
+      String(value).toLowerCase().includes(searchValue.toLowerCase())
+    )
   );
 
   return (
-    <div className="mt-4 ">
-      {/* Thanh tìm kiếm */}
-      {showSearch && (
-        <div className="text-right mb-4">
-          <Input
-            placeholder="Tìm kiếm"
-            value={searchValue}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-1/3 p-2 border border-black rounded-md"
-          />
-        </div>
-      )}
+    <div style={{ width: "100%" }}>
+      {/* Header Actions */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "16px",
+        }}
+      >
+        <div></div>
+        <Search
+          placeholder="Tìm kiếm..."
+          allowClear
+          style={{ width: 300 }}
+          value={searchValue} // Giá trị tìm kiếm hiển thị
+          onChange={(e) => setSearchValue(e.target.value)} // Cập nhật ngay lập tức khi người dùng nhập
+        />
+      </div>
 
-      {/* Bảng dữ liệu */}
+      {/* Table */}
       <Table
-        columns={columns.map((col) => ({
-          ...col,
-          render: (text, record) => {
-            if (col.dataIndex === "total") {
-              return toVietnamCurrencyFormat(text);
-            }
-            if (col.dataIndex === "date") {
-              return formatDate(text);
-            }
-            return text;
-          },
-        }))}
-        dataSource={paginatedData} // Hiển thị dữ liệu đã phân trang
-        rowKey="id"
-        pagination={false} // Tắt pagination ở đây vì mình sẽ làm pagination thủ công
-        className="border-separate table-auto w-full"
-        style={{ borderCollapse: "separate" }}
-        rowClassName="hover:bg-gray-100 transition-colors duration-200" // Hiệu ứng hover cho dòng
+        loading={loading}
+        dataSource={filteredRows} // Sử dụng dữ liệu đã lọc
+        columns={columns}
+        rowSelection={rowSelection}
+        pagination={{
+          pageSize: paginationModel.pageSize || 10,
+          current: paginationModel.current || 1,
+          total: filteredRows.length, // Tổng số dữ liệu sau khi lọc
+          pageSizeOptions: ["5", "10", "15"], // Danh sách tùy chọn số dòng
+          showSizeChanger: true, // Hiển thị nút thay đổi số dòng mỗi trang
+          onChange: (page, pageSize) =>
+            onPaginationChange({ current: page, pageSize }),
+        }}
+        rowKey={(record) => record.key || record.id || record._id}
+        locale={{
+          emptyText: loading ? <Skeleton active /> : "Không có dữ liệu",
+        }}
+        rowClassName={(record, index) =>
+          index % 2 === 0 ? "even-row" : "odd-row"
+        }
+        style={{
+          border: "1px solid #f0f0f0",
+          borderRadius: "8px",
+          overflow: "hidden",
+        }}
       />
-
-      {/* Số dòng mỗi trang */}
-      {showRowsPerPage && (
-        <div className="my-4 flex justify-end px-4">
-          <Select
-            value={rowsPerPage}
-            onChange={handleRowsPerPageChange}
-            style={{ width: 120 }}
-            className="border border-gray-300 rounded-md shadow-sm"
-            options={[
-              { label: "5", value: 5 },
-              { label: "10", value: 10 },
-              { label: "15", value: 15 },
-            ]}
-          />
-        </div>
-      )}
-
-      {/* Phân trang */}
-      {showPagination && (
-        <div className="mt-6 flex justify-center">
-          <Pagination
-            current={currentPage}
-            pageSize={rowsPerPage}
-            total={filteredData.length}
-            onChange={onPageChange}
-            className="pagination"
-          />
-        </div>
-      )}
+      {/* Custom Row Styles */}
+      <style>
+        {`
+          .even-row {
+            background-color: #eef2fd;
+          }
+          .odd-row {
+            background-color: #ffffff;
+          }
+          .ant-table-thead > tr > th {
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+          }
+          .ant-table-tbody > tr > td {
+            font-size: 14px;
+          }
+          .ant-input-search {
+            background-color: white;
+            border-radius: 8px;
+          }
+        `}
+      </style>
     </div>
   );
 };
 
 TableComponent.propTypes = {
-  dataSource: PropTypes.array.isRequired,
+  loading: PropTypes.bool.isRequired,
+  rows: PropTypes.array.isRequired,
   columns: PropTypes.array.isRequired,
-  currentPage: PropTypes.number.isRequired,
-  ordersPerPage: PropTypes.number.isRequired,
-  totalOrders: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired,
-  filterStatus: PropTypes.string.isRequired,
-  onStatusChange: PropTypes.func.isRequired,
-  onSortChange: PropTypes.func.isRequired,
-  onSearchChange: PropTypes.func.isRequired,
-  searchValue: PropTypes.string.isRequired,
-  showPagination: PropTypes.bool,
-  showSearch: PropTypes.bool,
-  showRowsPerPage: PropTypes.bool,
+  paginationModel: PropTypes.object.isRequired,
+  handleSelected: PropTypes.func,
+  onPaginationChange: PropTypes.func, // Hàm callback khi phân trang thay đổi
+  checkbox: PropTypes.bool,
 };
 
 export default TableComponent;
