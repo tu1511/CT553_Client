@@ -178,12 +178,16 @@ const Header = () => {
               label="Tài khoản"
               icon={<CircleUser size={20} />}
             />
-            <button className="flex items-center space-x-1 border-2 border-black rounded-lg py-2 px-4 text-sm text-gray-700 hover:text-gray-900">
+
+            <Link
+              to="/san-pham-da-xem"
+              className="flex items-center space-x-1 border-2 border-black rounded-lg py-2 px-4 text-sm text-gray-700 hover:text-gray-900"
+            >
               <ShoppingBag size={20} />
               <span className="hidden md:inline font-bold">
                 Sản phẩm đã xem
               </span>
-            </button>
+            </Link>
             <Link to="/gio-hang">
               <button className="relative text-sm text-gray-700 hover:text-gray-900">
                 <ShoppingCart size={30} />

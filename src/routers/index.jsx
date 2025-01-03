@@ -9,6 +9,8 @@ import ProductPage from "@pages/ProductPage";
 import NewsPage from "@pages/NewsPage";
 import PromotionsPage from "@pages/PromotionsPage";
 import NewsCardDetail from "@components/NewsPage/NewsCardDetail";
+import ViewedProductsPage from "@pages/ViewedProductsPage";
+import SearchResultsPage from "@pages/SearchResultsPage";
 
 const routes = [
   {
@@ -40,6 +42,16 @@ const routes = [
     id: "vechungtoi",
     path: "/ve-chung-toi",
     element: <AboutUsPage />,
+  },
+  {
+    id: "sanphamdaxem",
+    path: "/san-pham-da-xem",
+    element: <ViewedProductsPage />,
+  },
+  {
+    id: "timkiem",
+    path: "/tim-kiem",
+    element: <SearchResultsPage />,
   },
   {
     id: "taikhoan",
