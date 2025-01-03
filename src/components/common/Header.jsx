@@ -12,6 +12,10 @@ import {
 import DropdownMenu from "@components/common/DropdownMenu";
 import ImageSearchModal from "@components/HomePage/ImageSearchModal";
 
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
+
 const Header = () => {
   const messages = useMemo(
     () => [
@@ -27,6 +31,32 @@ const Header = () => {
   const [isFading, setIsFading] = useState(false);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const [searchInput, setSearchInput] = useState("");
+
+  const { transcript, listening, resetTranscript } = useSpeechRecognition();
+
+  useEffect(() => {
+    if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+      console.error("Trình duyệt của bạn không hỗ trợ nhận diện giọng nói.");
+    }
+  }, []);
+
+  useEffect(() => {
+    setSearchInput(transcript); // Update search input as user speaks
+  }, [transcript]);
+
+  const handleMicClick = () => {
+    if (listening) {
+      SpeechRecognition.stopListening();
+    } else {
+      resetTranscript();
+      SpeechRecognition.startListening({
+        continuous: false,
+        language: "vi-VN", // Set language to Vietnamese
+      });
+    }
+  };
 
   useEffect(() => {
     let messageIndex = 0;
@@ -120,6 +150,8 @@ const Header = () => {
                 type="text"
                 placeholder="Tìm kiếm sản phẩm..."
                 className="w-full rounded-full border border-gray-300 py-2 pl-4 pr-36 text-gray-700 shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
               />
               <button className="absolute top-1/2 right-5 -translate-y-1/2 p-2">
                 <Search size={20} className="text-gray-600" />
@@ -131,7 +163,11 @@ const Header = () => {
                 <Camera size={20} className="text-gray-600" />
               </button>
               <button className="absolute top-1/2 right-24 -translate-y-1/2 p-2">
-                <Mic size={20} className="text-gray-600" />
+                <Mic
+                  size={20}
+                  className={` ${listening ? "text-red-500" : "text-gray-600"}`}
+                  onClick={handleMicClick}
+                />
               </button>
             </div>
           </div>

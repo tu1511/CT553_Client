@@ -7,6 +7,7 @@ import routes from "@routers";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ScrollToTop from "@helpers/ScrollToTop";
+import "regenerator-runtime/runtime";
 
 const MainLayout = lazy(() => import("@layouts/MainLayout"));
 

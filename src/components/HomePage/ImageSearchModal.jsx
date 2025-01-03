@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Modal, Upload, Button, Typography, Image, Spin } from "antd";
+import { Modal, Upload, Button, Typography, Image } from "antd";
 import {
   UploadOutlined,
   SearchOutlined,
@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 
 const { Text } = Typography;
 
+// eslint-disable-next-line react/prop-types
 const ImageSearchModal = ({ visible, onClose }) => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -94,10 +95,19 @@ const ImageSearchModal = ({ visible, onClose }) => {
             <Button
               type="primary"
               onClick={handleSearch}
-              style={{ width: "100%" }}
+              style={{
+                width: "100%",
+                backgroundColor: "#c60018",
+                borderColor: "#ffffff",
+                color: "white",
+              }}
               disabled={isSearching}
             >
-              {isSearching ? <Spin /> : "Tìm kiếm"}
+              {isSearching ? (
+                <div className="w-6 h-6 border-8 border-white border-dotted rounded-full animate-spin"></div>
+              ) : (
+                "Tìm kiếm"
+              )}
             </Button>
           </>
         )}

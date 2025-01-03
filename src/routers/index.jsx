@@ -1,13 +1,13 @@
 import HomePage from "@pages/HomePage";
-import ArticlePage from "@pages/ArticlePage";
 import AboutUsPage from "@pages/AboutUsPage";
 import SignUpPage from "@pages/SignUpPage";
 import LoginPage from "@pages/LoginPage";
 import ProfilePage from "@pages/ProfilePage";
 import ProductDetail from "@pages/ProductDetail";
-import { element } from "prop-types";
 import CartPage from "@pages/CartPage";
 import ProductPage from "@pages/ProductPage";
+import NewsPage from "@pages/NewsPage";
+import PromotionsPage from "@pages/PromotionsPage";
 
 const routes = [
   {
@@ -26,9 +26,9 @@ const routes = [
     element: <LoginPage />,
   },
   {
-    id: "baiviet",
-    path: "/bai-viet",
-    element: <ArticlePage />,
+    id: "tintuc",
+    path: "/tin-tuc",
+    element: <NewsPage />,
   },
   {
     id: "vechungtoi",
@@ -39,6 +39,11 @@ const routes = [
     id: "taikhoan",
     path: "/tai-khoan",
     element: <ProfilePage />,
+  },
+  {
+    id: "khuyenmai",
+    path: "/khuyen-mai",
+    element: <PromotionsPage />,
   },
   {
     id: "chitietsanpham",
