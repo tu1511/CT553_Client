@@ -8,6 +8,7 @@ import CartPage from "@pages/CartPage";
 import ProductPage from "@pages/ProductPage";
 import NewsPage from "@pages/NewsPage";
 import PromotionsPage from "@pages/PromotionsPage";
+import NewsCardDetail from "@components/NewsPage/NewsCardDetail";
 
 const routes = [
   {
@@ -29,6 +30,11 @@ const routes = [
     id: "tintuc",
     path: "/tin-tuc",
     element: <NewsPage />,
+  },
+  {
+    id: "chitiettintuc",
+    path: "/tin-tuc/:id",
+    element: <NewsCardDetail />,
   },
   {
     id: "vechungtoi",

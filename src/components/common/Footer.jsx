@@ -39,19 +39,19 @@ const Footer = () => {
   };
 
   const customerServices = [
-    { label: "Hướng dẫn chọn size", to: "#" },
-    { label: "Hướng dẫn mua hàng online", to: "#" },
-    { label: "Chính sách giao hàng", to: "#" },
-    { label: "Chính sách quyền riêng tư", to: "#" },
-    { label: "Chính sách trả hàng hoàn tiền", to: "#" },
+    { label: "Hướng dẫn chọn size", to: "/tin-tuc" },
+    { label: "Hướng dẫn mua hàng online", to: "/tin-tuc" },
+    { label: "Chính sách giao hàng", to: "/tin-tuc" },
+    { label: "Chính sách quyền riêng tư", to: "/tin-tuc" },
+    { label: "Chính sách trả hàng hoàn tiền", to: "/tin-tuc" },
   ];
 
   const supportServices = [
-    { label: "Tại sao nên chọn bạc cao cấp?", to: "#" },
-    { label: "Cách làm trang sức bạc tại nhà", to: "#" },
-    { label: "Phân biệt các loại bạc S925, S999,...", to: "#" },
-    { label: "Những tác dụng của bạc", to: "#" },
-    { label: "Cách bảo quản trang sức bạc", to: "#" },
+    { label: "Tại sao nên chọn bạc cao cấp?", to: "/tin-tuc" },
+    { label: "Cách làm trang sức bạc tại nhà", to: "/tin-tuc" },
+    { label: "Phân biệt các loại bạc S925, S999,...", to: "/tin-tuc" },
+    { label: "Những tác dụng của bạc", to: "/tin-tuc" },
+    { label: "Cách bảo quản trang sức bạc", to: "/tin-tuc" },
   ];
 
   const socialLinks = [
