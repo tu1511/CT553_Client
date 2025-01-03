@@ -3,6 +3,7 @@ import { Button, Form, Input, Radio, Table, Modal, Divider, Space } from "antd";
 import AddressFormDialog from "@components/ProfilePage/AddressFormDialog";
 import Breadcrumbs from "@components/common/Breadcrumbs";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const fakeShippingMethods = [
   { id: "1", name: "Giao hàng tiết kiệm", fee: 30000 },
@@ -62,6 +63,8 @@ const OrderPage = () => {
   const [open, setOpen] = useState(false);
   const [editAddress, setEditAddress] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(fakeAddresses[0]);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -123,6 +126,9 @@ const OrderPage = () => {
       total: calculateTotal(),
     });
 
+    setTimeout(() => {
+      navigate("/cam-on");
+    }, 3000);
     // Optionally, you can clear the form or redirect the user
     setFormData({
       fullname: "",

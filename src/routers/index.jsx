@@ -12,6 +12,7 @@ import NewsCardDetail from "@components/NewsPage/NewsCardDetail";
 import ViewedProductsPage from "@pages/ViewedProductsPage";
 import SearchResultsPage from "@pages/SearchResultsPage";
 import OrderPage from "@pages/OrderPage";
+import ThankYouPage from "@pages/ThankYouPage";
 
 const routes = [
   {
@@ -48,6 +49,11 @@ const routes = [
     id: "dathang",
     path: "/dat-hang",
     element: <OrderPage />,
+  },
+  {
+    id: "camon",
+    path: "/cam-on",
+    element: <ThankYouPage />,
   },
   {
     id: "vechungtoi",
