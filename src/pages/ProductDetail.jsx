@@ -4,6 +4,7 @@ import RatingSection from "@components/ProductPage/RatingSection";
 import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
 import { Star } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Dữ liệu mới
 const productData = {
@@ -94,6 +95,8 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(null);
 
+  const navigate = useNavigate();
+
   const handleSelectSize = (size) => {
     setSelectedSize(size);
     alert(`Kích thước được chọn: ${size}`);
@@ -102,7 +105,10 @@ const ProductDetail = () => {
   const handleImageClick = (image) => setCurrentImage(image);
   const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
   const increment = () => setQuantity((prev) => prev + 1);
-  const handleBuyNow = () => alert("Mua ngay!");
+  const handleBuyNow = () => {
+    alert(`Mua ngay ${quantity} sản phẩm!`);
+    navigate("/dat-hang");
+  };
   const handleAddToCart = () => alert("Thêm vào giỏ hàng!");
 
   const sizes = ["S", "M", "L", "XL"];
@@ -111,30 +117,33 @@ const ProductDetail = () => {
     <>
       <div className="container mx-auto p-8">
         {/* Product top */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-10">
           {/* Hình ảnh sản phẩm */}
-          <div>
-            <div className="flex flex-col items-center">
+          <div className="flex items-start space-x-8">
+            {/* Hình nhỏ nằm bên trái */}
+            <div className="flex flex-col space-y-4 overflow-y-auto scrollbar-hide">
+              {productData.productImagePath.slice(0, 5).map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Hình ${index + 1}`}
+                  className={`w-20 h-20 cursor-pointer object-cover border rounded-lg ${
+                    currentImage === image
+                      ? "border-primary"
+                      : "border-gray-300"
+                  } hover:border-primary transition duration-200`}
+                  onClick={() => handleImageClick(image)}
+                />
+              ))}
+            </div>
+
+            {/* Hình lớn nằm bên phải */}
+            <div>
               <img
                 src={currentImage}
                 alt={productData.productName}
-                className="h-96 w-96 rounded-lg border border-gray-300 object-cover"
+                className="h-[65vh] w-[30vw] rounded-lg border border-gray-300 object-cover"
               />
-              <div className="flex space-x-4 mt-4 overflow-x-auto scrollbar-hide">
-                {productData.productImagePath.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={`Hình ${index + 1}`}
-                    className={`w-20 h-20 cursor-pointer object-cover border rounded-lg ${
-                      currentImage === image
-                        ? "border-primary"
-                        : "border-gray-300"
-                    } hover:border-primary transition duration-200`}
-                    onClick={() => handleImageClick(image)}
-                  />
-                ))}
-              </div>
             </div>
           </div>
 

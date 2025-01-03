@@ -11,6 +11,7 @@ import PromotionsPage from "@pages/PromotionsPage";
 import NewsCardDetail from "@components/NewsPage/NewsCardDetail";
 import ViewedProductsPage from "@pages/ViewedProductsPage";
 import SearchResultsPage from "@pages/SearchResultsPage";
+import OrderPage from "@pages/OrderPage";
 
 const routes = [
   {
@@ -37,6 +38,16 @@ const routes = [
     id: "chitiettintuc",
     path: "/tin-tuc/:id",
     element: <NewsCardDetail />,
+  },
+  {
+    id: "vechungtoi",
+    path: "/ve-chung-toi",
+    element: <AboutUsPage />,
+  },
+  {
+    id: "dathang",
+    path: "/dat-hang",
+    element: <OrderPage />,
   },
   {
     id: "vechungtoi",
