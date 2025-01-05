@@ -39,11 +39,13 @@ const fakeAddresses = [
     id: 1,
     fullname: "Nguyễn Văn A",
     phone: "0123456789",
+    email: "test@gmail.com",
     address: "Số 1, Đường ABC, Phường XYZ, Hồ Chí Minh",
   },
   {
     id: 2,
     fullname: "Trần Thị B",
+    email: "test1@gmail.com",
     phone: "0987654321",
     address: "Số 2, Đường DEF, Phường ZYX, Hà Nội",
   },
@@ -54,7 +56,7 @@ const OrderPage = () => {
     fullname: fakeAddresses[0].fullname,
     phone: fakeAddresses[0].phone,
     address: fakeAddresses[0].address,
-    email: "",
+    email: fakeAddresses[0].email,
     notes: "",
   });
   const [selectedShippingMethod, setSelectedShippingMethod] = useState(null);
@@ -357,6 +359,7 @@ const OrderPage = () => {
                   ...prev,
                   fullname: address.fullname,
                   phone: address.phone,
+                  email: address.email,
                   address: address.address,
                 }));
                 setIsAddressModalVisible(false);

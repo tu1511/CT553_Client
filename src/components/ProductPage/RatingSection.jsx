@@ -65,7 +65,7 @@ function RatingSection() {
   const handleShowLess = () => setVisibleComments(5);
 
   return (
-    <div className="container mx-auto p-8">
+    <div className="container mx-auto px-8 py-6">
       <div className="p-8 bg-white rounded-lg shadow-lg border border-gray-200">
         <HeaderLine title="Đánh giá và nhận xét" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
