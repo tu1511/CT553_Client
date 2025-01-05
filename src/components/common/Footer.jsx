@@ -39,11 +39,11 @@ const Footer = () => {
   };
 
   const customerServices = [
-    { label: "Hướng dẫn chọn size", to: "/tin-tuc" },
-    { label: "Hướng dẫn mua hàng online", to: "/tin-tuc" },
-    { label: "Chính sách giao hàng", to: "/tin-tuc" },
-    { label: "Chính sách quyền riêng tư", to: "/tin-tuc" },
-    { label: "Chính sách trả hàng hoàn tiền", to: "/tin-tuc" },
+    { label: "Hướng dẫn chọn size", to: "/chinh-sach/1" },
+    { label: "Hướng dẫn mua hàng online", to: "/chinh-sach/1" },
+    { label: "Chính sách giao hàng", to: "/chinh-sach/1" },
+    { label: "Chính sách quyền riêng tư", to: "/chinh-sach/1" },
+    { label: "Chính sách trả hàng hoàn tiền", to: "/chinh-sach/1" },
   ];
 
   const supportServices = [

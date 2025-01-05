@@ -13,6 +13,7 @@ import ViewedProductsPage from "@pages/ViewedProductsPage";
 import SearchResultsPage from "@pages/SearchResultsPage";
 import OrderPage from "@pages/OrderPage";
 import ThankYouPage from "@pages/ThankYouPage";
+import PolicyPage from "@pages/PolicyPage"
 
 const routes = [
   {
@@ -79,6 +80,11 @@ const routes = [
     id: "khuyenmai",
     path: "/khuyen-mai",
     element: <PromotionsPage />,
+  },
+  {
+    id: "chinhsach",
+    path: "/chinh-sach/:id",
+    element: <PolicyPage />,
   },
   {
     id: "chitietsanpham",
