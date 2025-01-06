@@ -58,6 +58,14 @@ const Header = () => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("loggedInUserId");
+
+    window.location.reload();
+  };
+
   useEffect(() => {
     let messageIndex = 0;
     const interval = setInterval(() => {
@@ -109,7 +117,7 @@ const Header = () => {
     {
       label: (
         <Link
-          to="/"
+          onClick={() => handleLogout()}
           className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
         >
           Đăng xuất

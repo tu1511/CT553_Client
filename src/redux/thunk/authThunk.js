@@ -17,6 +17,8 @@ export const loginThunk = createAsyncThunk(
         response.metadata?.tokens?.refreshToken
       );
 
+      localStorage.setItem("loggedInUserId", response.metadata?.account?.id);
+
       return response;
     } catch (error) {
       return rejectWithValue(error.response.data.error);
@@ -50,12 +52,12 @@ export const loginThunk = createAsyncThunk(
 
 //       localStorage.removeItem("accessToken");
 //       localStorage.removeItem("refreshToken");
-//       localStorage.removeItem(
-//         `viewedProducts_${localStorage.getItem("loggedInUserId")}`
-//       );
 //       localStorage.removeItem("loggedInUserId");
-//       localStorage.removeItem("productQuantity");
-//       localStorage.removeItem("viewedProducts_null");
+//       // localStorage.removeItem(
+//       //   `viewedProducts_${localStorage.getItem("loggedInUserId")}`
+//       // );
+//       // localStorage.removeItem("productQuantity");
+//       // localStorage.removeItem("viewedProducts_null");
 
 //       window.location.reload();
 
