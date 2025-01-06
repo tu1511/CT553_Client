@@ -1,14 +1,36 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography } from "antd";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { loginThunk } from "@redux/thunk/authThunk"; // Import your Redux thunk
 
 const { Title, Text } = Typography;
 
 const LoginPage = () => {
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const onFinish = (values) => {
-    console.log("Login Data:", values);
+  const onSuccess = async (values) => {
+    try {
+      setLoading(true);
+      // Dispatch the login action
+      await dispatch(loginThunk(values));
+      toast.success("Đăng nhập thành công!");
+
+      // Redirect to homepage or another route after successful login
+      navigate("/");
+    } catch (error) {
+      const message =
+        error.response?.data?.message === "Invalid credentials"
+          ? "Email hoặc mật khẩu không đúng!"
+          : "Đăng nhập không thành công!";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -29,7 +51,7 @@ const LoginPage = () => {
             Đăng Nhập
           </Title>
 
-          <Form form={form} layout="vertical" onFinish={onFinish}>
+          <Form form={form} layout="vertical" onFinish={onSuccess}>
             {/* Email */}
             <Form.Item
               label="Email"
@@ -60,6 +82,7 @@ const LoginPage = () => {
                 type="primary"
                 htmlType="submit"
                 className="w-full"
+                loading={loading}
                 style={{
                   backgroundColor: "#c60018",
                   borderColor: "#ffffff",

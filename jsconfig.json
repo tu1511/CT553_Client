@@ -7,6 +7,7 @@
       "@layouts/*": ["layouts/*"],
       "@pages/*": ["pages/*"],
       "@routers/*": ["routers/*"],
+      "@redux/*": ["redux/*"],
       "@utils/*": ["utils/*"],
       "@services/*": ["services/*"],
       "@config/*": ["config/*"],
