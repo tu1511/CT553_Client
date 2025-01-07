@@ -7,5 +7,9 @@ class userService {
   async getLoggedInUser() {
     return this.api.get("/:id");
   }
+
+  async updateProfile(data) {
+    return this.api.put("/:id", data);
+  }
 }
 export default new userService();
