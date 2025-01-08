@@ -15,6 +15,7 @@ import ImageSearchModal from "@components/HomePage/ImageSearchModal";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
+import userService from "@services/user.service";
 
 const Header = () => {
   const messages = useMemo(
@@ -57,6 +58,25 @@ const Header = () => {
       });
     }
   };
+  const [user, setUser] = useState(null); // Lưu thông tin người dùng
+  const [loading, setLoading] = useState(true);
+
+  const fetchUser = async () => {
+    try {
+      const userId = localStorage.getItem("loggedInUserId"); // Lấy ID người dùng từ localStorage
+      if (!userId) return; // Nếu không có ID, không gọi API
+      const response = await userService.getLoggedInUser(userId); // Gọi API với ID
+      setUser(response?.data?.metadata); // Cập nhật thông tin người dùng
+    } catch (error) {
+      console.error("Không thể lấy thông tin người dùng:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
@@ -80,52 +100,55 @@ const Header = () => {
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, [messages]);
 
-  const accountMenuItems = [
-    {
-      label: (
-        <Link
-          to="/dang-ky"
-          className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
-        >
-          Đăng ký tài khoản
-        </Link>
-      ),
-      key: "dang-ky",
-    },
-    {
-      label: (
-        <Link
-          to="/dang-nhap"
-          className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
-        >
-          Đăng nhập
-        </Link>
-      ),
-      key: "dang-nhap",
-    },
-    {
-      label: (
-        <Link
-          to="/tai-khoan"
-          className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
-        >
-          Thông tin tài khoản
-        </Link>
-      ),
-      key: "thong-tin-tai-khoan",
-    },
-    {
-      label: (
-        <Link
-          onClick={() => handleLogout()}
-          className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
-        >
-          Đăng xuất
-        </Link>
-      ),
-      key: "dang-xuat",
-    },
-  ];
+  const accountMenuItems = user
+    ? [
+        {
+          label: (
+            <Link
+              to="/tai-khoan"
+              className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
+            >
+              Thông tin tài khoản
+            </Link>
+          ),
+          key: "thong-tin-tai-khoan",
+        },
+        {
+          label: (
+            <Link
+              onClick={() => handleLogout()}
+              className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
+            >
+              Đăng xuất
+            </Link>
+          ),
+          key: "dang-xuat",
+        },
+      ]
+    : [
+        {
+          label: (
+            <Link
+              to="/dang-ky"
+              className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
+            >
+              Đăng ký tài khoản
+            </Link>
+          ),
+          key: "dang-ky",
+        },
+        {
+          label: (
+            <Link
+              to="/dang-nhap"
+              className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
+            >
+              Đăng nhập
+            </Link>
+          ),
+          key: "dang-nhap",
+        },
+      ];
 
   return (
     <>
@@ -183,7 +206,7 @@ const Header = () => {
           <div className="flex items-center space-x-6 mt-4 md:mt-0">
             <DropdownMenu
               menuItems={accountMenuItems}
-              label="Tài khoản"
+              label={user ? `Xin chào, ${user.fullName}` : "Tài khoản"}
               icon={<CircleUser size={20} />}
             />
 

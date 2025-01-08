@@ -4,12 +4,8 @@ class userService {
   constructor(path = "/account") {
     this.api = createApiClient(path);
   }
-  async getLoggedInUser() {
-    return this.api.get("/:id");
-  }
-
-  async updateProfile(data) {
-    return this.api.put("/:id", data);
+  async getLoggedInUser(id) {
+    return this.api.get(`/${id}`);
   }
 }
 export default new userService();
