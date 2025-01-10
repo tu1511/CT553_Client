@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getLoggedInUser } from "@redux/thunk/authThunk";
+
 import { Camera } from "lucide-react";
 import { toast } from "react-toastify";
+import {
+  getLoggedInUser,
+  updateUserInfoThunk,
+} from "@redux/thunk/accountThunk";
+// import { updateUserInfoThunk } from "@redux/thunk/accountThunk";
 
 const UserProfileForm = () => {
   // State cục bộ để lưu thông tin người dùng
@@ -16,7 +21,7 @@ const UserProfileForm = () => {
   });
 
   const dispatch = useDispatch();
-  const userData = useSelector((state) => state.auth.authUser);
+  const userData = useSelector((state) => state.account.account);
 
   const accessToken = localStorage.getItem("accessToken");
 
@@ -29,12 +34,15 @@ const UserProfileForm = () => {
   // Cập nhật state cục bộ khi dữ liệu từ Redux thay đổi
   useEffect(() => {
     if (userData) {
+      const formattedDateOfBirth = userData.birthday
+        ? new Date(userData.birthday).toISOString().split("T")[0]
+        : "";
       setUser({
         fullName: userData.fullName || "",
         email: userData.email || "",
         phone: userData.phone || "",
-        gender: userData.gender || "Nam",
-        birthday: userData.birthday || "",
+        gender: userData.gender === true ? true : false,
+        birthday: formattedDateOfBirth || "",
         avatar:
           userData.avatar ||
           `https://ui-avatars.com/api/?name=${userData.fullName}&size=128`,
@@ -45,7 +53,11 @@ const UserProfileForm = () => {
   // Xử lý thay đổi thông tin người dùng
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser({ ...user, [name]: value });
+
+    setUser({
+      ...user,
+      [name]: name === "gender" ? (value === "Nam" ? true : false) : value,
+    });
   };
 
   // Xử lý thay đổi ảnh đại diện
@@ -61,10 +73,26 @@ const UserProfileForm = () => {
   };
 
   // Xử lý khi người dùng nhấn Cập Nhật
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Thông tin đã cập nhật:", user);
-    toast.success("Thông tin tài khoản đã được cập nhật thành công!");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const updatedData = {
+      fullName: user.fullName,
+      phone: user.phone,
+      gender: user.gender,
+      birthday: user.birthday,
+    };
+
+    try {
+      dispatch(updateUserInfoThunk({ updatedData, accessToken })).unwrap();
+      toast.success("Cập nhật thông tin tài khoản thành công");
+      // Đợi 500ms rồi mới fetch user mới
+      setTimeout(async () => {
+        await dispatch(getLoggedInUser(accessToken));
+      }, 500);
+    } catch (error) {
+      console.error("Lỗi cập nhật:", error);
+      toast.error("Cập nhật thông tin thất bại");
+    }
   };
 
   // Xử lý khi người dùng nhấn Hủy
@@ -98,7 +126,9 @@ const UserProfileForm = () => {
               onChange={handleAvatarChange}
             />
           </div>
-          <p className="text-gray-600 mt-4">Nhấn vào ảnh để thay đổi</p>
+          <p className="text-gray-600 mt-4 cursor-pointer">
+            Nhấn vào ảnh để thay đổi
+          </p>
         </div>
 
         {/* Form */}
@@ -157,7 +187,7 @@ const UserProfileForm = () => {
               </label>
               <select
                 name="gender"
-                value={user.gender}
+                value={user.gender === true ? "Nam" : "Nữ"} // Hiển thị Nam/Nữ nhưng giá trị là true/false
                 onChange={handleChange}
                 className="w-2/3 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-400"
                 required

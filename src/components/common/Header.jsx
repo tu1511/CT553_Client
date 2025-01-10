@@ -16,8 +16,8 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { useDispatch, useSelector } from "react-redux";
-import { getLoggedInUser } from "@redux/thunk/authThunk";
 import { setCredentials } from "@redux/slices/authSlice";
+import { getLoggedInUser } from "@redux/thunk/accountThunk";
 
 const Header = () => {
   const messages = useMemo(
@@ -62,7 +62,7 @@ const Header = () => {
   };
 
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.authUser);
+  const user = useSelector((state) => state.account.account);
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -77,7 +77,8 @@ const Header = () => {
     }
   }, [dispatch]);
 
-  console.log(user);
+  // console.log(user);
+
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");

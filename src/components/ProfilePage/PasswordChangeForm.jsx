@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import { Form, Input, Button } from "antd";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import {
+  changePasswordThunk,
+  getLoggedInUser,
+} from "@redux/thunk/accountThunk"; // Thunk redux
 
-// eslint-disable-next-line react/prop-types
 const PasswordChangeForm = () => {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const dispatch = useDispatch(); // Giả sử dùng Redux để dispatch action
   const user = {
     id: 1,
     username: "user@example.com",
@@ -12,17 +16,50 @@ const PasswordChangeForm = () => {
   };
   const [form] = Form.useForm();
   const [isGoogleLogin, setIsGoogleLogin] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Kiểm tra xem người dùng có đăng nhập bằng Google không
     if (user?.loginMethod === "google") {
       setIsGoogleLogin(true);
     }
   }, [user]);
 
-  // eslint-disable-next-line no-unused-vars
-  const handlePasswordChange = (values) => {
-    toast.success("Mật khẩu đã được thay đổi thành công!");
+  const accessToken = localStorage.getItem("accessToken");
+
+  // Xử lý thay đổi mật khẩu
+  const handlePasswordChange = async () => {
+    if (newPassword !== confirmPassword) {
+      toast.error("Mật khẩu xác nhận không khớp!");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      // Kiểm tra mật khẩu hợp lệ và dispatch thay đổi mật khẩu
+      const response = await dispatch(
+        changePasswordThunk({
+          passwordData: { password: newPassword },
+          accessToken,
+        })
+      ).unwrap();
+
+      toast.success("Mật khẩu đã được thay đổi thành công");
+
+      // Đặt lại giá trị form và mật khẩu
+      setNewPassword("");
+      setConfirmPassword("");
+
+      // Cập nhật lại thông tin người dùng sau khi thay đổi mật khẩu
+      dispatch(getLoggedInUser(accessToken)); // Lấy lại thông tin người dùng nếu cần
+    } catch (error) {
+      console.error(error);
+      toast.error("Đổi mật khẩu thất bại");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -40,17 +77,6 @@ const PasswordChangeForm = () => {
           </h2>
           <Form form={form} layout="vertical" onFinish={handlePasswordChange}>
             <Form.Item
-              label="Mật khẩu cũ"
-              name="oldPassword"
-              rules={[
-                { required: true, message: "Vui lòng nhập mật khẩu cũ!" },
-                { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự." },
-              ]}
-            >
-              <Input.Password disabled={isGoogleLogin} />
-            </Form.Item>
-
-            <Form.Item
               label="Mật khẩu mới"
               name="newPassword"
               rules={[
@@ -58,7 +84,11 @@ const PasswordChangeForm = () => {
                 { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự." },
               ]}
             >
-              <Input.Password disabled={isGoogleLogin} />
+              <Input.Password
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                disabled={isGoogleLogin}
+              />
             </Form.Item>
 
             <Form.Item
@@ -66,26 +96,21 @@ const PasswordChangeForm = () => {
               name="confirmNewPassword"
               rules={[
                 { required: true, message: "Vui lòng xác nhận mật khẩu mới!" },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue("newPassword") === value) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(
-                      new Error("Mật khẩu xác nhận không khớp!")
-                    );
-                  },
-                }),
               ]}
             >
-              <Input.Password disabled={isGoogleLogin} />
+              <Input.Password
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={isGoogleLogin}
+              />
             </Form.Item>
 
             <Form.Item>
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={isGoogleLogin}
+                disabled={isGoogleLogin || isLoading}
+                loading={isLoading}
                 style={{
                   backgroundColor: "#c60012",
                   borderColor: "#ffffff",

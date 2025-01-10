@@ -12,18 +12,15 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-
-// Giả lập dữ liệu người dùng
-const fakeUser = {
-  fullname: "Nguyễn Văn A",
-  avatarImagePath: "", // Thêm đường dẫn ảnh nếu có hoặc để trống
-};
+import { useSelector } from "react-redux";
 
 const ProfilePage = () => {
   const queryParams = new URLSearchParams(location.search);
   const initialTab = queryParams.get("tab") || "profile";
   const [selectedTab, setSelectedTab] = useState(initialTab);
-  const [user] = useState(fakeUser);
+  // const [user] = useState(fakeUser);
+  // const dispatch = useDispatch();
+  const user = useSelector((state) => state.account.account);
 
   useEffect(() => {
     setSelectedTab(initialTab);
@@ -78,13 +75,13 @@ const ProfilePage = () => {
                           /\\/g,
                           "/"
                         )}`
-                    : "https://ui-avatars.com/api/?name=Nguy%E1%BB%85n+V%C4%83n+A&size=128"
+                    : `https://ui-avatars.com/api/?name=${user?.fullName}&size=128`
                 }
                 alt="User avatar"
                 className="mx-auto rounded-full mb-2 size-24 border-2 border-primary"
               />
               <p className="text-lg font-bold">
-                {user?.fullname || "Người dùng"}
+                {user?.fullName || "Người dùng"}
               </p>
               <button
                 className="text-blue-500 hover:underline"

@@ -18,6 +18,7 @@ const LoginPage = () => {
       setLoading(true);
       // Dispatch the login action
       await dispatch(loginThunk(values));
+
       toast.success("Đăng nhập thành công!");
 
       // Redirect to homepage or another route after successful login

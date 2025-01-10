@@ -12,14 +12,5 @@ class authService {
   async register(data) {
     return this.api.post("/register", data);
   }
-
-  async getLoggedInUser(accessToken) {
-    const response = await this.api.get("/logged-in-account", {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
-  }
 }
 export default new authService();

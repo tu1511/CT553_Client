@@ -24,18 +24,6 @@ export const loginThunk = createAsyncThunk(
   }
 );
 
-export const getLoggedInUser = createAsyncThunk(
-  "auth/getLoggedInUser",
-  async (accessToken, { rejectWithValue }) => {
-    try {
-      const response = await authService.getLoggedInUser(accessToken);
-      return response;
-    } catch (error) {
-      return rejectWithValue(error.response.data.error);
-    }
-  }
-);
-
 // export const loginWithSocialThunk = createAsyncThunk(
 //   "auth/loginWithSocial",
 //   async (credentials, { rejectWithValue }) => {
