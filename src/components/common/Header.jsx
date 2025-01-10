@@ -15,7 +15,9 @@ import ImageSearchModal from "@components/HomePage/ImageSearchModal";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
-import userService from "@services/user.service";
+import { useDispatch, useSelector } from "react-redux";
+import { getLoggedInUser } from "@redux/thunk/authThunk";
+import { setCredentials } from "@redux/slices/authSlice";
 
 const Header = () => {
   const messages = useMemo(
@@ -58,30 +60,27 @@ const Header = () => {
       });
     }
   };
-  const [user, setUser] = useState(null); // Lưu thông tin người dùng
-  const [loading, setLoading] = useState(true);
 
-  const fetchUser = async () => {
-    try {
-      const userId = localStorage.getItem("loggedInUserId"); // Lấy ID người dùng từ localStorage
-      if (!userId) return; // Nếu không có ID, không gọi API
-      const response = await userService.getLoggedInUser(userId); // Gọi API với ID
-      setUser(response?.data?.metadata); // Cập nhật thông tin người dùng
-    } catch (error) {
-      console.error("Không thể lấy thông tin người dùng:", error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.authUser);
 
   useEffect(() => {
-    fetchUser();
-  }, []);
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
 
+    if (refreshToken && accessToken) {
+      dispatch(setCredentials({ accessToken, refreshToken }));
+    }
+
+    if (accessToken) {
+      dispatch(getLoggedInUser(accessToken));
+    }
+  }, [dispatch]);
+
+  console.log(user);
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    localStorage.removeItem("loggedInUserId");
 
     window.location.reload();
   };

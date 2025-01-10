@@ -6,7 +6,7 @@ export const getLoggedInUser = createAsyncThunk(
   "users/getLoggedInUser",
   async (accessToken, thunkAPI) => {
     try {
-      const response = await userService.getLoggedInUser();
+      const response = await userService.getLoggedInUser(accessToken);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(

@@ -1,22 +1,54 @@
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getLoggedInUser } from "@redux/thunk/authThunk";
 import { Camera } from "lucide-react";
-import { useState } from "react";
+import { toast } from "react-toastify";
 
 const UserProfileForm = () => {
+  // State cục bộ để lưu thông tin người dùng
   const [user, setUser] = useState({
-    fullname: "Nguyễn Văn A",
-    email: "nguyenvana@gmail.com",
-    phone: "0123 456 789",
-    gender: "Nam",
-    birthday: "2000-01-01",
-    avatar:
-      "https://ui-avatars.com/api/?name=Nguy%E1%BB%85n+V%C4%83n+A&size=128",
+    fullName: "",
+    email: "",
+    phone: "",
+    gender: "",
+    birthday: "",
+    // avatar: "",
   });
 
+  const dispatch = useDispatch();
+  const userData = useSelector((state) => state.auth.authUser);
+
+  const accessToken = localStorage.getItem("accessToken");
+
+  useEffect(() => {
+    if (accessToken && !userData) {
+      dispatch(getLoggedInUser(accessToken));
+    }
+  }, [accessToken, dispatch, userData]);
+
+  // Cập nhật state cục bộ khi dữ liệu từ Redux thay đổi
+  useEffect(() => {
+    if (userData) {
+      setUser({
+        fullName: userData.fullName || "",
+        email: userData.email || "",
+        phone: userData.phone || "",
+        gender: userData.gender || "Nam",
+        birthday: userData.birthday || "",
+        avatar:
+          userData.avatar ||
+          `https://ui-avatars.com/api/?name=${userData.fullName}&size=128`,
+      });
+    }
+  }, [userData]);
+
+  // Xử lý thay đổi thông tin người dùng
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser({ ...user, [name]: value });
   };
 
+  // Xử lý thay đổi ảnh đại diện
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -28,14 +60,16 @@ const UserProfileForm = () => {
     }
   };
 
+  // Xử lý khi người dùng nhấn Cập Nhật
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Thông tin đã cập nhật:", user);
-    alert("Thông tin tài khoản đã được cập nhật thành công!");
+    toast.success("Thông tin tài khoản đã được cập nhật thành công!");
   };
 
+  // Xử lý khi người dùng nhấn Hủy
   const handleCancel = () => {
-    alert("Đã hủy cập nhật thông tin tài khoản.");
+    toast.error("Đã hủy cập nhật thông tin tài khoản.");
   };
 
   return (
@@ -77,9 +111,9 @@ const UserProfileForm = () => {
             {[
               {
                 label: "Họ và Tên",
-                name: "fullname",
+                name: "fullName",
                 type: "text",
-                value: user.fullname,
+                value: user.fullName,
               },
               {
                 label: "Email",

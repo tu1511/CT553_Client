@@ -17,8 +17,18 @@ export const loginThunk = createAsyncThunk(
         response.metadata?.tokens?.refreshToken
       );
 
-      localStorage.setItem("loggedInUserId", response.metadata?.account?.id);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data.error);
+    }
+  }
+);
 
+export const getLoggedInUser = createAsyncThunk(
+  "auth/getLoggedInUser",
+  async (accessToken, { rejectWithValue }) => {
+    try {
+      const response = await authService.getLoggedInUser(accessToken);
       return response;
     } catch (error) {
       return rejectWithValue(error.response.data.error);

@@ -7,18 +7,6 @@ const commonConfig = {
   },
 };
 
-// async function checkLocalhost() {
-//   try {
-//     await axios.get("http://localhost:5000/check");
-//     return true;
-//     // eslint-disable-next-line no-unused-vars
-//   } catch (error) {
-//     return false;
-//   }
-// }
-
-// const isLocalhostRunning = await checkLocalhost();
-
 const rootURL = "http://localhost:5000/api/v1";
 
 console.log(rootURL);

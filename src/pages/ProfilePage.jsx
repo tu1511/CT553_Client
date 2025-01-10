@@ -64,7 +64,7 @@ const ProfilePage = () => {
   return (
     <>
       <Breadcrumbs items={breadcrumbItems} />
-      <div className="container mx-auto py-8 px-10">
+      <div className="container mx-auto pb-6 px-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar */}
           <div className="w-full lg:w-1/4 bg-white p-6 rounded-lg shadow-md">
