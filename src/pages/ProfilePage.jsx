@@ -18,9 +18,10 @@ const ProfilePage = () => {
   const queryParams = new URLSearchParams(location.search);
   const initialTab = queryParams.get("tab") || "profile";
   const [selectedTab, setSelectedTab] = useState(initialTab);
-  // const [user] = useState(fakeUser);
-  // const dispatch = useDispatch();
+
   const user = useSelector((state) => state.account.account);
+
+  console.log(user);
 
   useEffect(() => {
     setSelectedTab(initialTab);
@@ -68,13 +69,8 @@ const ProfilePage = () => {
             <div className="text-center mb-4">
               <img
                 src={
-                  user?.avatarImagePath
-                    ? user.avatarImagePath.startsWith("http")
-                      ? user.avatarImagePath
-                      : `http://localhost:5000/${user.avatarImagePath.replace(
-                          /\\/g,
-                          "/"
-                        )}`
+                  user
+                    ? user.avatar?.path
                     : `https://ui-avatars.com/api/?name=${user?.fullName}&size=128`
                 }
                 alt="User avatar"

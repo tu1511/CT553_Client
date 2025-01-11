@@ -5,7 +5,7 @@ import {
   changePasswordThunk,
 } from "@redux/thunk/accountThunk";
 
-const userSlice = createSlice({
+const accountSlice = createSlice({
   name: "account",
   initialState: {
     account: null,
@@ -54,4 +54,4 @@ const userSlice = createSlice({
   },
 });
 
-export default userSlice.reducer;
+export default accountSlice.reducer;

@@ -64,18 +64,20 @@ const Header = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.account.account);
 
+  const accessToken = localStorage.getItem("accessToken");
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
 
     if (refreshToken && accessToken) {
       dispatch(setCredentials({ accessToken, refreshToken }));
     }
+  }, [dispatch, accessToken]);
 
+  useEffect(() => {
     if (accessToken) {
       dispatch(getLoggedInUser(accessToken));
     }
-  }, [dispatch]);
+  }, [accessToken, dispatch]);
 
   // console.log(user);
 

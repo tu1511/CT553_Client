@@ -7,6 +7,7 @@ import {
   getLoggedInUser,
   updateUserInfoThunk,
 } from "@redux/thunk/accountThunk";
+import uploadService from "@services/upload.service";
 // import { updateUserInfoThunk } from "@redux/thunk/accountThunk";
 
 const UserProfileForm = () => {
@@ -17,13 +18,15 @@ const UserProfileForm = () => {
     phone: "",
     gender: "",
     birthday: "",
-    // avatar: "",
+    avatar: "",
   });
 
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.account.account);
-
+  const [avatar, setAvatar] = useState("");
   const accessToken = localStorage.getItem("accessToken");
+
+  // console.log(userData);
 
   useEffect(() => {
     if (accessToken && !userData) {
@@ -61,14 +64,26 @@ const UserProfileForm = () => {
   };
 
   // Xử lý thay đổi ảnh đại diện
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setUser({ ...user, avatar: reader.result });
-      };
-      reader.readAsDataURL(file);
+
+  const handleAvatarChange = async (e) => {
+    if (!e.target.files[0]) return;
+
+    try {
+      const response = await uploadService.uploadImage(e.target.files[0]);
+
+      if (response && response.metadata) {
+        setAvatar(response.metadata);
+        setUser((prevUser) => ({
+          ...prevUser,
+          avatar: response.metadata, // Lấy trực tiếp URL ảnh từ metadata
+        }));
+        toast.success("Tải ảnh lên thành công");
+      } else {
+        toast.error("Lỗi tải ảnh lên");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải ảnh lên:", error);
+      toast.error("Tải ảnh lên thất bại");
     }
   };
 
@@ -80,6 +95,7 @@ const UserProfileForm = () => {
       phone: user.phone,
       gender: user.gender,
       birthday: user.birthday,
+      avatarId: avatar?.id,
     };
 
     try {
@@ -107,7 +123,10 @@ const UserProfileForm = () => {
         <div className="w-1/3 flex flex-col items-center">
           <div className="relative">
             <img
-              src={user.avatar}
+              src={
+                user.avatar?.path ||
+                "https://ui-avatars.com/api/?name=" + user.fullName
+              }
               alt="Avatar"
               className="w-72 h-72 rounded-full object-cover border-2 border-gray-300"
             />
