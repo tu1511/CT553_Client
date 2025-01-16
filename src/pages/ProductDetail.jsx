@@ -4,38 +4,11 @@ import ProductList from "@components/HomePage/ProductList";
 import InfoSection from "@components/ProductPage/InfoSection";
 import RatingSection from "@components/ProductPage/RatingSection";
 import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
+import productService from "@services/product.service";
 
 import { Star } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-// Dữ liệu mới
-const productData = {
-  productName:
-    "Vòng cổ bạc nữ đẹp và độc đính pha lê Swarovski hình trái tim LILI_972812",
-  price: "1194000",
-  overview:
-    "Bạn có đang tìm kiếm một món trang sức tinh tế và sang trọng? Dây chuyền bạc trái tim pha lê Swarovski LILI_972812 được thiết kế nhằm thỏa mãn yêu cầu đó. Thử tưởng tượng bạn diện em nó ra ngoài đi chơi, đi làm hay đi hẹn hò, đảm bảo bạn sẽ thêm phần xinh đẹp và thu hút đó. Sản phẩm được làm từ bạc 92.5% nguyên chất, đính viên pha lê Swarovski hình trái tim cao cấp và nhiều viên Cubic Zirconia lấp lánh, được chế tác tỉ mỉ và công phu bởi những nghệ nhân lành nghề. Sẽ không bất ngờ khi sự xinh xắn, đáng yêu của bạn thu hút mọi người xung quanh đâu nhé !!",
-  productImagePath: [
-    "https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_1-400x400.jpg",
-    "https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_4-400x400.jpg",
-    "https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_3-400x400.jpg",
-    "https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_5-400x400.jpg",
-    "https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_2-400x400.jpg",
-  ],
-  sold_number: 0,
-  discountPrice: 10,
-  rating: 0,
-  reviews: [],
-  description:
-    '<div class="elementor-widget-container"><p><img loading="lazy" decoding="async" class="img-border-15px aligncenter wp-image-46994 size-full" src="https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_3.jpg" alt="Nhẫn Bạc Nữ đính Kim Cương Moissanite Elfleda LILI 564974 3" width="800" height="800" srcset="https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_3.jpg 800w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_3-400x400.jpg 400w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_3-150x150.jpg 150w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_3-768x768.jpg 768w" sizes="auto, (max-width: 800px) 100vw, 800px"></p><p><img loading="lazy" decoding="async" class="img-border-15px aligncenter wp-image-46995 size-full" src="https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_4.jpg" alt="Nhẫn Bạc Nữ đính Kim Cương Moissanite Elfleda LILI 564974 4" width="800" height="800" srcset="https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_4.jpg 800w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_4-400x400.jpg 400w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_4-150x150.jpg 150w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_4-768x768.jpg 768w" sizes="auto, (max-width: 800px) 100vw, 800px"></p><p><img loading="lazy" decoding="async" class="img-border-15px aligncenter wp-image-46996 size-full" src="https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_5.jpg" alt="Nhẫn Bạc Nữ đính Kim Cương Moissanite Elfleda LILI 564974 5" width="800" height="800" srcset="https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_5.jpg 800w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_5-400x400.jpg 400w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_5-150x150.jpg 150w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_5-768x768.jpg 768w" sizes="auto, (max-width: 800px) 100vw, 800px"></p><p><img loading="lazy" decoding="async" class="img-border-15px aligncenter wp-image-46993 size-full" src="https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_2.jpg" alt="Nhẫn Bạc Nữ đính Kim Cương Moissanite Elfleda LILI 564974 2" width="800" height="800" srcset="https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_2.jpg 800w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_2-400x400.jpg 400w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_2-150x150.jpg 150w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_2-768x768.jpg 768w" sizes="auto, (max-width: 800px) 100vw, 800px"></p><p><img loading="lazy" decoding="async" class="img-border-15px aligncenter wp-image-46992 size-full" src="https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_1.jpg" alt="Nhẫn Bạc Nữ đính Kim Cương Moissanite Elfleda LILI 564974 1" width="800" height="800" srcset="https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_1.jpg 800w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_1-400x400.jpg 400w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_1-150x150.jpg 150w, https://lili.vn/wp-content/uploads/2022/07/Nhan-bac-nu-dinh-kim-cuong-Moissanite-Elfleda-LILI_564974_1-768x768.jpg 768w" sizes="auto, (max-width: 800px) 100vw, 800px"></p></div>',
-  category: "Dây chuyền",
-  color: "Bạc và pha lê xanh dương/xanh dương tím/vàng/vàng xanh lá",
-  material: "Bạc 925",
-  stone: "Pha lê Swarovski, Cubic Zirconia",
-  gender: "Nữ",
-  completion: "Xuất sắc",
-};
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const products = [
   {
@@ -91,9 +64,10 @@ const products = [
 ];
 
 const ProductDetail = () => {
-  const [currentImage, setCurrentImage] = useState(
-    productData.productImagePath[0]
-  );
+  const [product, setProduct] = useState(null);
+  const { slug } = useParams();
+  const accsessToken = localStorage.getItem("accessToken");
+
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(null);
 
@@ -104,7 +78,9 @@ const ProductDetail = () => {
     alert(`Kích thước được chọn: ${size}`);
   };
 
-  const handleImageClick = (image) => setCurrentImage(image);
+  const handleImageClick = (image) => {
+    setCurrentImage(image?.image?.path);
+  };
   const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
   const increment = () => setQuantity((prev) => prev + 1);
   const handleBuyNow = () => {
@@ -113,12 +89,23 @@ const ProductDetail = () => {
   };
   const handleAddToCart = () => alert("Thêm vào giỏ hàng!");
 
-  // const sizes = ["S", "M", "L", "XL"];
+  const [currentImage, setCurrentImage] = useState(null);
+
+  useEffect(() => {
+    productService
+      .getOneBySlug({ slug, accessToken: accsessToken })
+      .then((data) => {
+        setProduct(data?.metadata);
+        if (data?.metadata?.images?.length > 0) {
+          setCurrentImage(data.metadata.images[0].image.path);
+        }
+      });
+  }, [slug, accsessToken]);
 
   const breadcrumb = [
     { label: "Trang chủ", path: "/" },
     { label: "Dây chuyền", path: "/day-chuyen" },
-    { label: productData.productName, path: `/san-pham/${productData.id}` },
+    { label: product?.name, path: `/san-pham/slug/${product?.slug}` },
   ];
 
   return (
@@ -131,10 +118,10 @@ const ProductDetail = () => {
           <div className="flex items-start space-x-8">
             {/* Hình nhỏ nằm bên trái */}
             <div className="flex flex-col space-y-4 overflow-y-auto scrollbar-hide">
-              {productData.productImagePath.slice(0, 6).map((image, index) => (
+              {product?.images.slice(0, 6).map((image, index) => (
                 <img
                   key={index}
-                  src={image}
+                  src={image?.image?.path}
                   alt={`Hình ${index + 1}`}
                   className={`w-20 h-20 cursor-pointer object-cover border rounded-lg ${
                     currentImage === image
@@ -150,7 +137,7 @@ const ProductDetail = () => {
             <div>
               <img
                 src={currentImage}
-                alt={productData.productName}
+                alt={product?.name}
                 className="h-[76vh] w-[100%] rounded-lg border border-gray-300 object-cover"
               />
             </div>
@@ -159,13 +146,13 @@ const ProductDetail = () => {
           {/* Chi tiết sản phẩm */}
           <div className="bg-white shadow-lg rounded-lg p-4">
             <h1 className="text-2xl font-semibold mb-4 text-gray-800 border-b-2 border-dashed border-black pb-2">
-              {productData.productName}
+              {product?.name}
             </h1>
             <div className="flex space-x-6 items-center mb-4">
               <p className="text-lg text-gray-600 border-r-2 pr-4 border-gray-300">
                 Loại sản phẩm:{" "}
                 <span className="text-primary font-medium">
-                  {productData.category}
+                  {product?.categories[0]?.category?.name}
                 </span>
               </p>
               <div className="flex items-center">
@@ -176,7 +163,7 @@ const ProductDetail = () => {
                       key={index}
                       size={20}
                       className={`${
-                        index < Math.floor(productData.rating)
+                        index < Math.floor(product?.rating || 5)
                           ? "text-yellow-400"
                           : "text-gray-300"
                       }`}
@@ -184,36 +171,36 @@ const ProductDetail = () => {
                   ))}
                 </span>
                 <p className="ml-2 text-gray-500">
-                  ({productData.rating} / 5 điểm đánh giá)
+                  ({product?.rating || 5} / 5 điểm đánh giá)
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 mb-4">
-              {productData.discountPrice > 0 ? (
+            {/* <div className="flex items-center gap-4 mb-4">
+              {product?.discountPrice  > 0 ? (
                 <>
                   <p className="text-3xl font-bold text-primary">
                     {toVietnamCurrencyFormat(
-                      productData.price -
-                        (productData.price * productData.discountPrice) / 100
+                      product.price -
+                        (product.price * product.discountPrice) / 100
                     )}
                   </p>
                   <p className="text-lg text-gray-500 line-through">
-                    {toVietnamCurrencyFormat(productData.price)}
+                    {toVietnamCurrencyFormat(product.price)}
                   </p>
                   <span className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm font-bold">
-                    -{productData.discountPrice}%
+                    -{product.discountPrice}%
                   </span>
                 </>
               ) : (
                 <p className="text-3xl font-bold text-primary">
-                  {toVietnamCurrencyFormat(productData.price)}
+                  {toVietnamCurrencyFormat(product.price)}
                 </p>
               )}
-            </div>
+            </div> */}
 
             <div className="text-gray-700 leading-relaxed mb-6 font-normal italic">
-              <p>{productData.overview}</p>
+              <p>{product?.overview}</p>
             </div>
 
             {/* Chọn số lượng và kích thước */}
@@ -283,7 +270,7 @@ const ProductDetail = () => {
         <div className="container mx-auto px-8 w-[80%]">
           <div
             className="leading-relaxed  "
-            dangerouslySetInnerHTML={{ __html: productData.description }}
+            dangerouslySetInnerHTML={{ __html: product?.description }}
           ></div>
         </div>
       </div>
@@ -296,15 +283,17 @@ const ProductDetail = () => {
             <div className="space-y-4">
               <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg shadow-sm">
                 <span className="font-semibold text-gray-700">Loại:</span>
-                <span className="text-gray-600">{productData.category}</span>
+                <span className="text-gray-600">
+                  {product?.categories[0]?.category?.name}
+                </span>
               </div>
               <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50">
                 <span className="font-semibold text-gray-700">Màu sắc:</span>
-                <span className="text-gray-600">{productData.color}</span>
+                <span className="text-gray-600">{product?.color}</span>
               </div>
               <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg shadow-sm">
                 <span className="font-semibold text-gray-700">Chất liệu:</span>
-                <span className="text-gray-600">{productData.material}</span>
+                <span className="text-gray-600">{product?.material}</span>
               </div>
             </div>
 
@@ -312,17 +301,17 @@ const ProductDetail = () => {
             <div className="space-y-4">
               <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg shadow-sm">
                 <span className="font-semibold text-gray-700">Đá:</span>
-                <span className="text-gray-600">{productData.stone}</span>
+                <span className="text-gray-600">{product?.stone}</span>
               </div>
               <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50">
                 <span className="font-semibold text-gray-700">Giới tính:</span>
-                <span className="text-gray-600">{productData.gender}</span>
+                <span className="text-gray-600">{product?.gender}</span>
               </div>
               <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg shadow-sm">
                 <span className="font-semibold text-gray-700">
                   Độ hoàn thiện:
                 </span>
-                <span className="text-gray-600">{productData.completion}</span>
+                <span className="text-gray-600">{product?.completion}</span>
               </div>
             </div>
           </div>

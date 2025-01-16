@@ -113,6 +113,7 @@ const ProductPage = () => {
           {sortedProducts.map((product) => (
             <ProductCard
               key={product.id}
+              productLink={`/san-pham/${product?.slug}`}
               image={
                 Array.isArray(product.images) && product.images.length > 0
                   ? product?.images[0]?.image?.path

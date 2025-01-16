@@ -10,6 +10,7 @@ function ProductCard({
   price,
   discountPercentage,
   ratings,
+  productLink,
   id,
   buyed,
 }) {
@@ -25,14 +26,14 @@ function ProductCard({
       {/* Hình ảnh sản phẩm */}
       <div className="relative">
         <img
-          className="w-full h-64 object-cover rounded-t-lg transition-all duration-300 ease-in-out hover:opacity-90"
+          className="w-full h-64 object-cover rounded-t-lg transition-all duration-300 ease-in-out hover:brightness-110 brightness-105"
           src={image}
           alt={name}
         />
       </div>
 
       {/* Nội dung sản phẩm */}
-      <Link to={`/san-pham/1`} className="px-2 py-4 flex flex-col">
+      <Link to={productLink} className="px-2 py-4 flex flex-col">
         {/* Tên sản phẩm */}
         <h5
           className="mb-2 text-lg line-clamp-2 font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors duration-300 h-[50px]"

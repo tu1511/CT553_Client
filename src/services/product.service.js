@@ -24,6 +24,16 @@ class productService {
     });
     return response.data;
   }
+
+  //get one by slug
+  async getOneBySlug({ accessToken, slug }) {
+    const response = await this.api.get(`/slug/${slug}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  }
 }
 
 export default new productService();

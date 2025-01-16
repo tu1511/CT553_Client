@@ -13,7 +13,7 @@ import ViewedProductsPage from "@pages/ViewedProductsPage";
 import SearchResultsPage from "@pages/SearchResultsPage";
 import OrderPage from "@pages/OrderPage";
 import ThankYouPage from "@pages/ThankYouPage";
-import PolicyPage from "@pages/PolicyPage"
+import PolicyPage from "@pages/PolicyPage";
 
 const routes = [
   {
@@ -88,7 +88,7 @@ const routes = [
   },
   {
     id: "chitietsanpham",
-    path: "/san-pham/1",
+    path: "/san-pham/:slug",
     element: <ProductDetail />,
   },
   {
