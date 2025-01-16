@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import HeaderLine from "@components/common/HeaderLine";
 import ProductList from "@components/HomePage/ProductList";
 import FilterComponent from "@components/ProductPage/FilterComponent";
 import ProductCard from "@components/common/ProductCard";
+import productService from "@services/product.service";
 
 const ProductPage = () => {
   const [filters, setFilters] = useState({
@@ -14,72 +15,35 @@ const ProductPage = () => {
     sortBy: "",
   });
 
-  // All products (mock data)
-  const allProducts = [
-    {
-      id: 1,
-      image:
-        "https://lili.vn/wp-content/uploads/2021/12/Day-chuyen-bac-nu-phong-cach-co-trang-CZ-LILI_831944_2-400x400.jpg",
-      name: "Dây chuyền bạc cao cấp",
-      price: 1200000, // Giá gốc
-      material: "silver",
-      gender: "female",
-      discountPercentage: 20,
-      ratings: 4,
-    },
-    {
-      id: 2,
-      image:
-        "https://lili.vn/wp-content/uploads/2022/08/Nhan-bac-nu-dinh-da-CZ-hoa-buom-LILI_661591_2-400x400.jpg",
-      name: "Nhẫn bạc đẹp",
-      price: 500000,
-      material: "gold",
-      gender: "female",
-      ratings: 5,
-      discountPercentage: 20,
-    },
-    {
-      id: 3,
-      image:
-        "https://lili.vn/wp-content/uploads/2022/06/Mat-day-chuyen-bac-nu-dinh-kim-cuong-Moissanite-tron-cach-dieu-LILI_413898_6.jpg",
-      name: "Dây chuyền bạc thời trang",
-      price: 1500000,
-      material: "silver",
-      gender: "unisex",
-      ratings: 3,
-      discountPercentage: 20,
-    },
-    {
-      id: 4,
-      image:
-        "https://lili.vn/wp-content/uploads/2021/12/Nhan-doi-bac-hiep-si-va-cong-chua-dinh-da-CZ-LILI_819229_2-400x400.jpg",
-      name: "Nhẫn bạc thời trang đẹp quá trời",
-      price: 600000,
-      material: "platinum",
-      gender: "male",
-      ratings: 4,
-      discountPercentage: 20,
-    },
-    {
-      id: 5,
-      image:
-        "https://lili.vn/wp-content/uploads/2021/11/Lac-tay-bac-nu-co-4-la-cach-dieu-LILI_661577_6-400x400.jpg",
-      name: "Lắc tay bạc",
-      price: 700000,
-      material: "silver",
-      gender: "female",
-      ratings: 5,
-    },
-    {
-      id: 6,
-      image: "https://via.placeholder.com/150",
-      name: "Chocker bạc",
-      price: 800000,
-      material: "gold",
-      gender: "unisex",
-      ratings: 2,
-    },
-  ];
+  const [products, setProducts] = useState([]);
+  const accessToken = localStorage.getItem("accessToken"); // Không nên đặt trong useEffect
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        if (!accessToken) {
+          console.warn(
+            "⚠ Không tìm thấy accessToken, có thể yêu cầu đăng nhập."
+          );
+          return;
+        }
+
+        const data = await productService.getAll({
+          accessToken,
+          type: "All",
+          limit: 8,
+        });
+
+        setProducts(data.metadata?.products || []);
+      } catch (error) {
+        console.error("Lỗi khi lấy sản phẩm:", error);
+      }
+    };
+
+    fetchProducts();
+  }, [accessToken]);
+
+  console.log(products[0]);
 
   // Handle filter changes
   const handleFilterChange = (newFilters) => {
@@ -87,33 +51,36 @@ const ProductPage = () => {
   };
 
   // Apply filters to products
-  const filteredProducts = allProducts.filter((product) => {
+  const filteredProducts = products.filter((product) => {
     const { type, material, gender, priceRange, searchText } = filters;
 
-    // Type filter (example: necklaces or rings)
-    if (type && !product.name.toLowerCase().includes(type.toLowerCase())) {
+    // Lọc theo type (phải kiểm tra product.type thay vì name)
+    if (type && product.type !== type) {
       return false;
     }
 
-    // Material filter
+    // Lọc theo chất liệu
     if (material && product.material !== material) {
       return false;
     }
 
-    // Gender filter
+    // Lọc theo giới tính
     if (gender && product.gender !== gender) {
       return false;
     }
 
-    // Price range filter
+    // Lọc theo khoảng giá (kiểm tra tránh lỗi split)
     if (priceRange) {
-      const [minPrice, maxPrice] = priceRange.split("-").map(Number);
-      if (product.price < minPrice || product.price > maxPrice) {
+      const range = priceRange.split("-").map(Number);
+      if (
+        range.length === 2 &&
+        (product.price < range[0] || product.price > range[1])
+      ) {
         return false;
       }
     }
 
-    // Search text filter
+    // Lọc theo tên sản phẩm
     if (
       searchText &&
       !product.name.toLowerCase().includes(searchText.toLowerCase())
@@ -126,16 +93,10 @@ const ProductPage = () => {
 
   // Sort products based on filters.sortBy
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (filters.sortBy === "priceAsc") {
-      return a.price - b.price;
-    }
-    if (filters.sortBy === "priceDesc") {
-      return b.price - a.price;
-    }
-    if (filters.sortBy === "newest") {
-      return b.id - a.id; // Assuming newer products have higher IDs
-    }
-    return 0; // Default, no sorting
+    if (filters.sortBy === "priceAsc") return a.price - b.price;
+    if (filters.sortBy === "priceDesc") return b.price - a.price;
+    if (filters.sortBy === "newest") return b.id - a.id; // Sắp xếp mới nhất
+    return 0; // Không sắp xếp
   });
 
   return (
@@ -152,13 +113,17 @@ const ProductPage = () => {
           {sortedProducts.map((product) => (
             <ProductCard
               key={product.id}
-              image={product.image}
-              name={product.name}
-              price={product.price}
-              discountPercentage={product.discountPercentage}
-              ratings={product.ratings}
+              image={
+                Array.isArray(product.images) && product.images.length > 0
+                  ? product?.images[0]?.image?.path
+                  : "https://via.placeholder.com/150"
+              }
+              name={product.name || "Sản phẩm không có tên"}
+              price={product?.variants?.[0]?.price}
+              discountPercentage={product.discountPercentage || 10}
+              ratings={product.ratings || 5}
               id={product.id}
-              buyed={product.buyed}
+              buyed={product.soldNumber || 0}
             />
           ))}
         </div>
