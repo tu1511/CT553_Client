@@ -69,13 +69,20 @@ const ProductDetail = () => {
   const accsessToken = localStorage.getItem("accessToken");
 
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState(null);
 
   const navigate = useNavigate();
 
   const handleSelectSize = (size) => {
-    setSelectedSize(size);
-    alert(`Kích thước được chọn: ${size}`);
+    const variant = product?.variants.find((v) => v.size === size);
+    setSelectedVariant(variant);
+    // if (variant) {
+    //   alert(
+    //     `Đã chọn size: ${size} với giá ${toVietnamCurrencyFormat(
+    //       variant.price
+    //     )}`
+    //   );
+    // }
   };
 
   const handleImageClick = (image) => {
@@ -96,6 +103,10 @@ const ProductDetail = () => {
       .getOneBySlug({ slug, accessToken: accsessToken })
       .then((data) => {
         setProduct(data?.metadata);
+        // Đặt mặc định variant đầu tiên
+        if (data?.metadata?.variants?.length > 0) {
+          setSelectedVariant(data?.metadata?.variants[0]); // Mặc định chọn variant đầu tiên
+        }
         if (data?.metadata?.images?.length > 0) {
           setCurrentImage(data.metadata.images[0].image.path);
         }
@@ -176,28 +187,17 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* <div className="flex items-center gap-4 mb-4">
-              {product?.discountPrice  > 0 ? (
-                <>
-                  <p className="text-3xl font-bold text-primary">
-                    {toVietnamCurrencyFormat(
-                      product.price -
-                        (product.price * product.discountPrice) / 100
-                    )}
-                  </p>
-                  <p className="text-lg text-gray-500 line-through">
-                    {toVietnamCurrencyFormat(product.price)}
-                  </p>
-                  <span className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm font-bold">
-                    -{product.discountPrice}%
-                  </span>
-                </>
+            <div className="flex items-center gap-4 mb-4">
+              {selectedVariant ? (
+                <p className="text-3xl font-bold text-primary">
+                  {toVietnamCurrencyFormat(selectedVariant.price)}
+                </p>
               ) : (
                 <p className="text-3xl font-bold text-primary">
-                  {toVietnamCurrencyFormat(product.price)}
+                  {toVietnamCurrencyFormat(product?.price)}
                 </p>
               )}
-            </div> */}
+            </div>
 
             <div className="text-gray-700 leading-relaxed mb-6 font-normal italic">
               <p>{product?.overview}</p>
@@ -224,22 +224,23 @@ const ProductDetail = () => {
                 </button>
               </div>
               {/* Kích thước */}
-              {/* <div>
+              <div>
                 <label htmlFor="size" className="text-gray-700 font-medium">
                   Kích thước:
                 </label>
                 <select
                   id="size"
                   className="ml-2 border border-gray-300 rounded-lg py-2 px-3 focus:ring-primary focus:border-primary text-gray-800"
+                  onChange={(e) => handleSelectSize(e.target.value)}
                 >
                   <option value="">Chọn size</option>
-                  {sizes.map((size) => (
-                    <option key={size} value={size}>
-                      {size}
+                  {product?.variants?.map((variant) => (
+                    <option key={variant.id} value={variant.size}>
+                      {variant.size}
                     </option>
                   ))}
                 </select>
-              </div> */}
+              </div>
             </div>
 
             {/* Hành động */}
@@ -267,7 +268,7 @@ const ProductDetail = () => {
         <div className="mt-10 ">
           <HeaderLine title="Mô tả sản phẩm" />
         </div>
-        <div className="container mx-auto px-8 w-[80%]">
+        <div className="container mx-auto px-10 w-[70%]">
           <div
             className="leading-relaxed  "
             dangerouslySetInnerHTML={{ __html: product?.description }}

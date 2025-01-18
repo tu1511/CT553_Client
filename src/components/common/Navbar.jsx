@@ -5,26 +5,67 @@ const Navbar = () => {
   const categories = [
     { name: "Trang chủ", link: "/", menuItems: [] },
     {
-      name: "Trang sức nữ",
-      link: "/trang-suc-nu",
+      name: "Trang sức",
       menuItems: [
-        { label: "Nhẫn bạc nữ", key: "ring", link: "/san-pham" },
-        { label: "Dây chuyền bạc nữ", key: "necklace", link: "/san-pham" },
-        { label: "Lắc tay bạc nữ", key: "bracelet", link: "/san-pham" },
-        { label: "Bông tai bạc nữ", key: "earring", link: "/san-pham" },
+        {
+          label: "Trang sức nữ",
+          key: "female-jewelry",
+          children: [
+            { label: "Nhẫn bạc nữ", key: "ring-female", link: "/san-pham" },
+            {
+              label: "Dây chuyền bạc nữ",
+              key: "necklace-female",
+              link: "/san-pham",
+            },
+            {
+              label: "Lắc tay bạc nữ",
+              key: "bracelet-female",
+              link: "/san-pham",
+            },
+            {
+              label: "Bông tai bạc nữ",
+              key: "earring-female",
+              link: "/san-pham",
+            },
+          ],
+        },
+        {
+          label: "Trang sức nam",
+          key: "male-jewelry",
+          children: [
+            { label: "Nhẫn bạc nam", key: "ring-male", link: "/san-pham" },
+            {
+              label: "Dây chuyền bạc nam",
+              key: "necklace-male",
+              link: "/san-pham",
+            },
+            {
+              label: "Lắc tay bạc nam",
+              key: "bracelet-male",
+              link: "/san-pham",
+            },
+          ],
+        },
+        {
+          label: "Trang sức đôi",
+          key: "couple-jewelry",
+          children: [
+            {
+              label: "Nhẫn cặp",
+              key: "couple-ring",
+              link: "/san-pham",
+            },
+            {
+              label: "Dây chuyền cặp",
+              key: "couple-necklace",
+              link: "/san-pham",
+            },
+          ],
+        },
       ],
     },
-    {
-      name: "Trang sức nam",
-      link: "/trang-suc-nam",
-      menuItems: [
-        { label: "Nhẫn bạc nam", key: "ring", link: "/san-pham" },
-        { label: "Dây chuyền bạc nam", key: "necklace", link: "/san-pham" },
-        { label: "Lắc tay bạc nam", key: "bracelet", link: "/san-pham" },
-      ],
-    },
-    { name: "Trang sức đôi", link: "/trang-suc-doi", menuItems: [] },
-    { name: "Bộ sưu tập", link: "/bo-sieu-tap", menuItems: [] },
+    { name: "Khuyến mãi", link: "/khuyen-mai", menuItems: [] },
+    { name: "Tin tức", link: "/tin-tuc", menuItems: [] },
     {
       name: "Chính sách",
       link: "/chinh-sach",
@@ -46,29 +87,17 @@ const Navbar = () => {
         },
       ],
     },
+    { name: "Về chúng tôi", link: "/ve-chung-toi", menuItems: [] },
   ];
-
-  const formatMenuItems = (menuItems) =>
-    menuItems.map((item) => ({
-      label: (
-        <Link
-          to={item.link}
-          className="block text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
-        >
-          {item.label}
-        </Link>
-      ),
-      key: item.key,
-    }));
 
   return (
     <nav className="bg-beige-100 border-b-2 border-red-700">
       <div className="container mx-auto flex flex-wrap justify-center md:justify-between items-center px-4 py-2">
         {categories.map((category, index) => (
           <div key={index} className="relative">
-            {category.menuItems.length > 0 ? (
+            {category.menuItems && category.menuItems.length > 0 ? (
               <DropdownMenu
-                menuItems={formatMenuItems(category.menuItems)}
+                menuItems={category.menuItems}
                 label={category.name}
               />
             ) : (
