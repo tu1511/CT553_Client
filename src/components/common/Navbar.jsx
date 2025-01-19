@@ -1,68 +1,50 @@
-import DropdownMenu from "@components/common/DropdownMenu";
+import React, { Children, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import DropdownMenu from "@components/common/DropdownMenu";
+import categoryService from "@services/category.service";
 
 const Navbar = () => {
-  const categories = [
+  const [categories, setCategories] = useState([]);
+  const accessToken = localStorage.getItem("accessToken");
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await categoryService.getAll({ accessToken });
+        if (response?.metadata) {
+          setCategories(response.metadata);
+        } else {
+          console.warn("No metadata found in response");
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories: ", error);
+      }
+    };
+
+    fetchCategories();
+  }, [accessToken]);
+
+  useEffect(() => {
+    console.log(categories); // Chỉ log sau khi categories thay đổi
+  }, [categories]); // Chạy khi categories thay đổi
+
+  // Tạo menuItems động từ categories
+  const jewelryMenuItems = categories.map((category) => ({
+    label: category.name,
+    key: category.slug,
+    children: category.children?.map((child) => ({
+      label: child.name, // Tên mục con
+      key: child.slug, // Khóa của mục con
+      link: `/${child.slug}`, // Liên kết đến trang của mục con
+    })),
+  }));
+
+  const navbar = [
     { name: "Trang chủ", link: "/", menuItems: [] },
     {
       name: "Trang sức",
-      menuItems: [
-        {
-          label: "Trang sức nữ",
-          key: "female-jewelry",
-          children: [
-            { label: "Nhẫn bạc nữ", key: "ring-female", link: "/san-pham" },
-            {
-              label: "Dây chuyền bạc nữ",
-              key: "necklace-female",
-              link: "/san-pham",
-            },
-            {
-              label: "Lắc tay bạc nữ",
-              key: "bracelet-female",
-              link: "/san-pham",
-            },
-            {
-              label: "Bông tai bạc nữ",
-              key: "earring-female",
-              link: "/san-pham",
-            },
-          ],
-        },
-        {
-          label: "Trang sức nam",
-          key: "male-jewelry",
-          children: [
-            { label: "Nhẫn bạc nam", key: "ring-male", link: "/san-pham" },
-            {
-              label: "Dây chuyền bạc nam",
-              key: "necklace-male",
-              link: "/san-pham",
-            },
-            {
-              label: "Lắc tay bạc nam",
-              key: "bracelet-male",
-              link: "/san-pham",
-            },
-          ],
-        },
-        {
-          label: "Trang sức đôi",
-          key: "couple-jewelry",
-          children: [
-            {
-              label: "Nhẫn cặp",
-              key: "couple-ring",
-              link: "/san-pham",
-            },
-            {
-              label: "Dây chuyền cặp",
-              key: "couple-necklace",
-              link: "/san-pham",
-            },
-          ],
-        },
-      ],
+      link: "/trang-suc",
+      menuItems: jewelryMenuItems, // Sử dụng dữ liệu động từ API
     },
     { name: "Khuyến mãi", link: "/khuyen-mai", menuItems: [] },
     { name: "Tin tức", link: "/tin-tuc", menuItems: [] },
@@ -93,7 +75,7 @@ const Navbar = () => {
   return (
     <nav className="bg-beige-100 border-b-2 border-red-700">
       <div className="container mx-auto flex flex-wrap justify-center md:justify-between items-center px-4 py-2">
-        {categories.map((category, index) => (
+        {navbar.map((category, index) => (
           <div key={index} className="relative">
             {category.menuItems && category.menuItems.length > 0 ? (
               <DropdownMenu

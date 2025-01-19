@@ -1,14 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@components/common/Navbar";
-import {
-  Camera,
-  CircleUser,
-  Mic,
-  Search,
-  ShoppingBag,
-  ShoppingCart,
-} from "lucide-react";
+import { Camera, Mic, Search, ShoppingBag, ShoppingCart } from "lucide-react";
 // import DropdownMenu from "@components/common/DropdownMenu";
 import ImageSearchModal from "@components/HomePage/ImageSearchModal";
 
