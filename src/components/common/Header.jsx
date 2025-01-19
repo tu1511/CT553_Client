@@ -9,7 +9,7 @@ import {
   ShoppingBag,
   ShoppingCart,
 } from "lucide-react";
-import DropdownMenu from "@components/common/DropdownMenu";
+// import DropdownMenu from "@components/common/DropdownMenu";
 import ImageSearchModal from "@components/HomePage/ImageSearchModal";
 
 import SpeechRecognition, {
@@ -18,6 +18,7 @@ import SpeechRecognition, {
 import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "@redux/slices/authSlice";
 import { getLoggedInUser } from "@redux/thunk/accountThunk";
+import DropdownCus from "@components/common/DropDownCus";
 
 const Header = () => {
   const messages = useMemo(
@@ -82,10 +83,12 @@ const Header = () => {
   // console.log(user);
 
   const handleLogout = () => {
+    // Xóa token khỏi localStorage
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
 
-    window.location.reload();
+    // Chuyển hướng về trang chủ
+    window.location.href = "/";
   };
 
   useEffect(() => {
@@ -105,50 +108,26 @@ const Header = () => {
   const accountMenuItems = user
     ? [
         {
-          label: (
-            <Link
-              to="/tai-khoan"
-              className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
-            >
-              Thông tin tài khoản
-            </Link>
-          ),
+          label: "Thông tin tài khoản",
           key: "thong-tin-tai-khoan",
+          link: "/tai-khoan",
         },
         {
-          label: (
-            <Link
-              onClick={() => handleLogout()}
-              className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
-            >
-              Đăng xuất
-            </Link>
-          ),
+          label: "Đăng xuất",
           key: "dang-xuat",
+          onClick: handleLogout, // Gắn sự kiện đăng xuất
         },
       ]
     : [
         {
-          label: (
-            <Link
-              to="/dang-ky"
-              className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
-            >
-              Đăng ký tài khoản
-            </Link>
-          ),
+          label: "Đăng ký tài khoản",
           key: "dang-ky",
+          link: "/dang-ky",
         },
         {
-          label: (
-            <Link
-              to="/dang-nhap"
-              className="text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 transition duration-200 ease-in-out"
-            >
-              Đăng nhập
-            </Link>
-          ),
+          label: "Đăng nhập",
           key: "dang-nhap",
+          link: "/dang-nhap",
         },
       ];
 
@@ -206,10 +185,10 @@ const Header = () => {
           </div>
 
           <div className="flex items-center space-x-6 mt-4 md:mt-0">
-            <DropdownMenu
+            <DropdownCus
               menuItems={accountMenuItems}
               label={user ? `Xin chào, ${user.fullName}` : "Tài khoản"}
-              icon={<CircleUser size={20} />}
+              // icon={<CircleUser size={20} />}
             />
 
             <Link
