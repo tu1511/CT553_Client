@@ -115,6 +115,10 @@ const ProductDetail = () => {
 
   const breadcrumb = [
     { label: "Trang chủ", path: "/" },
+    {
+      label: "Trang sức nữ",
+      path: "/trang-suc-nu",
+    },
     { label: "Dây chuyền", path: "/day-chuyen" },
     { label: product?.name, path: `/san-pham/slug/${product?.slug}` },
   ];

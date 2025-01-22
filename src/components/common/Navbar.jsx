@@ -1,4 +1,4 @@
-import React, { Children, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import DropdownMenu from "@components/common/DropdownMenu";
 import categoryService from "@services/category.service";
@@ -32,10 +32,11 @@ const Navbar = () => {
   const jewelryMenuItems = categories.map((category) => ({
     label: category.name,
     key: category.slug,
+    link: `/${category.slug}`,
     children: category.children?.map((child) => ({
-      label: child.name, // Tên mục con
-      key: child.slug, // Khóa của mục con
-      link: `/${child.slug}`, // Liên kết đến trang của mục con
+      label: child.name,
+      key: child.slug,
+      link: `/${child.slug}`,
     })),
   }));
 

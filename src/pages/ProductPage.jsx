@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import HeaderLine from "@components/common/HeaderLine";
-import ProductList from "@components/HomePage/ProductList";
+// import ProductList from "@components/HomePage/ProductList";
 import FilterComponent from "@components/ProductPage/FilterComponent";
 import ProductCard from "@components/common/ProductCard";
 import productService from "@services/product.service";
+import Breadcrumbs from "@components/common/Breadcrumbs";
+import { useParams } from "react-router-dom";
+import categoryService from "@services/category.service";
 
 const ProductPage = () => {
   const [filters, setFilters] = useState({
@@ -17,6 +20,31 @@ const ProductPage = () => {
 
   const [products, setProducts] = useState([]);
   const accessToken = localStorage.getItem("accessToken"); // Không nên đặt trong useEffect
+
+  // console.log(products[0]);
+  const { slug } = useParams();
+  console.log(slug);
+  const [category, setCategory] = useState(null);
+
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const response = await categoryService.getOneBySlug({
+          accessToken,
+          slug,
+        });
+        if (response?.metadata) {
+          setCategory(response.metadata);
+        } else {
+          console.warn("No metadata found in response");
+        }
+      } catch (error) {
+        console.error("Failed to fetch category: ", error);
+      }
+    };
+
+    fetchCategory();
+  }, [accessToken, slug]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -32,6 +60,7 @@ const ProductPage = () => {
           accessToken,
           type: "All",
           limit: 8,
+          categoryIds: category?.id ? [category?.id] : [],
         });
 
         setProducts(data.metadata?.products || []);
@@ -41,9 +70,7 @@ const ProductPage = () => {
     };
 
     fetchProducts();
-  }, [accessToken]);
-
-  console.log(products[0]);
+  }, [accessToken, category]);
 
   // Handle filter changes
   const handleFilterChange = (newFilters) => {
@@ -99,37 +126,53 @@ const ProductPage = () => {
     return 0; // Không sắp xếp
   });
 
+  const breadcrumb = [
+    { label: "Trang chủ", path: "/" },
+    {
+      label: `${category?.name || "Sản phẩm của chúng tôi"}`,
+      path: `/san-pham/${category?.slug}`,
+    },
+    // { label: "Dây chuyền", path: "/day-chuyen" },
+    // { label: product?.name, path: `/san-pham/slug/${product?.slug}` },
+  ];
+
   return (
-    <div className="container mx-auto p-8">
-      {/* Header */}
-      <HeaderLine title="Sản phẩm của chúng tôi" />
+    <>
+      <Breadcrumbs items={breadcrumb} />
+      <div className="container mx-auto p-8">
+        {/* Header */}
+        <HeaderLine title="Sản phẩm của chúng tôi" />
 
-      {/* Filter Section */}
-      <FilterComponent filters={filters} onFilterChange={handleFilterChange} />
+        {/* Filter Section */}
+        <FilterComponent
+          filters={filters}
+          onFilterChange={handleFilterChange}
+        />
 
-      <div className="container mx-auto px-8 py-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {/* Hiển thị tối đa 4 sản phẩm */}
-          {sortedProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              productLink={`/san-pham/${product?.slug}`}
-              image={
-                Array.isArray(product.images) && product.images.length > 0
-                  ? product?.images[0]?.image?.path
-                  : "https://via.placeholder.com/150"
-              }
-              name={product.name || "Sản phẩm không có tên"}
-              price={product?.variants?.[0]?.price}
-              discountPercentage={product.discountPercentage || 10}
-              ratings={product.ratings || 5}
-              id={product.id}
-              buyed={product.soldNumber || 0}
-            />
-          ))}
+        <div className="container mx-auto px-8 py-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {/* Hiển thị tối đa 4 sản phẩm */}
+            {sortedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                productLink={`/san-pham/${product?.slug}`}
+                image={
+                  Array.isArray(product.images) && product.images.length > 0
+                    ? product?.images[0]?.image?.path
+                    : "https://via.placeholder.com/150"
+                }
+                name={product.name || "Sản phẩm không có tên"}
+                price={product?.variants?.[0]?.price}
+                discountPercentage={product.discountPercentage || 10}
+                ratings={product.ratings || 5}
+                id={product.id}
+                buyed={product.soldNumber || 0}
+              />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

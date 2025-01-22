@@ -93,7 +93,7 @@ const routes = [
   },
   {
     id: "sanpham",
-    path: "/san-pham",
+    path: "/:slug",
     element: <ProductPage />,
   },
   {
