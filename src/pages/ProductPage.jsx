@@ -59,7 +59,7 @@ const ProductPage = () => {
         const data = await productService.getAll({
           accessToken,
           type: "All",
-          limit: 8,
+          limit: 24,
           categoryIds: category?.id ? [category?.id] : [],
         });
 

@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { Modal, Form, Input, Button, Radio, Select } from "antd";
-import openApiService from "@services/open-api.service"; // Import dịch vụ API
+import addressService from "@services/address.service"; // Import dịch vụ API
 
-// eslint-disable-next-line react/prop-types
 const AddressFormDialog = ({ open, onClose, addressData }) => {
   const [form] = Form.useForm();
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
-  const [communes, setCommunes] = useState([]);
+  const [wards, setWards] = useState([]);
 
   useEffect(() => {
-    // Gọi API để lấy danh sách tỉnh thành khi component được mount
     fetchProvinces();
   }, []);
 
@@ -30,44 +28,42 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
     }
   }, [addressData, form]);
 
-  // Gọi API lấy danh sách tỉnh thành
   const fetchProvinces = async () => {
     try {
-      const provincesData = await openApiService.getProvinces();
-      setProvinces(provincesData);
+      const provincesData = await addressService.getProvinces();
+      setProvinces(provincesData?.metadata || []);
     } catch (error) {
       console.error("Lỗi khi lấy danh sách tỉnh thành:", error.message);
     }
   };
 
-  // Gọi API lấy danh sách quận huyện theo tỉnh thành
-  const fetchDistricts = async (provinceCode) => {
+  const fetchDistricts = async (provinceId) => {
     try {
-      const districtsData = await openApiService.getDistricts(provinceCode);
-      setDistricts(districtsData);
+      const districtsData = await addressService.getDistricts(provinceId);
+      setDistricts(districtsData?.metadata || []);
+      setWards([]); // Reset danh sách xã/phường
     } catch (error) {
       console.error("Lỗi khi lấy danh sách quận huyện:", error.message);
     }
   };
 
-  // Gọi API lấy danh sách xã phường theo quận huyện
-  const fetchCommunes = async (districtCode) => {
+  const fetchWards = async (districtId) => {
     try {
-      const communesData = await openApiService.getWards(districtCode);
-      setCommunes(communesData);
+      const wardsData = await addressService.getWards(districtId);
+      setWards(wardsData?.metadata || []);
     } catch (error) {
       console.error("Lỗi khi lấy danh sách xã phường:", error.message);
     }
   };
 
   const handleProvinceChange = (value) => {
-    fetchDistricts(value); // Lấy danh sách quận huyện khi tỉnh thành thay đổi
-    form.setFieldsValue({ district: undefined, commune: undefined });
+    fetchDistricts(value); // Gọi API với ProvinceID
+    form.setFieldsValue({ district: undefined, commune: undefined }); // Reset giá trị
   };
 
   const handleDistrictChange = (value) => {
-    fetchCommunes(value); // Lấy danh sách xã phường khi quận huyện thay đổi
-    form.setFieldsValue({ commune: undefined });
+    fetchWards(value); // Gọi API với DistrictID
+    form.setFieldsValue({ commune: undefined }); // Reset giá trị
   };
 
   const handleOk = () => {
@@ -89,7 +85,7 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
   return (
     <Modal
       title={addressData ? "Sửa địa chỉ" : "Thêm địa chỉ mới"}
-      visible={open}
+      open={open}
       onOk={handleOk}
       onCancel={handleCancel}
       footer={[
@@ -113,9 +109,9 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
     >
       <Form
         form={form}
-        layout="horizontal" // Layout ngang
+        layout="horizontal"
         initialValues={{
-          isDefault: false, // Mặc định không phải địa chỉ chính
+          isDefault: false,
         }}
       >
         <Form.Item
@@ -155,8 +151,8 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
             onChange={handleProvinceChange}
             placeholder="Chọn tỉnh thành"
             options={provinces.map((province) => ({
-              label: province.name,
-              value: province.code,
+              label: province.ProvinceName,
+              value: province.ProvinceID,
             }))}
           />
         </Form.Item>
@@ -172,8 +168,8 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
             onChange={handleDistrictChange}
             placeholder="Chọn quận huyện"
             options={districts.map((district) => ({
-              label: district.name,
-              value: district.code,
+              label: district.DistrictName,
+              value: district.DistrictID,
             }))}
           />
         </Form.Item>
@@ -187,9 +183,9 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
         >
           <Select
             placeholder="Chọn xã phường"
-            options={communes.map((commune) => ({
-              label: commune.name,
-              value: commune.code,
+            options={wards.map((commune) => ({
+              label: commune.WardName, // Sửa để phù hợp với API
+              value: commune.WardCode,
             }))}
           />
         </Form.Item>
