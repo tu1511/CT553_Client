@@ -51,6 +51,43 @@ class addressService {
 
     return response.data;
   }
+
+  // get user address
+  async getUserAddress(accessToken) {
+    try {
+      const response = await this.api.get("/current-account", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || "Error fetching user address"
+      );
+    }
+  }
+
+  // delete
+  async deleteAddress(id, accessToken) {
+    const response = await this.api.delete(`/${id}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  }
+
+  //update
+
+  async updateAddress(address, accessToken) {
+    const response = await this.api.put(`/${address.address_id}`, address, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  }
 }
 
 export default new addressService();

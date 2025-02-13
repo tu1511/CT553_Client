@@ -1,91 +1,50 @@
 import { useEffect, useState } from "react";
 import AddressFormDialog from "@components/ProfilePage/AddressFormDialog"; // Modal thêm/sửa địa chỉ
 import { SquarePen, Trash2 } from "lucide-react";
-import addressService from "@services/address.service";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteAddressThunk,
+  getUserAddressThunk,
+} from "@redux/thunk/addressThunk";
+import { toast } from "react-toastify";
 
 const AddressSection = () => {
   const [open, setOpen] = useState(false);
   const [editAddress, setEditAddress] = useState(null);
-  const [addresses, setAddresses] = useState([]);
   const accessToken = localStorage.getItem("accessToken");
 
-  // Lấy danh sách địa chỉ từ API
+  const dispatch = useDispatch();
+  const { addresses } = useSelector((state) => state.address);
+
   useEffect(() => {
-    const fetchAddress = async () => {
-      try {
-        const response = await addressService.getAll({ accessToken });
-        setAddresses(response?.metadata || []);
-      } catch (error) {
-        console.error("Failed to fetch addresses:", error);
-      }
-    };
-    fetchAddress();
-  }, [accessToken]);
+    dispatch(getUserAddressThunk(accessToken));
+  }, [dispatch, accessToken]);
+
+  console.log(addresses);
 
   // Mở modal thêm/sửa
   const handleClickOpen = (index = null) => {
-    setEditAddress(index !== null ? addresses[index] : null);
+    const addressData = index !== null ? addresses[index] : null;
+    setEditAddress(addressData);
     setOpen(true);
+
+    console.log("👉 Dữ liệu trước khi mở modal:", addressData); // Log dữ liệu ngay trước khi cập nhật
   };
 
   // Đóng modal
-  const handleClose = async (newAddress) => {
+  const handleClose = () => {
     setOpen(false);
-    if (newAddress) {
-      if (editAddress) {
-        // Sửa địa chỉ
-        try {
-          await addressService.update(editAddress.id, newAddress, {
-            accessToken,
-          });
-          setAddresses((prev) =>
-            prev.map((address) =>
-              address.id === editAddress.id
-                ? { ...address, ...newAddress }
-                : address
-            )
-          );
-        } catch (error) {
-          console.error("Failed to update address:", error);
-        }
-      } else {
-        // Thêm mới địa chỉ
-        try {
-          const response = await addressService.create(newAddress, {
-            accessToken,
-          });
-          setAddresses((prev) => [...prev, response]);
-        } catch (error) {
-          console.error("Failed to add address:", error);
-        }
-      }
-    }
-    setEditAddress(null);
   };
 
   // Xóa địa chỉ
-  const handleDelete = async (id) => {
+  const handleDelete = async (index) => {
     try {
-      await addressService.delete(id, { accessToken });
-      setAddresses((prev) => prev.filter((address) => address.id !== id));
+      await dispatch(deleteAddressThunk({ id: index, accessToken }));
+      dispatch(getUserAddressThunk(localStorage.getItem("accessToken")));
+      toast.success("Xóa địa chỉ thành công!");
     } catch (error) {
-      console.error("Failed to delete address:", error);
-    }
-  };
-
-  // Thiết lập mặc định
-  const handleSetDefault = async (id) => {
-    try {
-      await addressService.setDefault(id, { accessToken });
-      setAddresses((prev) =>
-        prev.map((address) =>
-          address.id === id
-            ? { ...address, isDefault: true }
-            : { ...address, isDefault: false }
-        )
-      );
-    } catch (error) {
-      console.error("Failed to set default address:", error);
+      console.error("❌ Lỗi khi xóa địa chỉ:", error);
+      toast.error("Không thể xóa địa chỉ. Vui lòng thử lại!");
     }
   };
 
@@ -149,12 +108,12 @@ const AddressSection = () => {
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>
-                        <button
+                        {/* <button
                           className="block mt-2 text-gray-600 border border-gray-300 py-1 px-2 rounded hover:bg-gray-200"
                           onClick={() => handleSetDefault(address.id)}
                         >
                           Thiết lập mặc định
-                        </button>
+                        </button> */}
                       </>
                     )}
                   </div>

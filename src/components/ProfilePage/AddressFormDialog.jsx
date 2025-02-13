@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { Modal, Form, Input, Button, Radio, Select } from "antd";
 import addressService from "@services/address.service"; // Import dịch vụ API
 import { useDispatch } from "react-redux";
-import { createAddressThunk } from "@redux/thunk/addressThunnk";
+import {
+  createAddressThunk,
+  getUserAddressThunk,
+  updateAddressThunk,
+} from "@redux/thunk/addressThunk";
 import { toast } from "react-toastify";
 
 // eslint-disable-next-line react/prop-types
@@ -18,17 +22,41 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
     fetchProvinces();
   }, []);
 
+  // useEffect(() => {
+  //   if (addressData) {
+  //     form.setFieldsValue({
+  //       contactName: addressData.contactName,
+  //       contactPhone: addressData.contactPhone,
+  //       detail: addressData.detail,
+  //       wardCode: addressData.wardCode,
+  //       district: addressData.district,
+  //       province: addressData.province,
+  //       isDefault: addressData.isDefault,
+  //     });
+  //   } else {
+  //     form.resetFields();
+  //   }
+  // }, [addressData, form]);
+
   useEffect(() => {
     if (addressData) {
       form.setFieldsValue({
         contactName: addressData.contactName,
         contactPhone: addressData.contactPhone,
-        detail: addressData.detail,
+        detail: addressData.detailAddress,
         wardCode: addressData.wardCode,
-        district: addressData.district,
-        province: addressData.province,
+        district: addressData.districtId,
+        province: addressData.provinceId,
         isDefault: addressData.isDefault,
       });
+
+      if (addressData.provinceId) {
+        fetchDistricts(addressData.provinceId).then(() => {
+          if (addressData.districtId) {
+            fetchWards(addressData.districtId);
+          }
+        });
+      }
     } else {
       form.resetFields();
     }
@@ -63,8 +91,10 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
   };
 
   const handleProvinceChange = (value) => {
-    fetchDistricts(value); // Gọi API với ProvinceID
-    form.setFieldsValue({ district: undefined, wardCode: undefined }); // Reset giá trị
+    fetchDistricts(value).then(() => {
+      form.setFieldsValue({ district: undefined, wardCode: undefined });
+      setWards([]); // Reset danh sách xã/phường để tránh lỗi
+    });
   };
 
   const handleDistrictChange = (value) => {
@@ -77,6 +107,7 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
       const values = await form.validateFields(); // Lấy dữ liệu từ form
 
       const formData = {
+        address_id: addressData?.id,
         contactName: values.contactName,
         contactPhone: values.contactPhone,
         provinceId: values.province,
@@ -86,17 +117,28 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
         isDefault: values.isDefault,
       };
 
-      console.log("🔹 Dữ liệu gửi đi:", formData);
+      if (formData.address_id) {
+        // Nếu có address_id -> Cập nhật địa chỉ
+        await dispatch(
+          updateAddressThunk({
+            updatedData: formData, // Truyền đúng key expected
+            accessToken: localStorage.getItem("accessToken"),
+          })
+        );
+        toast.success("Cập nhật địa chỉ thành công");
+      } else {
+        // Nếu không có ID -> Tạo mới địa chỉ
+        await dispatch(
+          createAddressThunk({
+            addressData: formData,
+            accessToken: localStorage.getItem("accessToken"),
+          })
+        );
+        toast.success("Tạo địa chỉ thành công");
+      }
 
-      await dispatch(
-        createAddressThunk({
-          addressData: formData,
-          accessToken: localStorage.getItem("accessToken"),
-        })
-      );
-
-      toast.success("Tạo địa chỉ thành công");
-      onClose(); // Đóng modal sau khi tạo thành công
+      dispatch(getUserAddressThunk(localStorage.getItem("accessToken")));
+      onClose();
     } catch (error) {
       console.error("❌ Lỗi khi gửi dữ liệu:", error);
       toast.error("Vui lòng kiểm tra lại thông tin!");
