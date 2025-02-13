@@ -6,22 +6,14 @@ class categoryService {
   }
 
   // Get all categorys
-  async getAll({ accessToken } = {}) {
-    const response = await this.api.get("/", {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+  async getAll() {
+    const response = await this.api.get("/", {});
     return response.data;
   }
 
   // get one by slug
-  async getOneBySlug({ accessToken, slug }) {
-    const response = await this.api.get(`/${slug}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+  async getOneBySlug({ slug }) {
+    const response = await this.api.get(`/${slug}`, {});
     return response.data;
   }
 }

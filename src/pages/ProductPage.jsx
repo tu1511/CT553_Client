@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import HeaderLine from "@components/common/HeaderLine";
 // import ProductList from "@components/HomePage/ProductList";
 import FilterComponent from "@components/ProductPage/FilterComponent";
 import ProductCard from "@components/common/ProductCard";
 import productService from "@services/product.service";
 import Breadcrumbs from "@components/common/Breadcrumbs";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import categoryService from "@services/category.service";
+import { Pagination } from "antd";
 
 const ProductPage = () => {
   const [filters, setFilters] = useState({
@@ -20,6 +21,19 @@ const ProductPage = () => {
 
   const [products, setProducts] = useState([]);
   const accessToken = localStorage.getItem("accessToken"); // Không nên đặt trong useEffect
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [totalPage, setTotalPage] = useState(1);
+  const query = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  );
+  const page = parseInt(query.get("page") || "1", 10);
+
+  const handlePageChange = (page) => {
+    navigate(`?page=${page}`);
+  };
 
   // console.log(products[0]);
   const { slug } = useParams();
@@ -49,19 +63,15 @@ const ProductPage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        if (!accessToken) {
-          console.warn(
-            "⚠ Không tìm thấy accessToken, có thể yêu cầu đăng nhập."
-          );
-          return;
-        }
-
         const data = await productService.getAll({
-          accessToken,
+          // accessToken,
           type: "All",
-          limit: 24,
+          limit: 12,
+          page: page,
           categoryIds: category?.id ? [category?.id] : [],
         });
+
+        setTotalPage(data?.metadata?.pagination?.totalPages);
 
         setProducts(data.metadata?.products || []);
       } catch (error) {
@@ -70,7 +80,9 @@ const ProductPage = () => {
     };
 
     fetchProducts();
-  }, [accessToken, category]);
+  }, [accessToken, category, page]);
+
+  // console.log("products", products);
 
   // Handle filter changes
   const handleFilterChange = (newFilters) => {
@@ -170,6 +182,15 @@ const ProductPage = () => {
               />
             ))}
           </div>
+        </div>
+        <div className="flex justify-center mt-8">
+          <Pagination
+            current={page}
+            total={totalPage * 10} // Tổng số trang * 10 (Ant Design yêu cầu giá trị này đại diện cho số mục)
+            pageSize={12} // Số mục mỗi trang
+            onChange={handlePageChange}
+            showSizeChanger={false} // Ẩn thay đổi kích thước trang
+          />
         </div>
       </div>
     </>

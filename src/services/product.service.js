@@ -6,15 +6,13 @@ class productService {
   }
 
   // Get all products
-  async getAll({ accessToken, type, limit = 8, categoryIds = [] } = {}) {
+  async getAll({ type, limit = 8, page, categoryIds = [] } = {}) {
     const response = await this.api.get("/", {
       params: {
         type, // Bắt buộc (nếu thiếu sẽ bị lỗi "Product query type is missing!")
         limit, // Bắt buộc là số
+        page,
         categoryIds,
-      },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     return response.data;
