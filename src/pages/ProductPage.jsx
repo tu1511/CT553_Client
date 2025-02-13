@@ -40,6 +40,41 @@ const ProductPage = () => {
   console.log(slug);
   const [category, setCategory] = useState(null);
 
+  const [breadcrumb, setBreadcrumb] = useState([]);
+
+  useEffect(() => {
+    const fetchBreadcrumb = async () => {
+      try {
+        const response = await categoryService.getBreadcrumbFromCategory(
+          category?.id
+        );
+        console.log(response);
+        const res = response?.metadata || [];
+        setBreadcrumb([
+          { label: "Trang chủ", path: "/" },
+          ...res.map((item) => ({
+            label: item.name,
+            path: item.slug,
+          })),
+        ]);
+
+        // const breadcrumb = [
+        //   { label: "Trang chủ", path: "/" },
+        //   {
+        //     label: `${category?.name || "Sản phẩm của chúng tôi"}`,
+        //     path: `/san-pham/${category?.slug}`,
+        //   },
+        //   // { label: "Dây chuyền", path: "/day-chuyen" },
+        //   // { label: product?.name, path: `/san-pham/slug/${product?.slug}` },
+        // ];
+      } catch (error) {
+        console.error("Failed to fetch breadcrumb: ", error);
+      }
+    };
+
+    fetchBreadcrumb();
+  }, [category]);
+
   useEffect(() => {
     const fetchCategory = async () => {
       try {
@@ -137,16 +172,6 @@ const ProductPage = () => {
     if (filters.sortBy === "newest") return b.id - a.id; // Sắp xếp mới nhất
     return 0; // Không sắp xếp
   });
-
-  const breadcrumb = [
-    { label: "Trang chủ", path: "/" },
-    {
-      label: `${category?.name || "Sản phẩm của chúng tôi"}`,
-      path: `/san-pham/${category?.slug}`,
-    },
-    // { label: "Dây chuyền", path: "/day-chuyen" },
-    // { label: product?.name, path: `/san-pham/slug/${product?.slug}` },
-  ];
 
   return (
     <>

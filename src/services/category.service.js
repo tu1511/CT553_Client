@@ -16,6 +16,16 @@ class categoryService {
     const response = await this.api.get(`/${slug}`, {});
     return response.data;
   }
+
+  // get breadcrumb from category
+  async getBreadcrumbFromCategory(fromCategoryId) {
+    const response = await this.api.get("/breadcrumb", {
+      params: {
+        fromCategoryId,
+      },
+    });
+    return response.data;
+  }
 }
 
 export default new categoryService();

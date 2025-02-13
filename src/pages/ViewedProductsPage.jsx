@@ -89,7 +89,7 @@ const allProducts = [
 ];
 
 const ViewedProductsPage = () => {
-  const itemsPerPage = 4; // Số sản phẩm mỗi trang
+  const itemsPerPage = 8; // Số sản phẩm mỗi trang
   const [currentPage, setCurrentPage] = useState(1);
   const [paginatedProducts, setPaginatedProducts] = useState([]);
 

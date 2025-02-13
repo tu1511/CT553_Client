@@ -58,7 +58,7 @@ const NewsCardDetail = () => {
 
   const breadcrumbs = [
     { label: "Trang chủ", path: "/" },
-    { label: "Tin tức", path: "/tin-tuc" },
+    { label: "Tin tức", path: "tin-tuc" },
     { label: news.title || "Đang tải..." },
   ];
 
