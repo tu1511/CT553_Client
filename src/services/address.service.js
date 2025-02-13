@@ -40,6 +40,17 @@ class addressService {
     });
     return response.data;
   }
+
+  // Create address
+  async createAddress(address, accessToken) {
+    const response = await this.api.post("/", address, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return response.data;
+  }
 }
 
 export default new addressService();

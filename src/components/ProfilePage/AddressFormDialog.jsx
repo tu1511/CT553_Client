@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 import { Modal, Form, Input, Button, Radio, Select } from "antd";
 import addressService from "@services/address.service"; // Import dịch vụ API
+import { useDispatch } from "react-redux";
+import { createAddressThunk } from "@redux/thunk/addressThunnk";
+import { toast } from "react-toastify";
 
+// eslint-disable-next-line react/prop-types
 const AddressFormDialog = ({ open, onClose, addressData }) => {
   const [form] = Form.useForm();
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     fetchProvinces();
@@ -15,10 +21,10 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
   useEffect(() => {
     if (addressData) {
       form.setFieldsValue({
-        fullname: addressData.fullname,
-        phone: addressData.phone,
+        contactName: addressData.contactName,
+        contactPhone: addressData.contactPhone,
         detail: addressData.detail,
-        commune: addressData.commune,
+        wardCode: addressData.wardCode,
         district: addressData.district,
         province: addressData.province,
         isDefault: addressData.isDefault,
@@ -58,24 +64,43 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
 
   const handleProvinceChange = (value) => {
     fetchDistricts(value); // Gọi API với ProvinceID
-    form.setFieldsValue({ district: undefined, commune: undefined }); // Reset giá trị
+    form.setFieldsValue({ district: undefined, wardCode: undefined }); // Reset giá trị
   };
 
   const handleDistrictChange = (value) => {
     fetchWards(value); // Gọi API với DistrictID
-    form.setFieldsValue({ commune: undefined }); // Reset giá trị
+    form.setFieldsValue({ wardCode: undefined }); // Reset giá trị
   };
 
-  const handleOk = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        console.log("Dữ liệu địa chỉ:", values);
-        onClose();
-      })
-      .catch((errorInfo) => {
-        console.log("Validate Failed:", errorInfo);
-      });
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields(); // Lấy dữ liệu từ form
+
+      const formData = {
+        contactName: values.contactName,
+        contactPhone: values.contactPhone,
+        provinceId: values.province,
+        districtId: values.district,
+        wardCode: values.wardCode,
+        detail: values.detail,
+        isDefault: values.isDefault,
+      };
+
+      console.log("🔹 Dữ liệu gửi đi:", formData);
+
+      await dispatch(
+        createAddressThunk({
+          addressData: formData,
+          accessToken: localStorage.getItem("accessToken"),
+        })
+      );
+
+      toast.success("Tạo địa chỉ thành công");
+      onClose(); // Đóng modal sau khi tạo thành công
+    } catch (error) {
+      console.error("❌ Lỗi khi gửi dữ liệu:", error);
+      toast.error("Vui lòng kiểm tra lại thông tin!");
+    }
   };
 
   const handleCancel = () => {
@@ -116,7 +141,7 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
       >
         <Form.Item
           label="Họ tên"
-          name="fullname"
+          name="contactName"
           rules={[{ required: true, message: "Vui lòng nhập họ tên!" }]}
           labelCol={{ span: 6 }}
           wrapperCol={{ span: 18 }}
@@ -126,7 +151,7 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
 
         <Form.Item
           label="Số điện thoại"
-          name="phone"
+          name="contactPhone"
           rules={[
             { required: true, message: "Vui lòng nhập số điện thoại!" },
             {
@@ -176,16 +201,16 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
 
         <Form.Item
           label="Xã/Phường"
-          name="commune"
+          name="wardCode"
           rules={[{ required: true, message: "Vui lòng chọn xã phường!" }]}
           labelCol={{ span: 6 }}
           wrapperCol={{ span: 18 }}
         >
           <Select
             placeholder="Chọn xã phường"
-            options={wards.map((commune) => ({
-              label: commune.WardName, // Sửa để phù hợp với API
-              value: commune.WardCode,
+            options={wards.map((wardCode) => ({
+              label: wardCode.WardName, // Sửa để phù hợp với API
+              value: wardCode.WardCode,
             }))}
           />
         </Form.Item>
@@ -193,9 +218,6 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
         <Form.Item
           label="Địa chỉ chi tiết"
           name="detail"
-          rules={[
-            { required: true, message: "Vui lòng nhập địa chỉ chi tiết!" },
-          ]}
           labelCol={{ span: 6 }}
           wrapperCol={{ span: 18 }}
         >
