@@ -84,6 +84,11 @@ const Header = () => {
     window.location.href = "/";
   };
 
+  // const cart = useSelector((state) => state.cart.cart);
+  const cart = JSON.parse(localStorage.getItem("cart")) || []; // Chuyển đổi JSON string thành array
+  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+  console.log(totalQuantity);
+
   useEffect(() => {
     let messageIndex = 0;
     const interval = setInterval(() => {
@@ -197,7 +202,7 @@ const Header = () => {
               <button className="relative text-sm text-gray-700 hover:text-gray-900">
                 <ShoppingCart size={30} />
                 <span className="absolute -top-2 -right-2 bg-primary text-xs rounded-full px-2 py-1 text-white">
-                  0
+                  {totalQuantity}
                 </span>
               </button>
             </Link>

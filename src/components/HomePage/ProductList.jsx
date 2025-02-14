@@ -14,13 +14,18 @@ function ProductList({ title = "", products = [] }) {
         {products.slice(0, 4).map((product) => (
           <ProductCard
             key={product.id}
-            image={product.image}
-            name={product.name}
-            price={product.price}
-            discountPercentage={product.discountPercentage}
-            ratings={product.ratings}
+            productLink={`/san-pham/${product?.slug}`}
+            image={
+              Array.isArray(product.images) && product.images.length > 0
+                ? product?.images[0]?.image?.path
+                : "https://via.placeholder.com/150"
+            }
+            name={product.name || "Sản phẩm không có tên"}
+            price={product?.variants?.[0]?.price}
+            discountPercentage={product.discountPercentage || 10}
+            ratings={product.ratings || 5}
             id={product.id}
-            buyed={product.buyed}
+            buyed={product.soldNumber || 0}
           />
         ))}
       </div>

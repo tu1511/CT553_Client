@@ -27,7 +27,7 @@ const TableComponent = ({
     : undefined;
 
   // Lọc dữ liệu dựa trên giá trị tìm kiếm
-  const filteredRows = rows.filter((row) =>
+  const filteredRows = rows?.filter((row) =>
     Object.values(row).some((value) =>
       String(value).toLowerCase().includes(searchValue.toLowerCase())
     )
@@ -62,7 +62,7 @@ const TableComponent = ({
         pagination={{
           pageSize: paginationModel.pageSize || 10,
           current: paginationModel.current || 1,
-          total: filteredRows.length, // Tổng số dữ liệu sau khi lọc
+          total: filteredRows?.length, // Tổng số dữ liệu sau khi lọc
           pageSizeOptions: ["5", "10", "15"], // Danh sách tùy chọn số dòng
           showSizeChanger: true, // Hiển thị nút thay đổi số dòng mỗi trang
           onChange: (page, pageSize) =>

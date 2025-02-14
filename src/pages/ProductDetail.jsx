@@ -3,87 +3,45 @@ import HeaderLine from "@components/common/HeaderLine";
 import ProductList from "@components/HomePage/ProductList";
 import InfoSection from "@components/ProductPage/InfoSection";
 import RatingSection from "@components/ProductPage/RatingSection";
-import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
 import productService from "@services/product.service";
+import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
 
 import { Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
-const products = [
-  {
-    id: 1,
-    image:
-      "https://lili.vn/wp-content/uploads/2021/12/Day-chuyen-bac-nu-phong-cach-co-trang-CZ-LILI_831944_2-400x400.jpg",
-    name: "Dây chuyền bạc cao cấp",
-    price: 1200000, // Giá gốc
-    discountPercentage: 20, // Phần trăm giảm
-    ratings: 4, // Số sao đánh giá (1 đến 5)
-    buyed: 2, // Số lượng đã bán
-  },
-  {
-    id: 2,
-    image:
-      "https://lili.vn/wp-content/uploads/2022/08/Nhan-bac-nu-dinh-da-CZ-hoa-buom-LILI_661591_2-400x400.jpg",
-    name: "Nhẫn bạc đẹp",
-    price: 500000, // Giá gốc
-    discountPercentage: 10, // Phần trăm giảm
-    ratings: 5, // Số sao đánh giá (1 đến 5)
-    buyed: 5, // Số lượng đã bán
-  },
-  {
-    id: 3,
-    image:
-      "https://lili.vn/wp-content/uploads/2022/06/Mat-day-chuyen-bac-nu-dinh-kim-cuong-Moissanite-tron-cach-dieu-LILI_413898_6.jpg",
-    name: "Dây chuyền bạc thời trang",
-    price: 1500000, // Giá gốc
-    discountPercentage: 15, // Phần trăm giảm
-    ratings: 3, // Số sao đánh giá (1 đến 5)
-    buyed: 3, // Số lượng đã bán
-  },
-  {
-    id: 4,
-    image:
-      "https://lili.vn/wp-content/uploads/2021/12/Nhan-doi-bac-hiep-si-va-cong-chua-dinh-da-CZ-LILI_819229_2-400x400.jpg",
-    name: "Nhẫn bạc thời trang đẹp quá trời",
-    price: 600000, // Giá gốc
-    discountPercentage: 25, // Phần trăm giảm
-    ratings: 4, // Số sao đánh giá (1 đến 5)
-    buyed: 7, // Số lượng đã bán
-  },
-  {
-    id: 5,
-    image:
-      "https://lili.vn/wp-content/uploads/2021/11/Lac-tay-bac-nu-co-4-la-cach-dieu-LILI_661577_6-400x400.jpg",
-    name: "Lắc tay bạc",
-    price: 700000, // Giá gốc
-    discountPercentage: 30, // Phần trăm giảm
-    ratings: 5, // Số sao đánh giá (1 đến 5)
-    buyed: 10, // Số lượng đã bán
-  },
-];
+import { useDispatch } from "react-redux";
+import { addToCart } from "@redux/thunk/cartThunk";
+import { toast } from "react-toastify";
+import categoryService from "@services/category.service";
 
 const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const { slug } = useParams();
-  const accsessToken = localStorage.getItem("accessToken");
 
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [selectedVariantId, setSelectedVariantId] = useState(0);
+  const [selectedVariant, setSelectedVariant] = useState();
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await productService.getAll({
+          // accessToken,
+          type: "All",
+          limit: 4,
+        });
+
+        setProducts(data.metadata?.products || []);
+      } catch (error) {
+        console.error("Lỗi khi lấy sản phẩm:", error);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const navigate = useNavigate();
-
-  const handleSelectSize = (size) => {
-    const variant = product?.variants.find((v) => v.size === size);
-    setSelectedVariant(variant);
-    // if (variant) {
-    //   alert(
-    //     `Đã chọn size: ${size} với giá ${toVietnamCurrencyFormat(
-    //       variant.price
-    //     )}`
-    //   );
-    // }
-  };
+  const dispatch = useDispatch();
 
   const handleImageClick = (image) => {
     setCurrentImage(image?.image?.path);
@@ -94,34 +52,92 @@ const ProductDetail = () => {
     alert(`Mua ngay ${quantity} sản phẩm!`);
     navigate("/dat-hang");
   };
-  const handleAddToCart = () => alert("Thêm vào giỏ hàng!");
+  const handleAddToCart = () => {
+    let discountPrice;
+    if (!product.productDiscount || product.productDiscount.length === 0) {
+      discountPrice = 0;
+    } else {
+      const { discountType, discountValue } = product.productDiscount[0];
+      if (discountType === "percentage") {
+        discountPrice = (selectedVariant.price * discountValue) / 100;
+      } else {
+        discountPrice = discountValue;
+      }
+    }
+
+    console.log("cartItem", {
+      variant: selectedVariant,
+      quantity: quantity,
+      product: product,
+      finalPricePerOne: selectedVariant.price - discountPrice,
+    });
+
+    dispatch(
+      addToCart({
+        data: {
+          variant: selectedVariant,
+          quantity: quantity,
+          isChecked: true,
+          product: product,
+          finalPricePerOne: selectedVariant.price - discountPrice,
+        },
+      })
+    );
+    toast.success("Đã thêm vào giỏ hàng!");
+  };
 
   const [currentImage, setCurrentImage] = useState(null);
 
   useEffect(() => {
-    productService
-      .getOneBySlug({ slug, accessToken: accsessToken })
-      .then((data) => {
-        setProduct(data?.metadata);
-        // Đặt mặc định variant đầu tiên
-        if (data?.metadata?.variants?.length > 0) {
-          setSelectedVariant(data?.metadata?.variants[0]); // Mặc định chọn variant đầu tiên
-        }
-        if (data?.metadata?.images?.length > 0) {
-          setCurrentImage(data.metadata.images[0].image.path);
-        }
-      });
-  }, [slug, accsessToken]);
+    productService.getOneBySlug({ slug }).then((data) => {
+      setProduct(data?.metadata);
+      console.log("product", data?.metadata);
+      // Đặt mặc định variant đầu tiên
+      if (data?.metadata?.variants?.length > 0) {
+        console.log("variant", data?.metadata?.variants[0]);
+        setSelectedVariant(data?.metadata?.variants[0]); // Mặc định chọn variant đầu tiên
+      }
+      if (data?.metadata?.images?.length > 0) {
+        setCurrentImage(data.metadata.images[0].image.path);
+      }
+    });
+  }, [slug]);
 
-  const breadcrumb = [
-    { label: "Trang chủ", path: "/" },
-    {
-      label: "Trang sức nữ",
-      path: "/trang-suc-nu",
-    },
-    { label: "Dây chuyền", path: "/day-chuyen" },
-    { label: product?.name, path: `/san-pham/slug/${product?.slug}` },
-  ];
+  // const breadcrumb = [
+  //   { label: "Trang chủ", path: "/" },
+  //   {
+  //     label: "Trang sức nữ",
+  //     path: "/trang-suc-nu",
+  //   },
+  //   { label: "Dây chuyền", path: "/day-chuyen" },
+  //   { label: product?.name, path: `/san-pham/slug/${product?.slug}` },
+  // ];
+
+  const [breadcrumb, setBreadcrumb] = useState([]);
+
+  useEffect(() => {
+    const fetchBreadcrumb = async () => {
+      try {
+        console.log("cateogry", product.categories[0]?.categoryId);
+        const response = await categoryService.getBreadcrumbFromCategory(
+          product.categories[0]?.categoryId
+        );
+        console.log(response);
+        const res = response?.metadata || [];
+        setBreadcrumb([
+          { label: "Trang chủ", path: "/" },
+          ...res.map((item) => ({
+            label: item.name,
+            path: item.slug,
+          })),
+          { label: product?.name, path: `/san-pham/slug/${product?.slug}` },
+        ]);
+      } catch (error) {
+        console.error("Failed to fetch breadcrumb: ", error);
+      }
+    };
+    fetchBreadcrumb();
+  }, [product]);
 
   return (
     <>
@@ -235,11 +251,15 @@ const ProductDetail = () => {
                 <select
                   id="size"
                   className="ml-2 border border-gray-300 rounded-lg py-2 px-3 focus:ring-primary focus:border-primary text-gray-800"
-                  onChange={(e) => handleSelectSize(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedVariantId(e.target.value);
+                    setSelectedVariant(product.variants[e.target.value]);
+                  }}
+                  value={selectedVariantId}
                 >
                   <option value="">Chọn size</option>
-                  {product?.variants?.map((variant) => (
-                    <option key={variant.id} value={variant.size}>
+                  {product?.variants?.map((variant, index) => (
+                    <option key={variant.id} value={index}>
                       {variant.size}
                     </option>
                   ))}

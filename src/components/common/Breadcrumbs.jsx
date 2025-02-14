@@ -5,8 +5,6 @@ import { Link } from "react-router-dom";
 const Breadcrumbs = ({ items }) => {
   const breadcrumbItems = items.map((item, index) => {
     const isLast = index === items.length - 1; // Kiểm tra nếu là phần tử cuối cùng
-    console.log("item", item);
-    console.log("isLast", isLast);
 
     return {
       key: item.label,

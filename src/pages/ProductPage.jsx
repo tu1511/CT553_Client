@@ -200,7 +200,7 @@ const ProductPage = () => {
                 }
                 name={product.name || "Sản phẩm không có tên"}
                 price={product?.variants?.[0]?.price}
-                discountPercentage={product.discountPercentage || 10}
+                discountPercentage={10}
                 ratings={product.ratings || 5}
                 id={product.id}
                 buyed={product.soldNumber || 0}

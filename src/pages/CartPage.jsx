@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Checkbox,
   Button,
@@ -11,34 +11,18 @@ import { DeleteOutlined } from "@ant-design/icons";
 import HeaderLine from "@components/common/HeaderLine";
 import Breadcrumbs from "@components/common/Breadcrumbs";
 import TableComponent from "@components/common/TableComponent"; // Import TableComponent
+import { useDispatch } from "react-redux";
+import { deleteItem, getCart, updateQuantity } from "@redux/thunk/cartThunk";
+import { toast } from "react-toastify";
 
 const { Text } = Typography;
 
-// Fake dữ liệu
-const fakeCart = [
-  {
-    id: "1",
-    productName: "Dây chuyền bạc cao cấp",
-    image:
-      "https://lili.vn/wp-content/uploads/2021/12/Day-chuyen-bac-nu-phong-cach-co-trang-CZ-LILI_831944_2-400x400.jpg",
-    price: 1200000,
-    discountPercent: 20,
-    quantity: 2,
-  },
-  {
-    id: "2",
-    productName: "Nhẫn bạc thời trang",
-    image:
-      "https://lili.vn/wp-content/uploads/2021/12/Nhan-doi-bac-hiep-si-va-cong-chua-dinh-da-CZ-LILI_819229_2-400x400.jpg",
-    price: 500000,
-    discountPercent: 10,
-    quantity: 1,
-  },
-];
-
 const CartPage = () => {
-  const [cartItems, setCartItems] = useState(fakeCart);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+
+  const dispatch = useDispatch();
 
   const handleSelectAll = (checked) => {
     if (checked) {
@@ -56,33 +40,47 @@ const CartPage = () => {
     );
   };
 
-  const handleQuantityChange = (id, value) => {
-    setCartItems((prevCartItems) =>
-      prevCartItems.map((item) =>
-        item.id === id ? { ...item, quantity: value } : item
-      )
-    );
+  const handleQuantityChange = (variantId, quantity) => {
+    console.log("quantity1", quantity);
+    if (!quantity || quantity < 1) {
+      return;
+    }
+    console.log("cartItems1", cartItems);
+    console.log("quantity2", quantity);
+    const data = { variantId, quantity };
+    dispatch(updateQuantity({ data })).then((response) => {
+      if (response.payload) {
+        setCartItems(response.payload.cart);
+        setTotalPrice(response.payload.totalPrice);
+      }
+    });
+    console.log("cartItems2", cartItems);
+    dispatch(getCart()).then((response) => {
+      if (response.payload) {
+        // console.log("response.payload: ", response.payload);
+        setCartItems(response.payload.cart);
+        setTotalPrice(response.payload.totalPrice);
+      }
+    });
   };
 
-  const handleRemoveItem = (id) => {
-    setCartItems((prevCartItems) =>
-      prevCartItems.filter((item) => item.id !== id)
-    );
-    setSelectedItems((prevSelectedItems) =>
-      prevSelectedItems.filter((itemId) => itemId !== id)
-    );
-    message.success("Sản phẩm đã được xóa khỏi giỏ hàng!");
-  };
+  const handleRemoveItem = (variantId) => {
+    dispatch(deleteItem({ variantId }))
+      .then(() => {
+        toast.success("Sản phẩm đã được xóa khỏi giỏ hàng!");
+      })
+      .catch((error) => {
+        toast.error("Xóa sản phẩm thất bại! Vui lòng thử lại.");
+        console.error("Lỗi khi xóa sản phẩm:", error);
+      });
 
-  const calculateTotal = () => {
-    return cartItems
-      .filter((item) => selectedItems.includes(item.id))
-      .reduce(
-        (total, item) =>
-          total +
-          item.price * ((100 - item.discountPercent) / 100) * item.quantity,
-        0
-      );
+    dispatch(getCart()).then((response) => {
+      if (response.payload) {
+        // console.log("response.payload: ", response.payload);
+        setCartItems(response.payload.cart);
+        setTotalPrice(response.payload.totalPrice);
+      }
+    });
   };
 
   const handleOrderNow = () => {
@@ -93,89 +91,96 @@ const CartPage = () => {
     message.success("Đặt hàng thành công!");
   };
 
+  useEffect(() => {
+    dispatch(getCart()).then((response) => {
+      if (response.payload) {
+        console.log("response.payload: ", response.payload);
+        setCartItems(response.payload.cart);
+        setTotalPrice(response.payload.totalPrice);
+      }
+    });
+  }, [dispatch]);
+
   const columns = [
     {
       title: (
         <Checkbox
           onChange={(e) => handleSelectAll(e.target.checked)}
-          checked={
-            cartItems.length > 0 && selectedItems.length === cartItems.length
-          }
+          // checked={
+          //   cartItems.length > 0 && selectedItems.length === cartItems.length
+          // }
         />
       ),
-      dataIndex: "id",
-      render: (id) => (
+      dataIndex: "isChecked",
+      render: (isChecked) => (
         <Checkbox
-          checked={selectedItems.includes(id)}
-          onChange={() => handleSelectItem(id)}
+          checked={isChecked}
+          // onChange={() => handleSelectItem(id)}
         />
       ),
     },
     {
       title: "Sản phẩm",
-      dataIndex: "productName",
-      render: (text, record) => (
+      dataIndex: "product",
+      render: (product) => (
         <div className="flex items-center">
           <Image
-            src={record.image}
-            alt={text}
+            src={product.images[0].image.path}
+            alt={product.name}
             width={80}
             className="rounded-md"
           />
           <div className="ml-4">
-            <Text>{text}</Text>
+            <Text>{product.name}</Text>
           </div>
         </div>
       ),
     },
     {
       title: "Đơn giá",
-      dataIndex: "price",
-      render: (price, record) => (
+      dataIndex: "finalPricePerOne",
+      render: (finalPricePerOne) => (
         <Text>
           {new Intl.NumberFormat("vi-VN", {
             style: "currency",
             currency: "VND",
-          }).format(price * ((100 - record.discountPercent) / 100))}
+          }).format(finalPricePerOne)}
         </Text>
       ),
     },
     {
       title: "Số lượng",
-      dataIndex: "quantity",
-      render: (quantity, record) => (
+      // dataIndex: "quantity",
+      key: "quantity",
+      render: (record) => (
         <InputNumber
           min={1}
-          value={quantity}
-          onChange={(value) => handleQuantityChange(record.id, value)}
+          max={record.variant.quantity}
+          value={record.quantity}
+          onChange={(value) => handleQuantityChange(record.variant.id, value)}
         />
       ),
     },
     {
       title: "Thành tiền",
-      dataIndex: "id",
-      render: (id, record) => (
+      render: (record) => (
         <Text>
           {new Intl.NumberFormat("vi-VN", {
             style: "currency",
             currency: "VND",
-          }).format(
-            record.price *
-              ((100 - record.discountPercent) / 100) *
-              record.quantity
-          )}
+          }).format(record.finalPricePerOne * record.quantity)}
         </Text>
       ),
     },
     {
       title: "Hành động",
-      dataIndex: "id",
-      render: (id) => (
+      // dataIndex: "id",
+      render: (record) => (
         <Button
           type="text"
           danger
           icon={<DeleteOutlined />}
-          onClick={() => handleRemoveItem(id)}
+          onClick={() => handleRemoveItem(record?.variant.id)}
         />
       ),
     },
@@ -191,7 +196,7 @@ const CartPage = () => {
       <Breadcrumbs items={breadcrumbItems} />
       <div className="container mx-auto p-8">
         <HeaderLine title="Giỏ hàng của bạn" />
-        {cartItems.length === 0 ? (
+        {cartItems?.length === 0 ? (
           <div className="text-center mt-8">
             <Image
               src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png"
@@ -218,7 +223,7 @@ const CartPage = () => {
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    }).format(calculateTotal())}
+                    }).format(totalPrice)}
                   </span>
                 </Text>
               </div>
