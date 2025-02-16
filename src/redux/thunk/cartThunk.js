@@ -32,7 +32,7 @@ export const addToCart = createAsyncThunk(
         (item) => item.variant.id === data.variant.id
       );
       const updatedCartItems = [...cart];
-      console.log("addToCart, existingCartItemIndex: ", existingCartItemIndex);
+      // console.log("addToCart, existingCartItemIndex: ", existingCartItemIndex);
       if (existingCartItemIndex !== -1) {
         // Check if current quantity + added value is less than variant quantity
         if (

@@ -122,7 +122,7 @@ const ProductDetail = () => {
         const response = await categoryService.getBreadcrumbFromCategory(
           product.categories[0]?.categoryId
         );
-        console.log(response);
+        // console.log(response);
         const res = response?.metadata || [];
         setBreadcrumb([
           { label: "Trang chủ", path: "/" },

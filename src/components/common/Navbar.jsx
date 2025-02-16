@@ -54,9 +54,9 @@ const Navbar = () => {
       link: "/chinh-sach",
       menuItems: [
         {
-          label: "Chính sách bảo mật",
-          key: "privacy",
-          link: "/chinh-sach-bao-mat",
+          label: "Chính sách thanh toán",
+          key: "payment-policy",
+          link: "/chinh-sach-thanh-toan",
         },
         {
           label: "Chính sách đổi trả",

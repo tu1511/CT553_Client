@@ -25,24 +25,33 @@ const CartPage = () => {
   const dispatch = useDispatch();
 
   const handleSelectAll = (checked) => {
-    if (checked) {
-      setSelectedItems(cartItems.map((item) => item.id));
-    } else {
-      setSelectedItems([]);
-    }
+    const updatedCart = cartItems.map((item) => ({
+      ...item,
+      isChecked: checked,
+    }));
+
+    setCartItems(updatedCart);
+    setSelectedItems(checked ? updatedCart.map((item) => item.variant.id) : []);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
   const handleSelectItem = (id) => {
-    setSelectedItems((prevSelectedItems) =>
-      prevSelectedItems.includes(id)
-        ? prevSelectedItems.filter((itemId) => itemId !== id)
-        : [...prevSelectedItems, id]
-    );
+    setCartItems((prevCartItems) => {
+      const updatedCart = prevCartItems.map((item) =>
+        item.variant.id === id ? { ...item, isChecked: !item.isChecked } : item
+      );
+
+      // Cập nhật vào localStorage
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+      return updatedCart;
+    });
   };
 
   const handleQuantityChange = (variantId, quantity) => {
     console.log("quantity1", quantity);
     if (!quantity || quantity < 1) {
+      handleRemoveItem(variantId);
       return;
     }
     console.log("cartItems1", cartItems);
@@ -55,6 +64,7 @@ const CartPage = () => {
       }
     });
     console.log("cartItems2", cartItems);
+
     dispatch(getCart()).then((response) => {
       if (response.payload) {
         // console.log("response.payload: ", response.payload);
@@ -83,6 +93,8 @@ const CartPage = () => {
     });
   };
 
+  // console.log(cartItems);
+
   const handleOrderNow = () => {
     if (selectedItems.length === 0) {
       message.error("Vui lòng chọn ít nhất một sản phẩm để đặt hàng!");
@@ -106,16 +118,16 @@ const CartPage = () => {
       title: (
         <Checkbox
           onChange={(e) => handleSelectAll(e.target.checked)}
-          // checked={
-          //   cartItems.length > 0 && selectedItems.length === cartItems.length
-          // }
+          checked={
+            cartItems.length > 0 && cartItems.every((item) => item.isChecked)
+          }
         />
       ),
       dataIndex: "isChecked",
-      render: (isChecked) => (
+      render: (_, record) => (
         <Checkbox
-          checked={isChecked}
-          // onChange={() => handleSelectItem(id)}
+          checked={record.isChecked}
+          onChange={() => handleSelectItem(record.variant.id)}
         />
       ),
     },
@@ -154,7 +166,7 @@ const CartPage = () => {
       key: "quantity",
       render: (record) => (
         <InputNumber
-          min={1}
+          min={0}
           max={record.variant.quantity}
           value={record.quantity}
           onChange={(value) => handleQuantityChange(record.variant.id, value)}
