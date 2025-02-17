@@ -1,12 +1,14 @@
-import  { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Form, Input, Radio, Table, Modal, Divider } from "antd";
 import AddressFormDialog from "@components/ProfilePage/AddressFormDialog";
 import Breadcrumbs from "@components/common/Breadcrumbs";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserAddressThunk } from "@redux/thunk/addressThunk";
 
 const fakeShippingMethods = [
-  { id: "1", name: "Giao hàng tiết kiệm", fee: 30000 },
+  // { id: "1", name: "Giao hàng tiết kiệm", fee: 30000 },
   { id: "2", name: "Giao hàng nhanh", fee: 50000 },
 ];
 
@@ -15,58 +17,68 @@ const fakePaymentMethods = [
   { id: "2", name: "Chuyển khoản ngân hàng" },
 ];
 
-const fakeProducts = [
-  {
-    id: 1,
-    name: "Dây chuyền bạc cao cấp",
-    image:
-      "https://lili.vn/wp-content/uploads/2021/12/Day-chuyen-bac-nu-phong-cach-co-trang-CZ-LILI_831944_2-400x400.jpg",
-    price: 1200000,
-    quantity: 1,
-  },
-  {
-    id: 2,
-    name: "Nhẫn bạc đẹp",
-    image:
-      "https://lili.vn/wp-content/uploads/2022/08/Nhan-bac-nu-dinh-da-CZ-hoa-buom-LILI_661591_2-400x400.jpg",
-    price: 500000,
-    quantity: 2,
-  },
-];
-
-const fakeAddresses = [
-  {
-    id: 1,
-    fullname: "Nguyễn Văn A",
-    phone: "0123456789",
-    email: "test@gmail.com",
-    address: "Số 1, Đường ABC, Phường XYZ, Hồ Chí Minh",
-  },
-  {
-    id: 2,
-    fullname: "Trần Thị B",
-    email: "test1@gmail.com",
-    phone: "0987654321",
-    address: "Số 2, Đường DEF, Phường ZYX, Hà Nội",
-  },
-];
-
 const OrderPage = () => {
-  const [formData, setFormData] = useState({
-    fullname: fakeAddresses[0].fullname,
-    phone: fakeAddresses[0].phone,
-    address: fakeAddresses[0].address,
-    email: fakeAddresses[0].email,
-    notes: "",
-  });
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const accessToken = localStorage.getItem("accessToken");
+
+  const { addresses } = useSelector((state) => state.address);
+  const { cart } = useSelector((state) => state.cart);
+
   const [selectedShippingMethod, setSelectedShippingMethod] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [isAddressModalVisible, setIsAddressModalVisible] = useState(false);
   const [open, setOpen] = useState(false);
-  const [editAddress, setEditAddress] = useState(null);
-  const [selectedAddress, setSelectedAddress] = useState(fakeAddresses[0]);
 
-  const navigate = useNavigate();
+  const [editAddress, setEditAddress] = useState(null);
+
+  const [selectedAddress, setSelectedAddress] = useState(addresses[0]);
+
+  const checkedProducts = Array.isArray(cart)
+    ? cart.filter((item) => item.isChecked)
+    : [];
+
+  const products = checkedProducts.map((item) => ({
+    id: item.product.id,
+    name: item?.product?.name,
+    image: item?.product?.images[0]?.image?.path,
+    price: item?.finalPricePerOne,
+    quantity: item?.quantity,
+  }));
+
+  useEffect(() => {
+    dispatch(getUserAddressThunk(accessToken));
+  }, [dispatch, accessToken]);
+
+  const [formData, setFormData] = useState({
+    contactName: addresses[0]?.contactName || "",
+    contactPhone: addresses[0]?.contactPhone || "",
+    address: addresses[0]
+      ? `${
+          addresses[0]?.detailAddress ? addresses[0]?.detailAddress + ", " : ""
+        }${addresses[0]?.wardName}, ${addresses[0]?.districtName}, ${
+          addresses[0]?.provinceName
+        }`
+      : "",
+    email: "",
+    notes: "",
+  });
+
+  useEffect(() => {
+    if (addresses[0]) {
+      setFormData((prevState) => ({
+        ...prevState,
+        contactName: addresses[0]?.contactName || "",
+        contactPhone: addresses[0]?.contactPhone || "",
+        address: `${
+          addresses[0]?.detailAddress ? addresses[0]?.detailAddress + ", " : ""
+        }${addresses[0]?.wardName}, ${addresses[0]?.districtName}, ${
+          addresses[0]?.provinceName
+        }`,
+      }));
+    }
+  }, [addresses]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,7 +86,7 @@ const OrderPage = () => {
   };
 
   const calculateTotal = () => {
-    const productTotal = fakeProducts.reduce(
+    const productTotal = products.reduce(
       (total, product) => total + product.price * product.quantity,
       0
     );
@@ -84,15 +96,15 @@ const OrderPage = () => {
 
   const handleOrderSubmit = () => {
     // Validate required fields
-    if (!formData.fullname.trim()) {
+    if (!formData.contactName.trim()) {
       return toast.error("Vui lòng nhập họ và tên.");
     }
 
-    if (!formData.phone.trim()) {
+    if (!formData.contactPhone.trim()) {
       return toast.error("Vui lòng nhập số điện thoại.");
     }
 
-    if (!/^\d{10,11}$/.test(formData.phone)) {
+    if (!/^\d{10,11}$/.test(formData.contactPhone)) {
       return toast.error(
         "Số điện thoại không hợp lệ. Vui lòng nhập 10-11 chữ số."
       );
@@ -124,17 +136,19 @@ const OrderPage = () => {
       formData,
       selectedShippingMethod,
       selectedPaymentMethod,
-      products: fakeProducts,
+      products: products,
       total: calculateTotal(),
     });
+
+    console.log(formData);
 
     setTimeout(() => {
       navigate("/cam-on");
     }, 3000);
     // Optionally, you can clear the form or redirect the user
     setFormData({
-      fullname: "",
-      phone: "",
+      contactName: "",
+      contactPhone: "",
       address: "",
       email: "",
       notes: "",
@@ -187,24 +201,24 @@ const OrderPage = () => {
     <>
       <Breadcrumbs items={breadcrumb} />
       <div className="container mx-auto px-8 pb-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white p-8 rounded-lg shadow-md">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="bg-white p-8 rounded-lg shadow-md col-span-2">
             <h2 className="text-2xl font-semibold text-primary mb-6 border-b pb-3">
               Thông tin người đặt
             </h2>
             <Form layout="vertical">
               <Form.Item label="Họ và tên" required>
                 <Input
-                  name="fullname"
-                  value={formData.fullname}
+                  name="contactName"
+                  value={formData.contactName}
                   placeholder="Nhập họ và tên"
                   onChange={handleChange}
                 />
               </Form.Item>
               <Form.Item label="Số điện thoại" required>
                 <Input
-                  name="phone"
-                  value={formData.phone}
+                  name="contactPhone"
+                  value={formData.contactPhone}
                   placeholder="Nhập số điện thoại"
                   onChange={handleChange}
                 />
@@ -253,7 +267,7 @@ const OrderPage = () => {
             </Form>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-lg shadow-md col-span-3">
             <h2 className="text-2xl font-semibold text-primary mb-4">
               Phương thức vận chuyển
             </h2>
@@ -299,7 +313,7 @@ const OrderPage = () => {
             </h2>
             <Table
               columns={columns}
-              dataSource={fakeProducts}
+              dataSource={products}
               pagination={false}
               rowKey="id"
               bordered
@@ -310,20 +324,40 @@ const OrderPage = () => {
               <span>Tổng cộng:</span>
               <span>{calculateTotal().toLocaleString()} VND</span>
             </div>
-            <Button
-              type="primary"
-              block
-              className="mt-4"
-              style={{
-                backgroundColor: "#c60018",
-                borderColor: "#ffffff",
-                color: "white",
-              }}
-              size="large"
-              onClick={handleOrderSubmit}
-            >
-              Xác nhận đặt hàng
-            </Button>
+            <div className="flex space-x-3">
+              <Button
+                type="primary"
+                block
+                className="mt-4"
+                style={{
+                  backgroundColor: "#000000",
+                  borderColor: "#ffffff",
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+                size="large"
+                onClick={() => {
+                  navigate("/gio-hang");
+                }}
+              >
+                Trở về giỏ hàng
+              </Button>
+              <Button
+                type="primary"
+                block
+                className="mt-4"
+                style={{
+                  backgroundColor: "#c60018",
+                  borderColor: "#ffffff",
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+                size="large"
+                onClick={handleOrderSubmit}
+              >
+                Xác nhận đặt hàng
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -349,27 +383,35 @@ const OrderPage = () => {
               Thêm địa chỉ
             </Button>
           </div>
-          {fakeAddresses.map((address) => (
-            <div
-              key={address.id}
-              className="p-3 border rounded-lg mb-2 cursor-pointer hover:bg-gray-100"
-              onClick={() => {
-                setSelectedAddress(address);
-                setFormData((prev) => ({
-                  ...prev,
-                  fullname: address.fullname,
-                  phone: address.phone,
-                  email: address.email,
-                  address: address.address,
-                }));
-                setIsAddressModalVisible(false);
-              }}
-            >
-              <p className="font-semibold">{address.fullname}</p>
-              <p>{address.phone}</p>
-              <p>{address.address}</p>
-            </div>
-          ))}
+          {addresses.map((address) => {
+            const fullAddress = `${
+              address.detailAddress ? address.detailAddress + ", " : ""
+            }${address.wardName}, ${address.districtName}, ${
+              address.provinceName
+            }`;
+
+            return (
+              <div
+                key={address.id}
+                className="p-3 border rounded-lg mb-2 cursor-pointer hover:bg-gray-100"
+                onClick={() => {
+                  setSelectedAddress(address);
+                  setFormData((prev) => ({
+                    ...prev,
+                    contactName: address.contactName,
+                    contactPhone: address.contactPhone,
+                    email: address.email || "",
+                    address: fullAddress,
+                  }));
+                  setIsAddressModalVisible(false);
+                }}
+              >
+                <p className="font-semibold">{address.contactName}</p>
+                <p>{address.contactPhone}</p>
+                <p>{fullAddress}</p>
+              </div>
+            );
+          })}
         </Modal>
 
         <AddressFormDialog

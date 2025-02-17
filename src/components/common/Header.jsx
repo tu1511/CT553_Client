@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "@redux/slices/authSlice";
 import { getLoggedInUser } from "@redux/thunk/accountThunk";
 import DropdownCus from "@components/common/DropDownCus";
+import { getCart } from "@redux/thunk/cartThunk";
 
 const Header = () => {
   const messages = useMemo(
@@ -67,13 +68,21 @@ const Header = () => {
     }
   }, [dispatch, accessToken]);
 
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [cartItems, setCartItems] = useState([]);
+
   useEffect(() => {
     if (accessToken) {
       dispatch(getLoggedInUser(accessToken));
+
+      dispatch(getCart()).then((response) => {
+        if (response.payload) {
+          setCartItems(response.payload.cart);
+          setTotalPrice(response.payload.totalPrice);
+        }
+      });
     }
   }, [accessToken, dispatch]);
-
-  // console.log(user);
 
   const handleLogout = () => {
     // Xóa token khỏi localStorage

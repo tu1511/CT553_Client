@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Checkbox,
-  Button,
-  InputNumber,
-  Typography,
-  Image,
-  message,
-} from "antd";
+import { Checkbox, Button, InputNumber, Typography, Image } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import HeaderLine from "@components/common/HeaderLine";
 import Breadcrumbs from "@components/common/Breadcrumbs";
@@ -14,6 +7,7 @@ import TableComponent from "@components/common/TableComponent"; // Import TableC
 import { useDispatch } from "react-redux";
 import { deleteItem, getCart, updateQuantity } from "@redux/thunk/cartThunk";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const { Text } = Typography;
 
@@ -23,6 +17,7 @@ const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSelectAll = (checked) => {
     const updatedCart = cartItems.map((item) => ({
@@ -39,6 +34,12 @@ const CartPage = () => {
     setCartItems((prevCartItems) => {
       const updatedCart = prevCartItems.map((item) =>
         item.variant.id === id ? { ...item, isChecked: !item.isChecked } : item
+      );
+
+      setSelectedItems(
+        updatedCart
+          .filter((item) => item.isChecked)
+          .map((item) => item.variant.id)
       );
 
       // Cập nhật vào localStorage
@@ -97,10 +98,14 @@ const CartPage = () => {
 
   const handleOrderNow = () => {
     if (selectedItems.length === 0) {
-      message.error("Vui lòng chọn ít nhất một sản phẩm để đặt hàng!");
+      toast.error("Vui lòng chọn ít nhất một sản phẩm để đặt hàng!");
       return;
+    } else {
+      setTimeout(() => {
+        window.location.href = "/dat-hang";
+      }, 300);
+      toast.success("Chuyển sang trang thanh toán!");
     }
-    message.success("Đặt hàng thành công!");
   };
 
   useEffect(() => {
@@ -108,10 +113,22 @@ const CartPage = () => {
       if (response.payload) {
         console.log("response.payload: ", response.payload);
         setCartItems(response.payload.cart);
-        setTotalPrice(response.payload.totalPrice);
+        setSelectedItems(
+          response.payload.cart
+            .filter((item) => item.isChecked)
+            .map((item) => item.variant.id)
+        );
       }
     });
   }, [dispatch]);
+
+  useEffect(() => {
+    const total = cartItems
+      .filter((item) => item.isChecked)
+      .reduce((sum, item) => sum + item.finalPricePerOne * item.quantity, 0);
+
+    setTotalPrice(total);
+  }, [cartItems]);
 
   const columns = [
     {
@@ -207,7 +224,6 @@ const CartPage = () => {
     <>
       <Breadcrumbs items={breadcrumbItems} />
       <div className="container mx-auto p-8">
-        <HeaderLine title="Giỏ hàng của bạn" />
         {cartItems?.length === 0 ? (
           <div className="text-center mt-8">
             <Image
@@ -220,6 +236,7 @@ const CartPage = () => {
           </div>
         ) : (
           <>
+            <HeaderLine title="Giỏ hàng của bạn" />
             <TableComponent
               loading={false}
               rows={cartItems}
@@ -243,7 +260,6 @@ const CartPage = () => {
                 type="primary"
                 size="large"
                 onClick={handleOrderNow}
-                disabled={selectedItems.length === 0}
                 style={{
                   backgroundColor: "#c60018",
                   borderColor: "#ffffff",

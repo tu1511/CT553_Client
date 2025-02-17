@@ -108,12 +108,6 @@ const AddressSection = () => {
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>
-                        {/* <button
-                          className="block mt-2 text-gray-600 border border-gray-300 py-1 px-2 rounded hover:bg-gray-200"
-                          onClick={() => handleSetDefault(address.id)}
-                        >
-                          Thiết lập mặc định
-                        </button> */}
                       </>
                     )}
                   </div>

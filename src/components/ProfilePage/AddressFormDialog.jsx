@@ -43,7 +43,7 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
       form.setFieldsValue({
         contactName: addressData.contactName,
         contactPhone: addressData.contactPhone,
-        detail: addressData.detailAddress,
+        detailAddress: addressData.detailAddress,
         wardCode: addressData.wardCode,
         district: addressData.districtId,
         province: addressData.provinceId,
@@ -113,7 +113,7 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
         provinceId: values.province,
         districtId: values.district,
         wardCode: values.wardCode,
-        detail: values.detail,
+        detailAddress: values.detailAddress,
         isDefault: values.isDefault,
       };
 
@@ -259,7 +259,7 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
 
         <Form.Item
           label="Địa chỉ chi tiết"
-          name="detail"
+          name="detailAddress"
           labelCol={{ span: 6 }}
           wrapperCol={{ span: 18 }}
         >
