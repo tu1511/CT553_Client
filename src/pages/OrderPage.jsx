@@ -6,15 +6,13 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAddressThunk } from "@redux/thunk/addressThunk";
+import shippingService from "@services/shipping.service";
 
-const fakeShippingMethods = [
-  // { id: "1", name: "Giao hàng tiết kiệm", fee: 30000 },
-  { id: "2", name: "Giao hàng nhanh", fee: 50000 },
-];
+import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
 
 const fakePaymentMethods = [
   { id: "1", name: "Thanh toán khi nhận hàng (COD)" },
-  { id: "2", name: "Chuyển khoản ngân hàng" },
+  { id: "2", name: "Thanh toán qua VNPay" },
 ];
 
 const OrderPage = () => {
@@ -29,6 +27,21 @@ const OrderPage = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [isAddressModalVisible, setIsAddressModalVisible] = useState(false);
+  const [fee, setFee] = useState(0);
+
+  const [shippingMethods, setShippingMethods] = useState([
+    { id: 1, name: "Giao hàng nhanh", feeShipping: fee },
+  ]);
+
+  // Cập nhật lại feeShipping mỗi khi fee thay đổi
+  useEffect(() => {
+    setShippingMethods((prev) =>
+      prev.map((method) => ({
+        ...method,
+        feeShipping: fee,
+      }))
+    );
+  }, [fee]);
   const [open, setOpen] = useState(false);
 
   const [editAddress, setEditAddress] = useState(null);
@@ -80,6 +93,29 @@ const OrderPage = () => {
     }
   }, [addresses]);
 
+  const fetchFee = async () => {
+    try {
+      const response = await shippingService.getFee({
+        toDistrictId: selectedAddress?.districtId,
+        toWardCode: selectedAddress?.wardCode,
+        weightInGram: 200,
+      });
+
+      console.log("response", response);
+      if (response?.metadata?.service_fee) {
+        setFee(response?.metadata?.service_fee);
+      }
+    } catch (error) {
+      console.error("Error fetching fee:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedAddress) {
+      fetchFee(); // Gọi fetchFee khi selectedAddress thay đổi
+    }
+  }, [selectedAddress]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -90,9 +126,11 @@ const OrderPage = () => {
       (total, product) => total + product.price * product.quantity,
       0
     );
-    const shippingFee = selectedShippingMethod?.fee || 0;
-    return productTotal + shippingFee;
+
+    return productTotal;
   };
+  const shippingFee = shippingMethods[0]?.feeShipping;
+  const total = calculateTotal() + shippingFee;
 
   const handleOrderSubmit = () => {
     // Validate required fields
@@ -275,15 +313,14 @@ const OrderPage = () => {
               className="flex flex-col gap-2 mb-4"
               onChange={(e) =>
                 setSelectedShippingMethod(
-                  fakeShippingMethods.find(
-                    (method) => method.id === e.target.value
-                  )
+                  shippingMethods.find((method) => method.id === e.target.value)
                 )
               }
+              value={selectedShippingMethod?.id} // Gán giá trị đã chọn
             >
-              {fakeShippingMethods.map((method) => (
+              {shippingMethods.map((method) => (
                 <Radio value={method.id} key={method.id}>
-                  {method.name} ({method.fee.toLocaleString()} VND)
+                  {method.name} ({toVietnamCurrencyFormat(method.feeShipping)})
                 </Radio>
               ))}
             </Radio.Group>
@@ -320,10 +357,25 @@ const OrderPage = () => {
               size="small"
             />
             <Divider />
-            <div className="flex justify-between text-lg font-semibold">
-              <span>Tổng cộng:</span>
-              <span>{calculateTotal().toLocaleString()} VND</span>
+            <div>
+              <div className="flex justify-between text-lg font-semibold">
+                <span>Giá sản phẩm:</span>
+                <span>{toVietnamCurrencyFormat(calculateTotal())} </span>
+              </div>
+              <div className="flex justify-between text-lg font-semibold">
+                <span>Phí vận chuyển:</span>
+                <span>{toVietnamCurrencyFormat(shippingFee)}</span>
+              </div>
+              <div className="flex justify-between text-lg font-semibold">
+                <span>Giảm giá:</span>
+                <span>{toVietnamCurrencyFormat(0)}</span>
+              </div>
+              <div className="flex justify-between text-lg font-semibold border-t pt-2 text-primary">
+                <span className="">Tổng cộng:</span>
+                <span>{toVietnamCurrencyFormat(total)}</span>
+              </div>
             </div>
+
             <div className="flex space-x-3">
               <Button
                 type="primary"
