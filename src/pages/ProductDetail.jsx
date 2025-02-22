@@ -33,6 +33,7 @@ const ProductDetail = () => {
         });
 
         setProducts(data.metadata?.products || []);
+        console.log("products", data.metadata?.products);
       } catch (error) {
         console.error("Lỗi khi lấy sản phẩm:", error);
       }

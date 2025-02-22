@@ -95,9 +95,8 @@ const CartPage = () => {
   };
 
   // console.log(cartItems);
-
   const handleOrderNow = () => {
-    if (selectedItems.length === 0) {
+    if (selectedItems && selectedItems.length === 0) {
       toast.error("Vui lòng chọn ít nhất một sản phẩm để đặt hàng!");
       return;
     } else {
@@ -165,6 +164,12 @@ const CartPage = () => {
         </div>
       ),
     },
+    {
+      title: "Kích thước",
+      dataIndex: "variant",
+      render: (variant) => <Text>{variant.size}</Text>,
+    },
+
     {
       title: "Đơn giá",
       dataIndex: "finalPricePerOne",
