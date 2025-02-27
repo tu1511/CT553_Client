@@ -24,10 +24,6 @@ const Navbar = () => {
     fetchCategories();
   }, [accessToken]);
 
-  useEffect(() => {
-    console.log(categories); // Chỉ log sau khi categories thay đổi
-  }, [categories]); // Chạy khi categories thay đổi
-
   // Tạo menuItems động từ categories
   const jewelryMenuItems = categories.map((category) => ({
     label: category.name,

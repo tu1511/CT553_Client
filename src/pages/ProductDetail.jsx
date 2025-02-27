@@ -58,12 +58,8 @@ const ProductDetail = () => {
     if (!product.productDiscount || product.productDiscount.length === 0) {
       discountPrice = 0;
     } else {
-      const { discountType, discountValue } = product.productDiscount[0];
-      if (discountType === "percentage") {
-        discountPrice = (selectedVariant.price * discountValue) / 100;
-      } else {
-        discountPrice = discountValue;
-      }
+      const { discountValue } = product.productDiscount[0];
+      discountPrice = (selectedVariant.price * discountValue) / 100;
     }
 
     console.log("cartItem", {
@@ -104,22 +100,12 @@ const ProductDetail = () => {
     });
   }, [slug]);
 
-  // const breadcrumb = [
-  //   { label: "Trang chủ", path: "/" },
-  //   {
-  //     label: "Trang sức nữ",
-  //     path: "/trang-suc-nu",
-  //   },
-  //   { label: "Dây chuyền", path: "/day-chuyen" },
-  //   { label: product?.name, path: `/san-pham/slug/${product?.slug}` },
-  // ];
-
   const [breadcrumb, setBreadcrumb] = useState([]);
 
   useEffect(() => {
     const fetchBreadcrumb = async () => {
       try {
-        console.log("cateogry", product.categories[0]?.categoryId);
+        // console.log("cateogry", product.categories[0]?.categoryId);
         const response = await categoryService.getBreadcrumbFromCategory(
           product.categories[0]?.categoryId
         );
@@ -139,6 +125,9 @@ const ProductDetail = () => {
     };
     fetchBreadcrumb();
   }, [product]);
+
+  const discountPrice = product?.productDiscount[0]?.discountValue || 0;
+  console.log("discountPrice", discountPrice);
 
   return (
     <>
@@ -211,11 +200,24 @@ const ProductDetail = () => {
             <div className="flex items-center gap-4 mb-4">
               {selectedVariant ? (
                 <p className="text-3xl font-bold text-primary">
-                  {toVietnamCurrencyFormat(selectedVariant.price)}
+                  {toVietnamCurrencyFormat(
+                    selectedVariant.price -
+                      selectedVariant.price * (discountPrice / 100)
+                  )}
                 </p>
               ) : (
                 <p className="text-3xl font-bold text-primary">
                   {toVietnamCurrencyFormat(product?.price)}
+                </p>
+              )}
+              {discountPrice > 0 && (
+                <p className="text-lg text-gray-500 line-through italic">
+                  {toVietnamCurrencyFormat(selectedVariant.price)}
+                </p>
+              )}
+              {discountPrice > 0 && (
+                <p className="text-sm border p-2 bg-primary rounded-xl font-bold text-white">
+                  Giảm {discountPrice}%
                 </p>
               )}
             </div>

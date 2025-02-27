@@ -57,16 +57,6 @@ const ProductPage = () => {
             path: item.slug,
           })),
         ]);
-
-        // const breadcrumb = [
-        //   { label: "Trang chủ", path: "/" },
-        //   {
-        //     label: `${category?.name || "Sản phẩm của chúng tôi"}`,
-        //     path: `/san-pham/${category?.slug}`,
-        //   },
-        //   // { label: "Dây chuyền", path: "/day-chuyen" },
-        //   // { label: product?.name, path: `/san-pham/slug/${product?.slug}` },
-        // ];
       } catch (error) {
         console.error("Failed to fetch breadcrumb: ", error);
       }
@@ -117,7 +107,7 @@ const ProductPage = () => {
     fetchProducts();
   }, [accessToken, category, page]);
 
-  // console.log("products", products);
+  console.log("products", products);
 
   // Handle filter changes
   const handleFilterChange = (newFilters) => {
@@ -200,7 +190,7 @@ const ProductPage = () => {
                 }
                 name={product.name || "Sản phẩm không có tên"}
                 price={product?.variants?.[0]?.price}
-                discountPercentage={10}
+                discountPercentage={product?.productDiscount[0]?.discountValue}
                 ratings={product.ratings || 5}
                 id={product.id}
                 buyed={product.soldNumber || 0}

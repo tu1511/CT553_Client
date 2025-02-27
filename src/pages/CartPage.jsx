@@ -7,7 +7,7 @@ import TableComponent from "@components/common/TableComponent"; // Import TableC
 import { useDispatch } from "react-redux";
 import { deleteItem, getCart, updateQuantity } from "@redux/thunk/cartThunk";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const { Text } = Typography;
 
@@ -50,13 +50,13 @@ const CartPage = () => {
   };
 
   const handleQuantityChange = (variantId, quantity) => {
-    console.log("quantity1", quantity);
+    // console.log("quantity1", quantity);
     if (!quantity || quantity < 1) {
       handleRemoveItem(variantId);
       return;
     }
-    console.log("cartItems1", cartItems);
-    console.log("quantity2", quantity);
+    // console.log("cartItems1", cartItems);
+    // console.log("quantity2", quantity);
     const data = { variantId, quantity };
     dispatch(updateQuantity({ data })).then((response) => {
       if (response.payload) {
@@ -64,7 +64,7 @@ const CartPage = () => {
         setTotalPrice(response.payload.totalPrice);
       }
     });
-    console.log("cartItems2", cartItems);
+    // console.log("cartItems2", cartItems);
 
     dispatch(getCart()).then((response) => {
       if (response.payload) {
@@ -151,17 +151,19 @@ const CartPage = () => {
       title: "Sản phẩm",
       dataIndex: "product",
       render: (product) => (
-        <div className="flex items-center">
-          <Image
-            src={product.images[0].image.path}
-            alt={product.name}
-            width={80}
-            className="rounded-md"
-          />
-          <div className="ml-4">
-            <Text>{product.name}</Text>
+        <Link to={`/san-pham/${product.slug}`}>
+          <div className="flex items-center">
+            <Image
+              src={product.images[0].image.path}
+              alt={product.name}
+              width={80}
+              className="rounded-md"
+            />
+            <div className="ml-4">
+              <Text>{product.name}</Text>
+            </div>
           </div>
-        </div>
+        </Link>
       ),
     },
     {
