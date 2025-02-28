@@ -74,7 +74,7 @@ const ProfilePage = () => {
                     : `https://ui-avatars.com/api/?name=${user?.fullName}&size=128`
                 }
                 alt="User avatar"
-                className="mx-auto rounded-full mb-2 size-24 border-2 border-primary"
+                className="mx-auto rounded-full mb-2 size-24 border-2 border-primary object-cover"
               />
               <p className="text-lg font-bold">
                 {user?.fullName || "Người dùng"}

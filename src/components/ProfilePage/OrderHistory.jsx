@@ -1,19 +1,50 @@
 import { useState, useEffect } from "react";
-import TableComponent from "@components/common/TableComponent";
-import { Button, Select } from "antd";
+import { Table, Button, Select, Modal, Divider } from "antd";
 import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
 import { formatDate } from "@helpers/FormatDate";
+import orderService from "@services/order.service";
+import { EllipsisVertical } from "lucide-react";
+import { formatDateTime } from "@helpers/formatDateTime";
 
 const { Option } = Select;
 
-// eslint-disable-next-line react/prop-types
+const STATUS_MAP = {
+  AWAITING_CONFIRM: "Chờ xác nhận",
+  AWAITING_FULFILLMENT: "Chờ xử lý",
+  DELIVERING: "Đang giao hàng",
+  DELIVERED: "Đã giao hàng",
+  CANCELED: "Đã hủy",
+  // RETURNED: "Đã trả hàng",
+};
+
+const PAYMENT_STATUS_MAP = {
+  PENDING: "Chưa thanh toán",
+  SUCCESS: "Đã thanh toán",
+  FAILED: "Thanh toán thất bại",
+};
+
+const statusClasses = {
+  AWAITING_CONFIRM: "text-gray-600 bg-gray-200 px-2 py-1 rounded-full",
+  AWAITING_FULFILLMENT: "text-yellow-500 bg-yellow-100 px-2 py-1 rounded-full",
+  DELIVERING: "text-blue-500 bg-blue-100 px-2 py-1 rounded-full",
+  DELIVERED: "text-green-500 bg-green-100 px-2 py-1 rounded-full",
+  CANCELED: "text-red-500 bg-red-100 px-2 py-1 rounded-full",
+  // RETURNED: "text-purple-500 bg-purple-100 px-2 py-1 rounded-full",
+};
+
+const statusPaymentClasses = {
+  PENDING: "text-yellow-500 bg-yellow-100 px-2 py-1 rounded-full",
+  SUCCESS: "text-green-500 bg-green-100 px-2 py-1 rounded-full",
+  FAILED: "text-red-500 bg-red-100 px-2 py-1 rounded-full",
+};
+
 const StatusFilterButtons = ({ filterStatus, handleStatusChange }) => {
   const statusList = [
     { label: "Tất cả", value: "all" },
-    { label: "Chờ xử lý", value: "processing" },
-    { label: "Đang vận chuyển", value: "shipping" },
-    { label: "Đã giao hàng", value: "delivered" },
-    { label: "Đã hủy", value: "cancelled" },
+    ...Object.entries(STATUS_MAP).map(([key, label]) => ({
+      value: key,
+      label,
+    })),
   ];
 
   return (
@@ -32,135 +63,120 @@ const StatusFilterButtons = ({ filterStatus, handleStatusChange }) => {
 };
 
 const OrderHistory = () => {
-  const [ordersData, setOrdersData] = useState([]);
   const [filterStatus, setFilterStatus] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
-  const [paginationModel, setPaginationModel] = useState({
-    current: 1,
-    pageSize: 5,
-  });
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
+  const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Giả lập dữ liệu đơn hàng
+  const accessToken = localStorage.getItem("accessToken");
+
   useEffect(() => {
-    const fakeOrdersData = [
-      {
-        id: "1",
-        orderCode: "OD123456",
-        status: "processing",
-        total: 100000,
-        date: "2024-12-10",
-      },
-      {
-        id: "2",
-        orderCode: "OD123457",
-        status: "delivered",
-        total: 200000,
-        date: "2024-12-08",
-      },
-      {
-        id: "3",
-        orderCode: "OD123458",
-        status: "delivered",
-        total: 150000,
-        date: "2024-12-05",
-      },
-      {
-        id: "4",
-        orderCode: "OD123459",
-        status: "processing",
-        total: 120000,
-        date: "2024-12-01",
-      },
-      {
-        id: "5",
-        orderCode: "OD123460",
-        status: "cancelled",
-        total: 50000,
-        date: "2024-11-28",
-      },
-      {
-        id: "6",
-        orderCode: "OD123461",
-        status: "shipping",
-        total: 90000,
-        date: "2024-11-20",
-      },
-    ];
-    setOrdersData(fakeOrdersData);
-  }, []);
+    const fetchOrders = async () => {
+      try {
+        const response = await orderService.getOrderByBuyId(accessToken, 0, 10);
+        setOrders(response.metadata?.orders || []);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+    fetchOrders();
+  }, [accessToken]);
 
-  // Xử lý lọc trạng thái
   const handleStatusChange = (status) => setFilterStatus(status);
-
-  // Xử lý sắp xếp
   const handleSortChange = (order) => setSortOrder(order);
-
-  // Xử lý phân trang
-  const handlePaginationChange = ({ current, pageSize }) => {
-    setPaginationModel({ current, pageSize });
+  const handleTableChange = (pagination) => setPagination(pagination);
+  const showOrderDetail = (order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
   };
+  const closeModal = () => setIsModalOpen(false);
 
-  // Lọc và sắp xếp dữ liệu
-  const filteredData = ordersData.filter((order) =>
-    filterStatus === "all" ? true : order.status === filterStatus
+  const filteredData = orders.filter((order) =>
+    filterStatus === "all" ? true : order.currentStatus.name === filterStatus
   );
 
   const sortedData = [...filteredData].sort((a, b) =>
     sortOrder === "newest"
-      ? new Date(b.date) - new Date(a.date)
-      : new Date(a.date) - new Date(b.date)
+      ? new Date(b.createdAt) - new Date(a.createdAt)
+      : new Date(a.createdAt) - new Date(b.createdAt)
   );
 
   const columns = [
-    {
-      title: "Mã Đơn Hàng",
-      dataIndex: "orderCode",
-      key: "orderCode",
-    },
+    { title: "Mã Đơn Hàng", dataIndex: "id", key: "id" },
     {
       title: "Trạng Thái",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => {
-        const statusClasses = {
-          processing: "text-yellow-500 bg-yellow-100 px-2 py-1 rounded-full",
-          shipping: "text-blue-500 bg-blue-100 px-2 py-1 rounded-full",
-          delivered: "text-green-500 bg-green-100 px-2 py-1 rounded-full",
-          cancelled: "text-red-500 bg-red-100 px-2 py-1 rounded-full",
-        };
-
-        return (
-          <span className={`${statusClasses[status] || "text-black"}`}>
-            {status}
-          </span>
-        );
-      },
+      dataIndex: "currentStatus",
+      key: "currentStatus",
+      render: (status) => (
+        <span
+          className={`px-2 py-1 rounded-full ${
+            statusClasses[status?.name] || "text-gray-600 bg-gray-200"
+          }`}
+        >
+          {STATUS_MAP[status?.name] || "Không xác định"}
+        </span>
+      ),
+    },
+    {
+      title: "Trạng thái thanh toán",
+      dataIndex: "payment",
+      key: "payment",
+      render: (payment) => (
+        <span
+          className={`px-2 py-1 rounded-full ${
+            statusPaymentClasses[payment?.paymentStatus?.name] ||
+            "text-gray-600 bg-gray-200"
+          }`}
+        >
+          {PAYMENT_STATUS_MAP[payment?.paymentStatus?.name] || "Không xác định"}
+        </span>
+      ),
     },
     {
       title: "Tổng Tiền",
-      dataIndex: "total",
-      key: "total",
-      render: (total) => toVietnamCurrencyFormat(total),
+      dataIndex: "finalPrice",
+      key: "finalPrice",
+      render: toVietnamCurrencyFormat,
     },
     {
       title: "Ngày Đặt Hàng",
-      dataIndex: "date",
-      key: "date",
-      render: (date) => formatDate(date),
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: formatDate,
+    },
+    {
+      title: "Hành động",
+      key: "actions",
+      render: (_, record) => (
+        <EllipsisVertical
+          className="cursor-pointer"
+          onClick={() => showOrderDetail(record)}
+        />
+      ),
     },
   ];
 
+  const productData = selectedOrder?.orderDetail.map((item) => ({
+    key: item.variant?.id,
+    images: item.variant?.product?.images[0]?.image?.path,
+    productName: item.variant?.product?.name,
+    size: item.variant?.size,
+    quantity: item?.quantity,
+    price: item?.price,
+    discount: item.variant?.product.productDiscount?.[0]?.discountValue || 0,
+  }));
+
+  console.log("selectedOrder", selectedOrder);
+
   return (
     <div className="container mx-auto p-8">
-      {/* Thanh công cụ */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        {/* Bộ lọc trạng thái */}
         <StatusFilterButtons
           filterStatus={filterStatus}
           handleStatusChange={handleStatusChange}
         />
-
-        {/* Sắp xếp theo ngày */}
         <Select
           defaultValue="newest"
           style={{ width: 200 }}
@@ -170,16 +186,159 @@ const OrderHistory = () => {
           <Option value="oldest">Cũ nhất</Option>
         </Select>
       </div>
-
-      {/* Bảng đơn hàng */}
-      <TableComponent
-        loading={false}
-        rows={sortedData}
+      <Table
         columns={columns}
-        paginationModel={paginationModel}
-        onPaginationChange={handlePaginationChange}
-        checkbox={false} // Ẩn checkbox chọn dòng
+        dataSource={sortedData}
+        rowKey="id"
+        pagination={pagination}
+        onChange={handleTableChange}
       />
+      {/* Modal chi tiết đơn hàng */}
+      {selectedOrder && (
+        <Modal
+          title={
+            <div className="text-2xl font-semibold text-gray-800">
+              Chi tiết đơn hàng{" "}
+              <span className="text-blue-600">#{selectedOrder.id}</span>
+            </div>
+          }
+          open={isModalOpen}
+          onCancel={closeModal}
+          footer={null}
+          width={1000}
+          className="custom-modal"
+        >
+          <div className="space-y-4 p-4">
+            <div className="grid grid-cols-2 gap-4 text-gray-700">
+              <p>
+                <strong className="text-gray-900">Người mua:</strong>{" "}
+                {selectedOrder.buyer.fullName}
+              </p>
+              <p>
+                <strong className="text-gray-900">Ngày đặt hàng:</strong>{" "}
+                {formatDateTime(selectedOrder.createdAt)}
+              </p>
+
+              <p>
+                <strong className="text-gray-900">Email:</strong>{" "}
+                {selectedOrder.buyer.email}
+              </p>
+              <p>
+                <strong className="text-gray-900">Điện thoại:</strong>{" "}
+                {selectedOrder.deliveryAddress.contactPhone}
+              </p>
+              <p>
+                <strong className="text-gray-900">
+                  Trạng thái thanh toán:
+                </strong>{" "}
+                <span
+                  className={`px-2 py-1 rounded-full ${
+                    statusPaymentClasses[
+                      selectedOrder?.payment?.paymentStatus?.name
+                    ] || "text-gray-600 bg-gray-200"
+                  }`}
+                >
+                  {PAYMENT_STATUS_MAP[selectedOrder.payment.paymentStatus.name]}
+                </span>
+              </p>
+              <p>
+                <strong className="text-gray-900">Địa chỉ giao hàng:</strong>{" "}
+                {selectedOrder.deliveryAddress.detailAddress},{" "}
+                {selectedOrder.deliveryAddress.wardName},{" "}
+                {selectedOrder.deliveryAddress.districtName},{" "}
+                {selectedOrder.deliveryAddress.provinceName}
+              </p>
+              <p>
+                <strong className="text-gray-900">
+                  Phương thức thanh toán:
+                </strong>{" "}
+                {selectedOrder.payment.paymentMethod.name}
+              </p>
+            </div>
+
+            <Divider />
+
+            <h3 className="text-lg font-semibold text-gray-900">
+              Chi tiết đơn hàng
+            </h3>
+            <Table
+              columns={[
+                {
+                  title: "Hình ảnh",
+                  dataIndex: "images",
+                  key: "images",
+                  render: (images) => (
+                    <div className="flex justify-center">
+                      <img
+                        src={images}
+                        alt="product"
+                        className="w-16 h-16 rounded-md shadow-sm border"
+                      />
+                    </div>
+                  ),
+                },
+                {
+                  title: "Tên sản phẩm",
+                  dataIndex: "productName",
+                  key: "productName",
+                },
+                {
+                  title: "Size",
+                  dataIndex: "size",
+                  key: "size",
+                  align: "center",
+                },
+                {
+                  title: "Số lượng",
+                  dataIndex: "quantity",
+                  key: "quantity",
+                  align: "center",
+                },
+                {
+                  title: "Giá",
+                  dataIndex: "price",
+                  key: "price",
+                  render: toVietnamCurrencyFormat,
+                  align: "right",
+                },
+              ]}
+              dataSource={productData}
+              pagination={false}
+              className="custom-table"
+            />
+
+            <Divider />
+            <div className="space-y-2 text-lg">
+              <div className="flex justify-between border-b pb-1">
+                <span className="text-gray-700">Tổng tiền:</span>
+                <span className="text-black font-semibold">
+                  {toVietnamCurrencyFormat(selectedOrder.totalPrice)}
+                </span>
+              </div>
+              <div className="flex justify-between border-b pb-1">
+                <span className="text-gray-700">Giá giảm:</span>
+                <span className="text-black font-medium">
+                  {toVietnamCurrencyFormat(selectedOrder?.totalDiscount)}
+                </span>
+              </div>
+
+              <div className="flex justify-between border-b pb-1">
+                <span className="text-gray-700">Phí giao hàng:</span>
+                <span className="text-black font-medium">
+                  {toVietnamCurrencyFormat(selectedOrder?.shippingFee)}
+                </span>
+              </div>
+
+              <div className="flex justify-between text-xl font-bold">
+                <span className="text-gray-900">Thành tiền:</span>
+                <span className="text-primary">
+                  {toVietnamCurrencyFormat(selectedOrder.finalPrice)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };
