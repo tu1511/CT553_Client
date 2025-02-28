@@ -19,8 +19,36 @@ function ProductCard({
     ? price - (price * discountPercentage) / 100
     : price;
 
+  // Hàm lưu sản phẩm vào danh sách đã xem
+  const handleViewProduct = () => {
+    const viewedProduct = {
+      id,
+      name,
+      image,
+      price: discountPrice,
+      productLink,
+      ratings,
+      buyed,
+      discountPercentage,
+    };
+    const storedViewed =
+      JSON.parse(localStorage.getItem("viewedProducts")) || [];
+
+    // Kiểm tra sản phẩm đã tồn tại trong danh sách chưa
+    const isAlreadyViewed = storedViewed.some((product) => product.id === id);
+
+    if (!isAlreadyViewed) {
+      const updatedViewed = [viewedProduct, ...storedViewed].slice(0, 10); // Giữ tối đa 10 sản phẩm
+      localStorage.setItem("viewedProducts", JSON.stringify(updatedViewed));
+    }
+  };
+
   return (
-    <div className="max-w-sm bg-white rounded-lg shadow-lg dark:bg-gray-800 transform hover:scale-105 transition-transform duration-300 ease-in-out relative">
+    <Link
+      to={productLink}
+      onClick={handleViewProduct}
+      className="max-w-sm bg-white rounded-lg shadow-lg dark:bg-gray-800 transform hover:scale-105 transition-transform duration-300 ease-in-out relative"
+    >
       {/* Chỉ hiển thị nếu có giảm giá */}
       {hasDiscount && (
         <div className="absolute top-4 right-2 bg-red-500 text-white py-1 px-3 rounded-lg font-bold text-sm z-50">
@@ -38,7 +66,7 @@ function ProductCard({
       </div>
 
       {/* Nội dung sản phẩm */}
-      <Link to={productLink} className="px-2 py-4 flex flex-col">
+      <div className="px-2 py-4 flex flex-col">
         {/* Tên sản phẩm */}
         <h5
           className="mb-2 text-lg line-clamp-2 font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors duration-300 h-[50px]"
@@ -78,8 +106,8 @@ function ProductCard({
             className="cursor-pointer text-gray-700 dark:text-gray-400 hover:text-primary transition-colors duration-300"
           />
         </div>
-      </Link>
-    </div>
+      </div>
+    </Link>
   );
 }
 

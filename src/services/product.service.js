@@ -27,6 +27,16 @@ class productService {
     });
     return response.data;
   }
+
+  // search product
+  async search({ search }) {
+    const response = await this.api.get("/search", {
+      params: {
+        search,
+      },
+    });
+    return response.data;
+  }
 }
 
 export default new productService();

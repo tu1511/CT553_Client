@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@components/common/Navbar";
 import { Camera, Mic, Search, ShoppingBag, ShoppingCart } from "lucide-react";
 // import DropdownMenu from "@components/common/DropdownMenu";
@@ -13,6 +13,8 @@ import { setCredentials } from "@redux/slices/authSlice";
 import { getLoggedInUser } from "@redux/thunk/accountThunk";
 import DropdownCus from "@components/common/DropDownCus";
 import { getCart } from "@redux/thunk/cartThunk";
+import productService from "@services/product.service";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const messages = useMemo(
@@ -24,6 +26,8 @@ const Header = () => {
     ],
     []
   );
+
+  const navigate = useNavigate();
 
   const [currentMessage, setCurrentMessage] = useState(messages[0]);
   const [isFading, setIsFading] = useState(false);
@@ -41,8 +45,16 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    setSearchInput(transcript); // Update search input as user speaks
-  }, [transcript]);
+    setSearchInput(transcript);
+
+    if (!listening && transcript.trim()) {
+      const delay = setTimeout(() => {
+        handleSearch();
+      }, 500); // Đợi 500ms rồi mới tìm kiếm
+
+      return () => clearTimeout(delay); // Xóa timeout nếu có update mới
+    }
+  }, [transcript, listening]);
 
   const handleMicClick = () => {
     if (listening) {
@@ -88,6 +100,7 @@ const Header = () => {
     // Xóa token khỏi localStorage
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("viewedProducts");
 
     // Chuyển hướng về trang chủ
     window.location.href = "/";
@@ -115,6 +128,17 @@ const Header = () => {
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, [messages]);
+
+  // search product
+  const handleSearch = async () => {
+    if (!searchInput.trim()) {
+      toast.warn("Vui lòng nhập từ khóa tìm kiếm!", { autoClose: 2000 });
+      return;
+    }
+
+    navigate(`/tim-kiem?tu-khoa=${encodeURIComponent(searchInput)}`);
+    setSearchInput("");
+  };
 
   const accountMenuItems = user
     ? [
@@ -175,9 +199,18 @@ const Header = () => {
                 className="w-full rounded-full border border-gray-300 py-2 pl-4 pr-36 text-gray-700 shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
               />
               <button className="absolute top-1/2 right-5 -translate-y-1/2 p-2">
-                <Search size={20} className="text-gray-600" />
+                <Search
+                  size={20}
+                  className="text-gray-600"
+                  onClick={handleSearch}
+                />
               </button>
               <button
                 className="absolute top-1/2 right-14 -translate-y-1/2 p-2"
