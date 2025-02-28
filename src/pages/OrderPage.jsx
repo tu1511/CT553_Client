@@ -10,6 +10,8 @@ import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
 import paymentService from "@services/payment.service";
 import AddressList from "@components/OrderPage/AddressList";
 import orderService from "@services/order.service";
+import { CreditCard, Package } from "lucide-react";
+import { deleteItem } from "@redux/thunk/cartThunk";
 
 const OrderPage = () => {
   const navigate = useNavigate();
@@ -49,6 +51,8 @@ const OrderPage = () => {
   const checkedProducts = Array.isArray(cart)
     ? cart.filter((item) => item.isChecked)
     : [];
+
+  console.log("checkedProducts", checkedProducts);
 
   const products = checkedProducts.map((item) => ({
     id: item.product.id,
@@ -119,7 +123,6 @@ const OrderPage = () => {
     }
 
     // If all validations pass
-    toast.success("Đơn hàng của bạn đã được xác nhận. Cảm ơn bạn!");
     console.log("Order submitted successfully:", {
       deliveryAddressId: idAddress,
       shippingFee: shippingFee,
@@ -147,9 +150,14 @@ const OrderPage = () => {
         toast.success("Đơn hàng của bạn đã được xác nhận. Cảm ơn bạn!");
         console.log("Order submitted successfully:", response.data);
 
+        const idsToDelete = checkedProducts.map((item) => item.variant.id);
+        idsToDelete.forEach((id) => {
+          dispatch(deleteItem({ variantId: id })); // Xóa từng id
+        });
+
         setTimeout(() => {
           navigate("/cam-on");
-        }, 3000);
+        }, 2000);
 
         setSelectedPaymentMethod(null);
       } else {
@@ -233,20 +241,6 @@ const OrderPage = () => {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md col-span-1">
-            {/* <h2 className="text-2xl font-semibold text-primary mb-4">
-              Phương thức vận chuyển
-            </h2>
-            <Radio.Group
-              className="flex flex-col gap-2 mb-4"
-              onChange={(e) => handleSelectShippingMethod(e.target.value)}
-              value={selectedShippingMethod?.id} // Gán giá trị đã chọn
-            >
-              {shippingMethods.map((method) => (
-                <Radio value={method.id} key={method.id}>
-                  {method.name} ({toVietnamCurrencyFormat(method.feeShipping)})
-                </Radio>
-              ))}
-            </Radio.Group> */}
             <h2 className="text-2xl font-semibold text-primary mb-4">
               Phương thức thanh toán
             </h2>
@@ -259,13 +253,38 @@ const OrderPage = () => {
               }
             >
               {paymentMethods.map((method) => (
-                <Radio value={method.id} key={method.id}>
-                  {method.name}
+                <Radio
+                  value={method.id}
+                  key={method.id}
+                  className="flex items-center gap-2"
+                >
+                  {method.name === "COD" ? (
+                    <>
+                      <div className="flex items-center gap-2 border p-2 rounded-md  ">
+                        <span className="text-black font-semibold">
+                          Thanh toán khi nhận hàng
+                        </span>
+                        <Package size={20} className="text-yellow-500" />
+                      </div>
+                    </>
+                  ) : method.name === "VNPAY" ? (
+                    <>
+                      <div className="flex items-center gap-2 border p-2 rounded-md ">
+                        <span className="text-black font-semibold">
+                          Thanh toán trực tuyến
+                        </span>
+                        <CreditCard size={20} className="text-blue-500" />
+                      </div>
+                    </>
+                  ) : (
+                    <span>{method.name}</span>
+                  )}
                 </Radio>
               ))}
             </Radio.Group>
+            <Divider />
 
-            <div>
+            <div className="mt-4">
               <div className="flex justify-between text-lg font-semibold">
                 <span>Giá sản phẩm:</span>
                 <span>{toVietnamCurrencyFormat(calculateTotal())} </span>

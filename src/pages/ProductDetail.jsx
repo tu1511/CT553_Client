@@ -74,7 +74,7 @@ const ProductDetail = () => {
         data: {
           variant: selectedVariant,
           quantity: quantity,
-          isChecked: true,
+          isChecked: false,
           product: product,
           finalPricePerOne: selectedVariant.price - discountPrice,
         },

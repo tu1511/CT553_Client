@@ -5,6 +5,7 @@ import { formatDate } from "@helpers/FormatDate";
 import orderService from "@services/order.service";
 import { EllipsisVertical } from "lucide-react";
 import { formatDateTime } from "@helpers/formatDateTime";
+import { render } from "react-dom";
 
 const { Option } = Select;
 
@@ -20,7 +21,7 @@ const STATUS_MAP = {
 const PAYMENT_STATUS_MAP = {
   PENDING: "Chưa thanh toán",
   SUCCESS: "Đã thanh toán",
-  FAILED: "Thanh toán thất bại",
+  FAILED: "Thất bại",
 };
 
 const statusClasses = {
@@ -33,7 +34,7 @@ const statusClasses = {
 };
 
 const statusPaymentClasses = {
-  PENDING: "text-yellow-500 bg-yellow-100 px-2 py-1 rounded-full",
+  PENDING: "text-blue-500 bg-blue-100 px-2 py-1 rounded-full",
   SUCCESS: "text-green-500 bg-green-100 px-2 py-1 rounded-full",
   FAILED: "text-red-500 bg-red-100 px-2 py-1 rounded-full",
 };
@@ -104,7 +105,13 @@ const OrderHistory = () => {
   );
 
   const columns = [
-    { title: "Mã Đơn Hàng", dataIndex: "id", key: "id" },
+    {
+      title: "Mã Đơn Hàng",
+      dataIndex: "id",
+      key: "id",
+      width: 130,
+      render: (id) => <span className="text-blue-600">{`#${id}`}</span>,
+    },
     {
       title: "Trạng Thái",
       dataIndex: "currentStatus",
@@ -149,6 +156,7 @@ const OrderHistory = () => {
     {
       title: "Hành động",
       key: "actions",
+      width: 120,
       render: (_, record) => (
         <EllipsisVertical
           className="cursor-pointer"

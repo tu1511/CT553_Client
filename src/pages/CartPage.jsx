@@ -17,7 +17,7 @@ const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const handleSelectAll = (checked) => {
     const updatedCart = cartItems.map((item) => ({
