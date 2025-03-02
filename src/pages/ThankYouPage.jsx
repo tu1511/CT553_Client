@@ -53,7 +53,7 @@ const ThankYouPage = () => {
             Quay lại Trang Chủ
           </Link>
           <Link
-            to="/profile/orders"
+            to="/tai-khoan"
             className="bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-900 transition-colors duration-300"
           >
             Xem Đơn Hàng Của Tôi

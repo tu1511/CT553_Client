@@ -145,6 +145,24 @@ const OrderPage = () => {
 
     try {
       const response = await orderService.createOrder(accessToken, orderData);
+      const paymentMethodId = response?.data?.metadata?.paymentMethod.id;
+      if (paymentMethodId === 2) {
+        const paymentData = {
+          orderId: response?.data?.metadata?.id,
+          amount: response?.data?.metadata?.finalPrice,
+        };
+        const paymentResponse = await paymentService.createVnPayPaymentURL(
+          paymentData
+        );
+
+        if (paymentResponse) {
+          window.location.href = paymentResponse.metadata.redirectUrl;
+          toast.success("Đơn hàng của bạn đã được xác nhận. Cảm ơn bạn!");
+        } else {
+          toast.error("Lỗi khi tạo đơn hàng, vui lòng thử lại.");
+          throw new Error("Lỗi khi tạo đơn hàng, vui lòng thử lại.");
+        }
+      }
 
       if (response?.data) {
         toast.success("Đơn hàng của bạn đã được xác nhận. Cảm ơn bạn!");
@@ -295,7 +313,7 @@ const OrderPage = () => {
               </div>
               <div className="flex justify-between text-lg font-semibold">
                 <span>Giảm giá:</span>
-                <span>{toVietnamCurrencyFormat(0)}</span>
+                <span>{toVietnamCurrencyFormat(calculateDiscount())}</span>
               </div>
               <div className="flex justify-between text-lg font-semibold border-t pt-2 text-primary">
                 <span className="">Tổng cộng:</span>

@@ -69,9 +69,11 @@ const ProfilePage = () => {
             <div className="text-center mb-4">
               <img
                 src={
-                  user
-                    ? user.avatar?.path
-                    : `https://ui-avatars.com/api/?name=${user?.fullName}&size=128`
+                  user?.avatar?.path
+                    ? user.avatar.path
+                    : user
+                    ? `https://ui-avatars.com/api/?name=${user.fullName}&size=128`
+                    : "/path/to/default-avatar.png"
                 }
                 alt="User avatar"
                 className="mx-auto rounded-full mb-2 size-24 border-2 border-primary object-cover"

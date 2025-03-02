@@ -9,6 +9,11 @@ class PaymentService {
     const response = await this.api.get("/methods");
     return response.data;
   }
+
+  async createVnPayPaymentURL(data) {
+    const response = await this.api.post("/create-payment-url", data);
+    return response.data;
+  }
 }
 
 export default new PaymentService();

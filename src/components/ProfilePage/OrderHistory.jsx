@@ -6,6 +6,9 @@ import orderService from "@services/order.service";
 import { EllipsisVertical } from "lucide-react";
 import { formatDateTime } from "@helpers/formatDateTime";
 import { render } from "react-dom";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import paymentService from "@services/payment.service";
 
 const { Option } = Select;
 
@@ -76,7 +79,11 @@ const OrderHistory = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await orderService.getOrderByBuyId(accessToken, 0, 10);
+        const response = await orderService.getOrderByBuyId(
+          accessToken,
+          0,
+          1000
+        );
         setOrders(response.metadata?.orders || []);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -178,6 +185,23 @@ const OrderHistory = () => {
 
   console.log("selectedOrder", selectedOrder);
 
+  const handlePayment = async (orderId) => {
+    const paymentData = {
+      orderId: orderId,
+      amount: selectedOrder.finalPrice,
+    };
+    const paymentResponse = await paymentService.createVnPayPaymentURL(
+      paymentData
+    );
+    if (paymentResponse) {
+      window.location.href = paymentResponse.metadata.redirectUrl;
+      toast.success("Đơn hàng của bạn đã được xác nhận. Cảm ơn bạn!");
+    } else {
+      toast.error("Lỗi khi tạo đơn hàng, vui lòng thử lại.");
+      throw new Error("Lỗi khi tạo đơn hàng, vui lòng thử lại.");
+    }
+  };
+
   return (
     <div className="container mx-auto p-8">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -235,6 +259,20 @@ const OrderHistory = () => {
                 <strong className="text-gray-900">Điện thoại:</strong>{" "}
                 {selectedOrder.deliveryAddress.contactPhone}
               </p>
+
+              <p>
+                <strong className="text-gray-900">
+                  Phương thức thanh toán:
+                </strong>{" "}
+                {selectedOrder.payment.paymentMethod.name}
+              </p>
+              <p>
+                <strong className="text-gray-900">Địa chỉ giao hàng:</strong>{" "}
+                {selectedOrder.deliveryAddress.detailAddress},{" "}
+                {selectedOrder.deliveryAddress.wardName},{" "}
+                {selectedOrder.deliveryAddress.districtName},{" "}
+                {selectedOrder.deliveryAddress.provinceName}
+              </p>
               <p>
                 <strong className="text-gray-900">
                   Trạng thái thanh toán:
@@ -249,19 +287,21 @@ const OrderHistory = () => {
                   {PAYMENT_STATUS_MAP[selectedOrder.payment.paymentStatus.name]}
                 </span>
               </p>
-              <p>
-                <strong className="text-gray-900">Địa chỉ giao hàng:</strong>{" "}
-                {selectedOrder.deliveryAddress.detailAddress},{" "}
-                {selectedOrder.deliveryAddress.wardName},{" "}
-                {selectedOrder.deliveryAddress.districtName},{" "}
-                {selectedOrder.deliveryAddress.provinceName}
-              </p>
-              <p>
-                <strong className="text-gray-900">
-                  Phương thức thanh toán:
-                </strong>{" "}
-                {selectedOrder.payment.paymentMethod.name}
-              </p>
+              {selectedOrder.payment.paymentStatus.name !== "SUCCESS" && (
+                <Button
+                  type="primary"
+                  style={{
+                    backgroundColor: "#c60018",
+                    borderColor: "#ffffff",
+                    color: "white",
+                  }}
+                  onClick={() => {
+                    handlePayment(selectedOrder.id);
+                  }}
+                >
+                  Thanh toán lại
+                </Button>
+              )}
             </div>
 
             <Divider />
@@ -275,20 +315,37 @@ const OrderHistory = () => {
                   title: "Hình ảnh",
                   dataIndex: "images",
                   key: "images",
-                  render: (images) => (
-                    <div className="flex justify-center">
-                      <img
-                        src={images}
-                        alt="product"
-                        className="w-16 h-16 rounded-md shadow-sm border"
-                      />
-                    </div>
-                  ),
+                  render: (images, record, index) => {
+                    const productSlug =
+                      selectedOrder?.orderDetail[index]?.variant?.product?.slug; // Lấy phần tử đầu tiên của variant
+                    return (
+                      <Link to={productSlug ? `/san-pham/${productSlug}` : "#"}>
+                        <div className="flex justify-center">
+                          <img
+                            src={images}
+                            alt="product"
+                            className="w-16 h-16 rounded-md shadow-sm border"
+                          />
+                        </div>
+                      </Link>
+                    );
+                  },
                 },
                 {
                   title: "Tên sản phẩm",
                   dataIndex: "productName",
                   key: "productName",
+                  render: (productName, record, index) => {
+                    const productSlug =
+                      selectedOrder?.orderDetail[index]?.variant?.product?.slug; // Lấy phần tử đầu tiên của variant
+                    return (
+                      <Link to={productSlug ? `/san-pham/${productSlug}` : "#"}>
+                        <div className="flex items-center">
+                          <span>{productName}</span>
+                        </div>
+                      </Link>
+                    );
+                  },
                 },
                 {
                   title: "Size",
