@@ -17,6 +17,19 @@ class uploadService {
 
     return response.data;
   }
+
+  async uploadImageToDisk(file) {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await this.api.post("/image/disk", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  }
 }
 
 export default new uploadService();

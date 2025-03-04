@@ -7,6 +7,7 @@ import { BadgeCheck, Gift, Share2, ThumbsUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import productService from "@services/product.service";
+import CouponsSection from "@components/HomePage/CouponsSection";
 
 function HomePage() {
   const [products, setProducts] = useState([]);
@@ -94,12 +95,15 @@ function HomePage() {
       {/* trending search section */}
       <TrendingSearch />
 
+      {/* coupons section */}
+      <CouponsSection />
+
       {/* product list section */}
       <ProductList title="Sản phẩm yêu thích nhất" products={products} />
 
       <ProductList title="Sản phẩm mới nhất" products={products} />
 
-      <ProductList title="Sản phẩm khuyến mãi" products={products} />
+      {/* <ProductList title="Sản phẩm khuyến mãi" products={products} /> */}
 
       {/* hero banner section */}
       <section

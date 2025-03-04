@@ -17,34 +17,64 @@ const SearchResultsPage = () => {
   const searchString = query.get("tu-khoa");
   console.log("searchString", searchString);
 
+  const imageUrl = query.get("hinh-anh");
+  console.log("imageUrl", imageUrl);
+
   const [products, setProducts] = useState([]);
 
   // search product
   useEffect(() => {
     const fetchProducts = async () => {
-      if (!searchString) return; // Kiểm tra nếu searchString rỗng thì không gọi API
+      if (!searchString?.trim() && !imageUrl?.trim()) return; // Kiểm tra nếu searchString rỗng hoặc chỉ chứa khoảng trắng
 
-      try {
-        const response = await productService.search({ search: searchString });
+      if (searchString) {
+        try {
+          const response = await productService.search({
+            search: searchString,
+          });
 
-        if (response?.metadata?.fullTextSearchResult?.length === 0) {
-          toast.info("Không tìm thấy sản phẩm nào!", { autoClose: 2000 });
-        } else {
-          toast.success(
-            `Tìm thấy ${response.metadata.fullTextSearchResult.length} sản phẩm!`,
-            { autoClose: 2000 }
-          );
+          const fullTextResults =
+            response?.metadata?.fullTextSearchResult || [];
+          const semanticResults =
+            response?.metadata?.semanticSearchResult || [];
+
+          if (fullTextResults.length > 0) {
+            toast.success(`Tìm thấy ${fullTextResults.length} sản phẩm!`);
+            setProducts(fullTextResults);
+          } else if (semanticResults.length > 0) {
+            toast.success(`Tìm thấy ${semanticResults.length} sản phẩm!`);
+            setProducts(semanticResults);
+          } else {
+            toast.info("Không tìm thấy sản phẩm nào.");
+            setProducts([]); // Xóa danh sách nếu không tìm thấy gì
+          }
+        } catch (error) {
+          toast.error("Lỗi khi tìm kiếm sản phẩm!", { autoClose: 2000 });
+          console.error("Search Error:", error);
         }
+      } else if (imageUrl) {
+        try {
+          const response = await productService.searchImage({ imageUrl });
 
-        setProducts(response?.metadata?.fullTextSearchResult || []);
-      } catch (error) {
-        toast.error("Lỗi khi tìm kiếm sản phẩm!", { autoClose: 2000 });
-        console.error("Search Error:", error);
+          const results = response?.metadata || [];
+
+          if (results.length > 0) {
+            toast.success(`Tìm thấy ${results.length} sản phẩm!`);
+            setProducts(results);
+          } else {
+            toast.info("Không tìm thấy sản phẩm nào.");
+            setProducts([]); // Xóa danh sách nếu không tìm thấy gì
+          }
+        } catch (error) {
+          toast.error("Lỗi khi tìm kiếm sản phẩm!");
+          console.error("Search Error:", error);
+        }
       }
     };
 
     fetchProducts();
-  }, [searchString]); // useEffect sẽ chạy lại khi searchString thay đổi
+  }, [searchString, imageUrl]);
+  // useEffect sẽ chạy lại khi searchString thay đổi
 
   console.log("products", products);
 
@@ -85,7 +115,11 @@ const SearchResultsPage = () => {
 
   const breadcrumbs = [
     { label: "Trang chủ", path: "/" },
-    { label: `Kết quả tìm kiếm cho ${searchString}` },
+    {
+      label: `Kết quả tìm kiếm ${
+        searchString ? `cho ${searchString}` : "bằng hình ảnh"
+      }`,
+    },
   ];
 
   return (
@@ -111,10 +145,10 @@ const SearchResultsPage = () => {
             <ProductCard
               key={product.id}
               productLink={`/san-pham/${product?.slug}`}
-              image={product.images[0].image?.path}
+              image={product?.images[0]?.image?.path}
               name={product.name}
-              price={product.variants[0].priceHistory[0].price}
-              discountPercentage={product.productDiscount[0]?.discountValue}
+              price={product.variants[0]?.priceHistory[0].price}
+              discountPercentage={product?.productDiscount[0]?.discountValue}
               ratings={4}
               id={product.id}
               buyed={product.soldNumber || 0}

@@ -28,11 +28,21 @@ class productService {
     return response.data;
   }
 
-  // search product
+  // search product by text
   async search({ search }) {
     const response = await this.api.get("/search", {
       params: {
         search,
+      },
+    });
+    return response.data;
+  }
+
+  // search product by image
+  async searchImage({ imageUrl }) {
+    const response = await this.api.get("/search/image", {
+      params: {
+        imageUrl,
       },
     });
     return response.data;

@@ -6,6 +6,8 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import uploadService from "@services/upload.service";
 
 const { Text } = Typography;
 
@@ -13,6 +15,7 @@ const { Text } = Typography;
 const ImageSearchModal = ({ visible, onClose }) => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
+  const navigate = useNavigate();
 
   const handleUpload = ({ file }) => {
     setUploadedFile(file);
@@ -24,7 +27,7 @@ const ImageSearchModal = ({ visible, onClose }) => {
     toast.info("Hình ảnh đã được xóa!");
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!uploadedFile) {
       toast.warning("Vui lòng tải lên hình ảnh để tìm kiếm!");
       return;
@@ -33,10 +36,26 @@ const ImageSearchModal = ({ visible, onClose }) => {
     setIsSearching(true);
     toast.info("Đang tìm kiếm sản phẩm tương tự...");
 
+    try {
+      const response = await uploadService.uploadImageToDisk(uploadedFile);
+
+      console.log("response", response);
+      const imageUrl = `http://localhost:5000/${response.metadata.path}`;
+      console.log("imageUrl", imageUrl);
+      if (response && response.metadata) {
+        navigate(`/tim-kiem?hinh-anh=${imageUrl}`);
+        // toast.success("Tải ảnh lên thành công");
+      } else {
+        toast.error("Lỗi tải ảnh lên");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải ảnh lên:", error);
+      toast.error("Tải ảnh lên thất bại");
+    }
+
     // Simulate search process
     setTimeout(() => {
       setIsSearching(false);
-      toast.success("Tìm kiếm hoàn tất! Hiển thị sản phẩm tương tự.");
       setUploadedFile(null); // Clear the uploaded file
       onClose(); // Close the modal
     }, 3000);
@@ -54,6 +73,7 @@ const ImageSearchModal = ({ visible, onClose }) => {
       onCancel={onClose}
       footer={null}
       centered
+      width={600}
     >
       <div className="text-center">
         {!uploadedFile ? (
