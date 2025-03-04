@@ -222,8 +222,11 @@ const ProductDetail = () => {
               )}
             </div>
 
-            <div className="text-gray-700 leading-relaxed mb-6 font-normal italic">
+            <div className="text-gray-700 leading-relaxed mb-4 font-normal italic">
               <p>{product?.overview}</p>
+            </div>
+            <div className="mb-4 font-semibold text-lg">
+              Số lượng còn: {selectedVariant?.quantity}
             </div>
 
             {/* Chọn số lượng và kích thước */}

@@ -32,7 +32,7 @@ const ProfilePage = () => {
     { id: "address", label: "Địa Chỉ", icon: <MapPinHouse /> },
     { id: "change-password", label: "Đổi Mật Khẩu", icon: <Lock /> },
     { id: "orders", label: "Đơn Mua", icon: <ShoppingCart /> },
-    { id: "vouchers", label: "Kho Vouchers", icon: <Gift /> },
+    { id: "coupons", label: "Kho Coupons", icon: <Gift /> },
   ];
 
   const renderContent = () => {
@@ -47,7 +47,7 @@ const ProfilePage = () => {
         return <PasswordChangeForm />;
       case "orders":
         return <OrderHistory />;
-      case "vouchers":
+      case "coupons":
         return <VoucherManagement />;
       default:
         return <UserProfileForm />;

@@ -6,6 +6,7 @@ import {
   changePasswordThunk,
   getLoggedInUser,
 } from "@redux/thunk/accountThunk"; // Thunk redux
+import HeaderLine from "@components/common/HeaderLine";
 
 const PasswordChangeForm = () => {
   const dispatch = useDispatch(); // Giả sử dùng Redux để dispatch action
@@ -71,10 +72,8 @@ const PasswordChangeForm = () => {
           </p>
         </div>
       ) : (
-        <div className="p-8">
-          <h2 className="text-2xl font-bold mb-2 text-gray-800 text-center">
-            Thay Đổi Mật Khẩu
-          </h2>
+        <div className="px-8">
+          <HeaderLine title="Thay đổi mật khẩu" />
           <Form form={form} layout="vertical" onFinish={handlePasswordChange}>
             <Form.Item
               label="Mật khẩu mới"

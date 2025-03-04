@@ -26,7 +26,11 @@ const CouponsSection = () => {
       <div className="">
         <div className="grid grid-cols-3 gap-6">
           {coupons.map((coupon) => (
-            <VoucherCard key={coupon.voucherId} voucher={coupon} />
+            <VoucherCard
+              key={coupon.voucherId}
+              voucher={coupon}
+              checkCollected={null}
+            />
           ))}
         </div>
       </div>

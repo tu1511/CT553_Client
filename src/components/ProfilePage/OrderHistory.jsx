@@ -9,6 +9,7 @@ import { render } from "react-dom";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import paymentService from "@services/payment.service";
+import HeaderLine from "@components/common/HeaderLine";
 
 const { Option } = Select;
 
@@ -203,7 +204,8 @@ const OrderHistory = () => {
   };
 
   return (
-    <div className="container mx-auto p-8">
+    <div className="container mx-auto px-8">
+      <HeaderLine title="Lịch sử đơn hàng" />
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <StatusFilterButtons
           filterStatus={filterStatus}
@@ -383,7 +385,7 @@ const OrderHistory = () => {
               <div className="flex justify-between border-b pb-1">
                 <span className="text-gray-700">Giá giảm:</span>
                 <span className="text-black font-medium">
-                  {toVietnamCurrencyFormat(selectedOrder?.totalDiscount)}
+                  -{toVietnamCurrencyFormat(selectedOrder?.totalDiscount)}
                 </span>
               </div>
 

@@ -1,0 +1,83 @@
+import { useEffect, useState } from "react";
+import { Modal, List, Radio } from "antd";
+import { Ticket } from "lucide-react";
+import couponService from "@services/coupon.service";
+import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
+
+// eslint-disable-next-line react/prop-types
+const CouponModal = ({ visible, onClose, onSelectCoupon }) => {
+  const [coupons, setCoupons] = useState([]);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+
+  const accessToken = localStorage.getItem("accessToken");
+
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        const response = await couponService.getCollected(accessToken);
+        const unusedCoupons = response.metadata.filter(
+          (coupon) => !coupon.used
+        );
+
+        setCoupons(unusedCoupons);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchCoupons();
+  }, [accessToken]);
+
+  //   console.log("coupons", coupons);
+
+  const handleOk = () => {
+    if (selectedCoupon) {
+      const selectedData = coupons.find(
+        (coupon) => coupon.coupon.id === selectedCoupon
+      );
+      onSelectCoupon(selectedData); // Truyền toàn bộ dữ liệu của coupon được chọn
+    }
+    onClose();
+  };
+
+  return (
+    <Modal
+      title={
+        <span className="flex items-center gap-2 text-primary">
+          <Ticket size={20} /> Chọn mã giảm giá
+        </span>
+      }
+      open={visible}
+      onOk={handleOk}
+      onCancel={onClose}
+      okText="Chọn"
+      cancelText="Hủy"
+      width={500}
+    >
+      <Radio.Group
+        className="w-full"
+        value={selectedCoupon}
+        onChange={(e) => setSelectedCoupon(e.target.value)}
+      >
+        <List
+          dataSource={coupons}
+          renderItem={(coupon) => (
+            <List.Item>
+              <Radio value={coupon.coupon.id} className="w-full">
+                <div className="w-[400px] border border-primary p-4 rounded-lg">
+                  <div className="font-semibold">Mã: {coupon.coupon.code} </div>
+                  <div className="italic text-gray-500">
+                    Giảm {coupon.coupon.discountValue}% cho đơn hàng tối thiểu{" "}
+                    {toVietnamCurrencyFormat(coupon.coupon.minimumPriceToUse)}
+                  </div>
+                </div>
+              </Radio>
+            </List.Item>
+          )}
+        />
+      </Radio.Group>
+    </Modal>
+  );
+};
+
+export default CouponModal;

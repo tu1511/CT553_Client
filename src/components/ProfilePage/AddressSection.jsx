@@ -7,6 +7,7 @@ import {
   getUserAddressThunk,
 } from "@redux/thunk/addressThunk";
 import { toast } from "react-toastify";
+import HeaderLine from "@components/common/HeaderLine";
 
 const AddressSection = () => {
   const [open, setOpen] = useState(false);
@@ -49,7 +50,9 @@ const AddressSection = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="px-8">
+      <HeaderLine title="Danh sách địa chỉ" />
+
       {/* Nút Thêm địa chỉ mới */}
       <button
         className="bg-primary hover:bg-red-600 text-white font-bold py-2 px-4 rounded shadow-md hover:shadow-lg transition duration-300"
@@ -66,7 +69,6 @@ const AddressSection = () => {
       />
 
       <div className="mt-6">
-        <h2 className="text-xl font-semibold mb-4">Danh sách địa chỉ</h2>
         {addresses.length > 0 ? (
           <div className="overflow-y-auto lg:max-h-96 max-h-full no-scrollbar">
             {addresses.map((address, index) => (

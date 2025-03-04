@@ -8,6 +8,7 @@ import {
   updateUserInfoThunk,
 } from "@redux/thunk/accountThunk";
 import uploadService from "@services/upload.service";
+import HeaderLine from "@components/common/HeaderLine";
 // import { updateUserInfoThunk } from "@redux/thunk/accountThunk";
 
 const UserProfileForm = () => {
@@ -117,7 +118,8 @@ const UserProfileForm = () => {
   };
 
   return (
-    <div className="bg-white p-8">
+    <div className="bg-white px-8">
+      <HeaderLine title="Thông tin tài khoản" />
       <div className="flex gap-8 items-start">
         {/* Avatar */}
         <div className="w-1/3 flex flex-col items-center">
@@ -152,9 +154,6 @@ const UserProfileForm = () => {
 
         {/* Form */}
         <div className="w-2/3">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
-            Thông Tin Tài Khoản
-          </h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/** Form field rendering */}
             {[

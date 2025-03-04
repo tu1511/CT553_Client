@@ -20,6 +20,19 @@ class CouponService {
     });
     return response.data;
   }
+
+  async collectCoupon(accessToken, couponCode) {
+    const response = await this.api.post(
+      "/collect",
+      { couponCode },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  }
 }
 
 export default new CouponService();

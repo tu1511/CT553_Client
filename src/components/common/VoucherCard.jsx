@@ -1,14 +1,30 @@
 import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
 import { formatDate } from "@helpers/FormatDate";
+import couponService from "@services/coupon.service";
 import { Button, Progress } from "antd";
 import { Gift } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
-const VoucherCard = ({ voucher }) => {
+const VoucherCard = ({ voucher, checkCollected }) => {
   // Đảm bảo tránh lỗi nếu voucher.currentUse hoặc voucher.quantity không tồn tại
   const percentageUsed =
     voucher?.currentUse && voucher?.quantity
       ? Math.round((voucher.currentUse / voucher.quantity) * 100)
       : 0;
+  const accessToken = localStorage.getItem("accessToken");
+
+  const handleCollectCoupon = async (couponCode) => {
+    try {
+      await couponService.collectCoupon(accessToken, couponCode);
+      toast.success("Thu thập voucher thành công!");
+    } catch (error) {
+      console.error(error.data?.message);
+      if (error.data?.message === "Coupon already collected") {
+        toast.warn("Bạn đã thu thập coupon này rồi!");
+      }
+    }
+  };
 
   // Chọn màu dựa trên phần trăm đã sử dụng
   const progressColor =
@@ -79,16 +95,23 @@ const VoucherCard = ({ voucher }) => {
           <p className="text-gray-700 font-medium text-sm md:text-base">
             Đã sử dụng: <span className="text-primary">{percentageUsed}%</span>
           </p>
-          <Button
-            type="primary"
-            style={{
-              backgroundColor: "#c60018",
-              borderColor: "#ffffff",
-              color: "white",
-            }}
-          >
-            Thu thập ngay
-          </Button>
+          {checkCollected ? (
+            <p className="font-medium text-sm md:text-base text-white border bg-primary rounded-full px-4 py-1">
+              Đã thu thập
+            </p>
+          ) : (
+            <Button
+              type="primary"
+              style={{
+                backgroundColor: "#c60018",
+                borderColor: "#ffffff",
+                color: "white",
+              }}
+              onClick={() => handleCollectCoupon(voucher.code)}
+            >
+              Thu thập ngay
+            </Button>
+          )}
         </div>
       </div>
     </div>

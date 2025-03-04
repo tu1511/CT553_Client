@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Radio, Table, Modal, Divider } from "antd";
+import { Button, Radio, Table, Divider } from "antd";
 import Breadcrumbs from "@components/common/Breadcrumbs";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +12,7 @@ import AddressList from "@components/OrderPage/AddressList";
 import orderService from "@services/order.service";
 import { CreditCard, Package } from "lucide-react";
 import { deleteItem } from "@redux/thunk/cartThunk";
+import CouponModal from "@components/OrderPage/CouponModal";
 
 const OrderPage = () => {
   const navigate = useNavigate();
@@ -33,6 +34,11 @@ const OrderPage = () => {
 
   const [paymentMethods, setPaymentMethods] = useState([]);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+
+  console.log("selectedCouponId", selectedCoupon);
+
   useEffect(() => {
     const fetchPaymentMethods = async () => {
       try {
@@ -52,67 +58,55 @@ const OrderPage = () => {
     ? cart.filter((item) => item.isChecked)
     : [];
 
-  console.log("checkedProducts", checkedProducts);
-
   const products = checkedProducts.map((item) => ({
     id: item.product.id,
     name: item?.product?.name,
     image: item?.product?.images[0]?.image?.path,
-    price: item?.product?.variants[0]?.price,
+    price: item?.variant?.price,
+    finalPrice: item?.finalPricePerOne,
     discount: item?.product?.productDiscount[0]?.discountValue || 0,
     quantity: item?.quantity,
     variantId: item?.product?.variants[0]?.id,
   }));
 
+  console.log("products", products);
+
   const items = products.map((product) => ({
     variantId: product.variantId,
     productId: product.id,
     quantity: product.quantity,
+    discount: product.discount,
     price: product.price,
+    finalPrice: product.finalPrice,
   }));
-
-  console.log("items", items);
 
   useEffect(() => {
     dispatch(getUserAddressThunk(accessToken));
   }, [dispatch, accessToken]);
 
-  // const handleSelectShippingMethod = (id) => {
-  //   const selectedMethod = shippingMethods.find((method) => method.id === id);
-  //   if (selectedMethod) {
-  //     setSelectedShippingMethod(selectedMethod);
-  //     fetchFee(); // Gọi lại fetchFee để cập nhật phí ngay khi chọn
-  //   }
-  // };
-
-  // console.log("products", products);
   const calculateTotal = () => {
     const productTotal = products.reduce(
-      (total, product) => total + product.price * product.quantity,
+      (total, product) => total + product.finalPrice * product.quantity,
       0
     );
 
     return productTotal;
   };
 
-  const calculateDiscount = () => {
-    const discountTotal = products.reduce(
-      (total, product) =>
-        total + (product.discount / 100) * product.price * product.quantity,
-      0
-    );
-    return discountTotal;
-  };
-
-  console.log("total", calculateTotal());
-
-  console.log("discount", calculateDiscount());
+  const couponValue = selectedCoupon?.coupon?.discountValue;
+  let totalDiscount = 0;
+  if (selectedCoupon) {
+    totalDiscount = (calculateTotal() * couponValue) / 100;
+  } else {
+    totalDiscount = 0;
+  }
 
   const handleAddressSelect = (selectedId) => {
     setIdAddress(selectedId);
   };
 
-  const totalPrice = calculateTotal() + shippingFee - calculateDiscount();
+  const totalPrice = calculateTotal();
+  const finalPrice = totalPrice + shippingFee - totalDiscount;
 
   const handleOrderSubmit = async () => {
     if (shippingFee === 0) {
@@ -129,8 +123,9 @@ const OrderPage = () => {
       paymentMethodId: idPaymentMethod,
       items: items,
       totalPrice: calculateTotal(),
-      finalPrice: totalPrice,
-      totalDiscount: calculateDiscount(),
+      finalPrice: finalPrice,
+      totalDiscount: totalDiscount,
+      usedCouponId: selectedCoupon?.couponId,
     });
 
     const orderData = {
@@ -139,8 +134,9 @@ const OrderPage = () => {
       paymentMethodId: idPaymentMethod,
       items: items,
       totalPrice: calculateTotal(),
-      finalPrice: totalPrice,
-      totalDiscount: calculateDiscount(),
+      finalPrice: finalPrice,
+      totalDiscount: totalDiscount,
+      usedCouponId: selectedCoupon?.couponId,
     };
 
     try {
@@ -215,10 +211,16 @@ const OrderPage = () => {
       render: (price) => `${price.toLocaleString()} VND`,
     },
     {
+      title: "Giảm giá",
+      dataIndex: "discount",
+      key: "discount",
+      render: (discount) => `${discount}%`,
+    },
+    {
       title: "Thành tiền",
       key: "total",
       render: (record) =>
-        `${(record.price * record.quantity).toLocaleString()} VND`,
+        `${(record.finalPrice * record.quantity).toLocaleString()} VND`,
     },
   ];
 
@@ -259,8 +261,8 @@ const OrderPage = () => {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md col-span-1">
-            <h2 className="text-2xl font-semibold text-primary mb-4">
-              Phương thức thanh toán
+            <h2 className="text-xl font-semibold  mb-4">
+              <span className="text-primary">*</span>Phương thức thanh toán
             </h2>
             <Radio.Group
               className="flex flex-col gap-2"
@@ -302,22 +304,71 @@ const OrderPage = () => {
             </Radio.Group>
             <Divider />
 
+            <div className="">
+              <h2 className="text-xl font-semibold">Mã giảm giá</h2>{" "}
+              {selectedCoupon ? (
+                <div className="w-[400px] border border-primary p-4 rounded-lg mt-3">
+                  <div className="font-semibold">
+                    Mã: {selectedCoupon.coupon.code}{" "}
+                  </div>
+                  <div className="italic text-gray-500">
+                    Giảm {selectedCoupon.coupon.discountValue}% cho đơn hàng tối
+                    thiểu{" "}
+                    {toVietnamCurrencyFormat(
+                      selectedCoupon.coupon.minimumPriceToUse
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="">Không có mã giảm giá nào được chọn</div>
+              )}
+              <div className=" text-center mt-4">
+                <Button
+                  type="primary"
+                  style={{
+                    backgroundColor: "#c60018",
+                    borderColor: "#ffffff",
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  Chọn mã giảm giá
+                </Button>
+              </div>
+              <CouponModal
+                visible={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSelectCoupon={setSelectedCoupon}
+              />
+            </div>
+            <Divider />
+
             <div className="mt-4">
               <div className="flex justify-between text-lg font-semibold">
-                <span>Giá sản phẩm:</span>
+                <span>Tổng giá sản phẩm:</span>
                 <span>{toVietnamCurrencyFormat(calculateTotal())} </span>
               </div>
               <div className="flex justify-between text-lg font-semibold">
-                <span>Phí vận chuyển:</span>
+                <div className="flex">
+                  <span>
+                    Phí vận chuyển{" "}
+                    <span className="italic font-normal text-primary">
+                      (Giao hàng nhanh)
+                    </span>
+                    :
+                  </span>
+                </div>
                 <span>{toVietnamCurrencyFormat(shippingFee)}</span>
               </div>
               <div className="flex justify-between text-lg font-semibold">
                 <span>Giảm giá:</span>
-                <span>{toVietnamCurrencyFormat(calculateDiscount())}</span>
+                <span>-{toVietnamCurrencyFormat(totalDiscount)}</span>
               </div>
+
               <div className="flex justify-between text-lg font-semibold border-t pt-2 text-primary">
                 <span className="">Tổng cộng:</span>
-                <span>{toVietnamCurrencyFormat(totalPrice)}</span>
+                <span>{toVietnamCurrencyFormat(finalPrice)}</span>
               </div>
             </div>
 
