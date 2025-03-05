@@ -1,13 +1,24 @@
 import { useEffect, useState } from "react";
-import { Table, Tag, Radio, Button } from "antd";
+import { Table, Radio, Button } from "antd";
 import AddressFormDialog from "@components/ProfilePage/AddressFormDialog";
 import { SquarePen } from "lucide-react";
 import shippingService from "@services/shipping.service";
 
 const AddressList = ({ addresses, onSelect, onFeeChange }) => {
-  const [selectedAddress, setSelectedAddress] = useState();
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [open, setOpen] = useState(false);
   const [editAddress, setEditAddress] = useState(null);
+
+  // Khi component render, chọn địa chỉ mặc định (isDefault: true)
+  useEffect(() => {
+    if (addresses.length > 0) {
+      const defaultAddress = addresses.find((addr) => addr.isDefault);
+      if (defaultAddress) {
+        setSelectedAddress(defaultAddress.id);
+        onSelect(defaultAddress.id);
+      }
+    }
+  }, [addresses]);
 
   const handleSelect = (id) => {
     setSelectedAddress(id);
@@ -30,15 +41,17 @@ const AddressList = ({ addresses, onSelect, onFeeChange }) => {
 
   const fetchFee = async () => {
     try {
+      if (!selectedAddressInfo) return;
+
       const response = await shippingService.getFee({
-        toDistrictId: selectedAddressInfo?.districtId,
-        toWardCode: selectedAddressInfo?.wardCode,
+        toDistrictId: selectedAddressInfo.districtId,
+        toWardCode: selectedAddressInfo.wardCode,
         weightInGram: 200,
       });
 
       if (response?.metadata?.service_fee) {
         const newFee = response.metadata.service_fee;
-        onFeeChange(newFee); // Truyền phí lên component cha
+        onFeeChange(newFee); // Truyền phí ship lên component cha
       }
     } catch (error) {
       console.error("Error fetching fee:", error);
@@ -46,9 +59,7 @@ const AddressList = ({ addresses, onSelect, onFeeChange }) => {
   };
 
   useEffect(() => {
-    if (selectedAddressInfo) {
-      fetchFee();
-    }
+    fetchFee();
   }, [selectedAddressInfo]);
 
   return (

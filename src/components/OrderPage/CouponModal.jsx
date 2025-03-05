@@ -3,9 +3,10 @@ import { Modal, List, Radio } from "antd";
 import { Ticket } from "lucide-react";
 import couponService from "@services/coupon.service";
 import { toVietnamCurrencyFormat } from "@helpers/ConvertCurrency";
+import { toast } from "react-toastify";
 
 // eslint-disable-next-line react/prop-types
-const CouponModal = ({ visible, onClose, onSelectCoupon }) => {
+const CouponModal = ({ visible, onClose, onSelectCoupon, totalPrice }) => {
   const [coupons, setCoupons] = useState([]);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
 
@@ -28,15 +29,33 @@ const CouponModal = ({ visible, onClose, onSelectCoupon }) => {
     fetchCoupons();
   }, [accessToken]);
 
-  //   console.log("coupons", coupons);
-
   const handleOk = () => {
-    if (selectedCoupon) {
-      const selectedData = coupons.find(
-        (coupon) => coupon.coupon.id === selectedCoupon
-      );
-      onSelectCoupon(selectedData); // Truyền toàn bộ dữ liệu của coupon được chọn
+    if (!selectedCoupon) {
+      toast.warning("Vui lòng chọn một mã giảm giá!");
+      return;
     }
+
+    const selectedData = coupons.find(
+      (coupon) => coupon.coupon.id === selectedCoupon
+    );
+
+    if (!selectedData) {
+      toast.error("Không tìm thấy mã giảm giá!");
+      return;
+    }
+
+    const minimumRequired = selectedData.coupon.minimumPriceToUse;
+
+    if (totalPrice < minimumRequired) {
+      toast.warning(
+        `Đơn hàng cần tối thiểu ${toVietnamCurrencyFormat(
+          minimumRequired
+        )} để sử dụng mã này!`
+      );
+      return;
+    }
+
+    onSelectCoupon(selectedData);
     onClose();
   };
 

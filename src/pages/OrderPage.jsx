@@ -69,7 +69,7 @@ const OrderPage = () => {
     variantId: item?.product?.variants[0]?.id,
   }));
 
-  console.log("products", products);
+  // console.log("products", products);
 
   const items = products.map((product) => ({
     variantId: product.variantId,
@@ -246,7 +246,7 @@ const OrderPage = () => {
             />
 
             <Divider />
-            <h2 className="text-2xl font-semibold text-primary mb-4">
+            <h2 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
               Chi tiết đơn hàng
             </h2>
             <Table
@@ -261,7 +261,7 @@ const OrderPage = () => {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md col-span-1">
-            <h2 className="text-xl font-semibold  mb-4">
+            <h2 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
               <span className="text-primary">*</span>Phương thức thanh toán
             </h2>
             <Radio.Group
@@ -305,7 +305,9 @@ const OrderPage = () => {
             <Divider />
 
             <div className="">
-              <h2 className="text-xl font-semibold">Mã giảm giá</h2>{" "}
+              <h2 className="text-lg font-semibold text-primary flex items-center gap-2">
+                Mã giảm giá
+              </h2>{" "}
               {selectedCoupon ? (
                 <div className="w-[400px] border border-primary p-4 rounded-lg mt-3">
                   <div className="font-semibold">
@@ -340,6 +342,7 @@ const OrderPage = () => {
                 visible={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSelectCoupon={setSelectedCoupon}
+                totalPrice={totalPrice}
               />
             </div>
             <Divider />

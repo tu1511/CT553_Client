@@ -289,21 +289,22 @@ const OrderHistory = () => {
                   {PAYMENT_STATUS_MAP[selectedOrder.payment.paymentStatus.name]}
                 </span>
               </p>
-              {selectedOrder.payment.paymentStatus.name !== "SUCCESS" && (
-                <Button
-                  type="primary"
-                  style={{
-                    backgroundColor: "#c60018",
-                    borderColor: "#ffffff",
-                    color: "white",
-                  }}
-                  onClick={() => {
-                    handlePayment(selectedOrder.id);
-                  }}
-                >
-                  Thanh toán lại
-                </Button>
-              )}
+              {selectedOrder.payment.paymentStatus.name !== "SUCCESS" &&
+                selectedOrder.payment?.paymentMethodId === 2 && (
+                  <Button
+                    type="primary"
+                    style={{
+                      backgroundColor: "#c60018",
+                      borderColor: "#ffffff",
+                      color: "white",
+                    }}
+                    onClick={() => {
+                      handlePayment(selectedOrder.id);
+                    }}
+                  >
+                    Thanh toán lại
+                  </Button>
+                )}
             </div>
 
             <Divider />
