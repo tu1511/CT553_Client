@@ -13,10 +13,11 @@ import {
   Phone,
   Smile,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "antd";
 import { toast } from "react-toastify";
+import articleService from "@services/article.service";
 
 const Footer = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -38,6 +39,25 @@ const Footer = () => {
     setIsModalVisible(false);
   };
 
+  const [articles, setArticles] = useState([]);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const response = await articleService.getAll({});
+        const unVisibleItems = response.metadata.filter(
+          (article) => article.visible
+        );
+        setArticles(unVisibleItems);
+      } catch (error) {
+        console.error("Lỗi khi tải tin tức:", error);
+      }
+    };
+    fetchArticles();
+  }, []);
+
+  console.log("articles", articles);
+
   const customerServices = [
     { label: "Hướng dẫn chọn size", to: "/chinh-sach/1" },
     { label: "Hướng dẫn mua hàng online", to: "/chinh-sach/1" },
@@ -46,13 +66,10 @@ const Footer = () => {
     { label: "Chính sách trả hàng hoàn tiền", to: "/chinh-sach/1" },
   ];
 
-  const supportServices = [
-    { label: "Tại sao nên chọn bạc cao cấp?", to: "/tin-tuc" },
-    { label: "Cách làm trang sức bạc tại nhà", to: "/tin-tuc" },
-    { label: "Phân biệt các loại bạc S925, S999,...", to: "/tin-tuc" },
-    { label: "Những tác dụng của bạc", to: "/tin-tuc" },
-    { label: "Cách bảo quản trang sức bạc", to: "/tin-tuc" },
-  ];
+  const supportServices = articles.slice(1, 6).map((item) => ({
+    label: item.title,
+    to: `/tin-tuc/${item.slug}`,
+  }));
 
   const socialLinks = [
     { href: "https://www.facebook.com", icon: <Facebook size={24} /> },
@@ -164,7 +181,7 @@ const Footer = () => {
                   <li key={index}>
                     <Link
                       to={service.to}
-                      className="text-black hover:text-primary"
+                      className="text-black hover:text-primary line-clamp-1"
                     >
                       {service.label}
                     </Link>

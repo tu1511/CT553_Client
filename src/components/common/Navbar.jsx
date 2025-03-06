@@ -44,7 +44,7 @@ const Navbar = () => {
       menuItems: jewelryMenuItems, // Sử dụng dữ liệu động từ API
     },
     { name: "Khuyến mãi", link: "/khuyen-mai", menuItems: [] },
-    // { name: "Tin tức", link: "/tin-tuc", menuItems: [] },
+    { name: "Tin tức", link: "/tin-tuc", menuItems: [] },
     {
       name: "Chính sách",
       link: "/chinh-sach",
