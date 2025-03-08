@@ -37,7 +37,6 @@ const ProductPage = () => {
 
   // console.log(products[0]);
   const { slug } = useParams();
-  console.log(slug);
   const [category, setCategory] = useState(null);
 
   const [breadcrumb, setBreadcrumb] = useState([]);
@@ -106,8 +105,6 @@ const ProductPage = () => {
 
     fetchProducts();
   }, [accessToken, category, page]);
-
-  console.log("products", products);
 
   // Handle filter changes
   const handleFilterChange = (newFilters) => {

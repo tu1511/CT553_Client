@@ -36,6 +36,20 @@ class OrderService {
       console.error("Error getting order by buyId:", error);
     }
   }
+
+  // get order by id
+  async getOrderById(accessToken, orderId) {
+    try {
+      const response = await this.api.get(`customer/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error getting order by id:", error);
+    }
+  }
 }
 
 export default new OrderService();

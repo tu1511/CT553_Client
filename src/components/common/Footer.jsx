@@ -56,8 +56,6 @@ const Footer = () => {
     fetchArticles();
   }, []);
 
-  console.log("articles", articles);
-
   const customerServices = [
     { label: "Hướng dẫn chọn size", to: "/chinh-sach/1" },
     { label: "Hướng dẫn mua hàng online", to: "/chinh-sach/1" },

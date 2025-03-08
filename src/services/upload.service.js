@@ -18,6 +18,22 @@ class uploadService {
     return response.data;
   }
 
+  // upload images
+  async uploadImages(files) {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    const response = await this.api.post("/images", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  }
+
   async uploadImageToDisk(file) {
     const formData = new FormData();
     formData.append("image", file);

@@ -1,170 +1,133 @@
-import { useEffect, useState, useCallback } from "react";
-import { Button, Rate, Input, Upload, List, Avatar } from "antd";
+import { useEffect, useState } from "react";
+import { Button, Rate, Input, List, Avatar, Progress, Upload } from "antd";
+import { UploadOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import HeaderLine from "@components/common/HeaderLine";
 import reviewsService from "@services/reviews.service";
+import { formatDateTime } from "@helpers/formatDateTime";
 import ReviewSummary from "@components/ProductPage/ReviewSummary";
 import uploadService from "@services/upload.service";
+import { Form } from "react-router-dom";
 import { Plus } from "lucide-react";
-import orderService from "@services/order.service";
-import { formatDateTime } from "@helpers/formatDateTime";
 
 function RatingSection({ productId }) {
-  const [ratingsData, setRatingsData] = useState([0, 0, 0, 1, 1]);
-  const [averageRating, setAverageRating] = useState(4.5);
-  const [totalRatings, setTotalRatings] = useState(2);
+  const [ratingsData] = useState([0, 0, 0, 1, 1]); // Giả lập số lượng đánh giá
+  const [averageRating] = useState(4.5); // Giả lập điểm trung bình
+  const [totalRatings] = useState(2); // Giả lập tổng số đánh giá
+  const [visibleComments, setVisibleComments] = useState(5);
   const [rating, setRating] = useState(5);
   const [review, setReview] = useState("");
-  const [fileList, setFileList] = useState([]);
+  const [reviewImages, setReviewImages] = useState([]); // Ảnh được tải lên
+
   const [reviews, setReviews] = useState([]);
-  const [filteredOrders, setFilteredOrders] = useState([]);
-  const [visibleComments, setVisibleComments] = useState(5);
 
-  const accessToken = localStorage.getItem("accessToken");
-
-  const handleLoadMore = () => setVisibleComments((prev) => prev + 5);
-  const handleShowLess = () => setVisibleComments(5);
-
-  // Lấy danh sách đánh giá
   useEffect(() => {
     const fetchReviews = async () => {
       try {
         const response = await reviewsService.getReviewByProductId(productId);
-        setReviews(response.metadata?.reviews || []);
+        setReviews(response.metadata?.reviews);
       } catch (error) {
         console.error("Failed to fetch reviews: ", error);
       }
     };
+
     fetchReviews();
   }, [productId]);
 
-  // Lấy danh sách đơn hàng đã mua
-  const fetchOrders = useCallback(async () => {
-    if (!accessToken) return;
-    try {
-      const response = await orderService.getOrderByBuyId(accessToken, 0, 1000);
-      console.log("Orders response:", response);
+  console.log("reviews", reviews);
 
-      const orderIds =
-        response.metadata?.orders?.map((order) => order.id) || [];
-      if (orderIds.length === 0) {
-        console.warn("Không tìm thấy đơn hàng hợp lệ!");
-        return;
-      }
-
-      fetchOrdersById(orderIds, productId);
-    } catch (error) {
-      console.error("Lỗi khi fetch orders:", error);
-    }
-  }, [accessToken]);
-
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
-
-  // Lấy chi tiết đơn hàng theo ID
-  const data = productId;
-  console.log("ProductId:", data);
-  const fetchOrdersById = async (orderIds, productId) => {
-    if (!orderIds.length || !accessToken || !productId) return;
-    console.log("Fetching orders cho productId:", productId);
-
-    try {
-      const responses = await Promise.all(
-        orderIds.map((id) => orderService.getOrderById(accessToken, id))
-      );
-
-      const allOrderDetails = responses.flatMap(
-        (res) => res.metadata?.orderDetail || []
-      );
-
-      const filteredData = allOrderDetails.filter(
-        (order) => order?.variant?.productId === productId
-      );
-
-      console.log("Filtered orders:", filteredData);
-      setFilteredOrders(filteredData);
-    } catch (error) {
-      console.error("Lỗi khi fetch chi tiết đơn hàng:", error);
-    }
-  };
-
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!rating || !review.trim()) {
-      return toast.error("Vui lòng chọn số sao và nhập nhận xét!");
+      toast.error("Vui lòng chọn đánh giá và nhập nhận xét!");
+      return;
     }
 
     const reviewData = {
-      orderId: filteredOrders[0]?.orderId,
-      variantId: filteredOrders[0]?.variantId,
-      productId,
       rating,
       comment: review,
-      uploadedImageIds: fileList.map((file) => file.uid) || [],
+      images: reviewImages,
+      productId,
     };
 
     console.log("Dữ liệu đánh giá:", reviewData);
 
-    try {
-      await reviewsService.createReview(accessToken, reviewData);
-      toast.success("Đánh giá của bạn đã được gửi thành công!");
-
-      // Reset form sau khi gửi đánh giá
-      setReview("");
-      setRating(5);
-      setFileList([]);
-    } catch (error) {
-      console.error("Lỗi khi gửi đánh giá:", error?.data?.message);
-      if (
-        error?.data?.message ===
-        "You have already reviewed this product for this order"
-      ) {
-        toast.error("Bạn đã đánh giá sản phẩm trong đơn hàng này rồi!");
-      } else {
-        toast.error("Đánh giá sản phẩm thất bại!");
-      }
-    }
-
-    // Refresh lại danh sách đánh giá
-    const response = await reviewsService.getReviewByProductId(data);
-    setReviews(response.metadata?.reviews ? response.metadata.reviews : []);
+    toast.success("Đánh giá thành công!");
+    setReview("");
+    setRating(5);
+    setReviewImages([]);
   };
 
+  const [form] = Form.useForm();
+  const [fileList, setFileList] = useState([]);
+
+  console.log("fileList", fileList);
+
   const handleImageUpload = async ({ file, fileList: newFileList }) => {
+    // Nếu file có trạng thái "removed", cập nhật lại fileList và form mà không gọi API.
     if (file.status === "removed") {
       setFileList(newFileList);
+      form.setFieldsValue({
+        uploadedImageIds: newFileList.map((f) => f.uid),
+        images: newFileList,
+      });
       return;
     }
 
+    // Tách ra các file đã được upload và các file mới (có originFileObj)
+    const alreadyUploaded = newFileList.filter((f) => !f.originFileObj);
     const toUpload = newFileList.filter((f) => f.originFileObj);
-    if (!toUpload.length) return setFileList(newFileList);
 
-    if (toUpload.some((file) => !file.type.startsWith("image/"))) {
-      return toast.error("Chỉ được phép tải lên ảnh!");
-    }
-
-    try {
-      const response = await uploadService.uploadImages(
-        toUpload.map((f) => f.originFileObj)
-      );
-      if (response?.metadata) {
-        const uploadedFiles = response.metadata.map((meta) => ({
-          uid: meta.id,
-          name: meta.filename || "image",
-          url: meta.path,
-        }));
-        setFileList([
-          ...newFileList.filter((f) => !f.originFileObj),
-          ...uploadedFiles,
-        ]);
-        toast.success("Tải ảnh lên thành công");
-      } else {
-        toast.error("Lỗi khi tải ảnh lên");
+    // Nếu có file mới cần upload, tiến hành upload
+    if (toUpload.length > 0) {
+      // Kiểm tra loại file
+      const filesToUpload = toUpload
+        .map((f) => f.originFileObj)
+        .filter(Boolean);
+      if (filesToUpload.some((file) => !file.type.startsWith("image/"))) {
+        return toast.error("Chỉ được phép tải lên ảnh!");
       }
-    } catch (error) {
-      toast.error("Tải ảnh lên thất bại");
+
+      try {
+        // Gọi API uploadImages với mảng các file mới
+        const response = await uploadService.uploadImages(filesToUpload);
+        if (response?.metadata) {
+          const uploadedFiles = response.metadata.map((meta) => ({
+            uid: meta.id,
+            name: meta.filename || "image",
+            url: meta.path,
+          }));
+
+          // Kết hợp file đã upload với file mới vừa upload
+          const mergedFiles = [...alreadyUploaded, ...uploadedFiles];
+          setFileList(mergedFiles);
+          form.setFieldsValue({
+            uploadedImageIds: mergedFiles.map((file) => file.uid),
+            images: mergedFiles,
+          });
+          toast.success("Tải ảnh lên thành công");
+        } else {
+          toast.error("Lỗi khi tải ảnh lên");
+        }
+      } catch (error) {
+        toast.error("Tải ảnh lên thất bại");
+      }
+    } else {
+      // Nếu không có file mới cần upload, chỉ cập nhật fileList và form
+      setFileList(newFileList);
+      form.setFieldsValue({
+        uploadedImageIds: newFileList.map((f) => f.uid),
+        images: newFileList,
+      });
     }
   };
+
+  const handleRemoveImage = (url) => {
+    const updatedImages = reviewImages.filter((img) => img !== url);
+    setReviewImages(updatedImages);
+  };
+
+  const handleLoadMore = () => setVisibleComments((prev) => prev + 5);
+  const handleShowLess = () => setVisibleComments(5);
 
   return (
     <div className="container mx-auto px-8 py-6">
@@ -183,36 +146,62 @@ function RatingSection({ productId }) {
           <Input.TextArea
             value={review}
             onChange={(e) => setReview(e.target.value)}
-            placeholder="Nhập nhận xét..."
+            placeholder="Nhập nhận xét của bạn ở đây..."
             rows={4}
             className="mb-4"
           />
-          <Upload
-            listType="picture-card"
-            fileList={fileList}
-            beforeUpload={() => false}
-            onChange={handleImageUpload}
-            multiple
-          >
-            {fileList.length >= 8 ? null : (
-              <div>
-                <Plus />
-                <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
-              </div>
-            )}
-          </Upload>
-          <Button
-            type="primary"
-            onClick={handleSubmit}
-            style={{
-              backgroundColor: "#c60018",
-              borderColor: "#ffffff",
-              color: "white",
-            }}
-          >
-            Đánh giá ngay
-          </Button>
+          <div className="flex flex-wrap gap-4">
+            <Form.Item label="Hình ảnh sản phẩm" name="uploadedImageIds">
+              <Upload
+                listType="picture-card"
+                fileList={fileList}
+                beforeUpload={() => false} // Ngăn upload tự động, xử lý theo API nếu cần
+                onChange={handleImageUpload}
+                multiple
+              >
+                {fileList.length >= 8 ? null : (
+                  <div>
+                    <Plus />
+                    <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
+                  </div>
+                )}
+              </Upload>
+            </Form.Item>
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              style={{
+                backgroundColor: "#c60018",
+                borderColor: "#ffffff",
+                color: "white",
+              }}
+            >
+              Đánh giá ngay
+            </Button>
+          </div>
+
+          {reviewImages.length > 0 && (
+            <div className="flex flex-wrap mt-4 gap-3">
+              {reviewImages.map((img, index) => (
+                <div
+                  key={index}
+                  className="relative w-24 h-24 bg-gray-100 rounded-lg overflow-hidden"
+                >
+                  <img
+                    src={img}
+                    alt={`Ảnh ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <CloseCircleOutlined
+                    className="absolute top-1 right-1 text-red-500 cursor-pointer"
+                    onClick={() => handleRemoveImage(img)}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+
         {reviews && reviews.length > 0 && (
           <List
             className="mt-8"

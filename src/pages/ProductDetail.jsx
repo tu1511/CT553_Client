@@ -33,7 +33,6 @@ const ProductDetail = () => {
         });
 
         setProducts(data.metadata?.products || []);
-        console.log("products", data.metadata?.products);
       } catch (error) {
         console.error("Lỗi khi lấy sản phẩm:", error);
       }
@@ -91,7 +90,6 @@ const ProductDetail = () => {
       console.log("product", data?.metadata);
       // Đặt mặc định variant đầu tiên
       if (data?.metadata?.variants?.length > 0) {
-        console.log("variant", data?.metadata?.variants[0]);
         setSelectedVariant(data?.metadata?.variants[0]); // Mặc định chọn variant đầu tiên
       }
       if (data?.metadata?.images?.length > 0) {
@@ -127,7 +125,6 @@ const ProductDetail = () => {
   }, [product]);
 
   const discountPrice = product?.productDiscount[0]?.discountValue || 0;
-  console.log("discountPrice", discountPrice);
 
   return (
     <>
@@ -349,11 +346,11 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      <RatingSection />
+      <RatingSection productId={product?.id} />
 
-      <ProductList title="Sản phẩm tương tự" products={products} />
+      {/* <ProductList title="Sản phẩm tương tự" products={products} />
 
-      <InfoSection />
+      <InfoSection /> */}
     </>
   );
 };
