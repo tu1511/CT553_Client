@@ -18,7 +18,7 @@ const ReviewSummary = ({ averageRating, totalRatings, ratingsData }) => {
 
       {/* Hiển thị biểu đồ đánh giá */}
       <div className="p-4 bg-gray-50 rounded-lg shadow-sm">
-        {[...ratingsData].reverse().map((count, index) => {
+        {[...ratingsData].map((count, index) => {
           const starLevel = 5 - index;
           const percentage = totalRatings ? (count / totalRatings) * 100 : 0;
 

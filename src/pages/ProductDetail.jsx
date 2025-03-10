@@ -13,6 +13,8 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "@redux/thunk/cartThunk";
 import { toast } from "react-toastify";
 import categoryService from "@services/category.service";
+import { Rate } from "antd";
+import reviewsService from "@services/reviews.service";
 
 const ProductDetail = () => {
   const [product, setProduct] = useState(null);
@@ -42,6 +44,8 @@ const ProductDetail = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  console.log("product", product);
 
   const handleImageClick = (image) => {
     setCurrentImage(image?.image?.path);
@@ -126,12 +130,37 @@ const ProductDetail = () => {
 
   const discountPrice = product?.productDiscount[0]?.discountValue || 0;
 
+  const [reviews, setReviews] = useState([]);
+
+  // Lấy danh sách đánh giá
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await reviewsService.getReviewByProductId(product?.id);
+        setReviews(response.metadata?.reviews || []);
+      } catch (error) {
+        console.error("Failed to fetch reviews: ", error);
+      }
+    };
+    fetchReviews();
+  }, [product]);
+
+  const totalRatings = reviews.length;
+  const averageRating =
+    totalRatings > 0
+      ? reviews.reduce((acc, review) => acc + review.rating, 0) / totalRatings
+      : 0;
+
+  const ratingsData = Array.from({ length: 5 }, (_, i) => {
+    return reviews.filter((review) => review.rating === 5 - i).length;
+  });
+
   return (
     <>
       <Breadcrumbs items={breadcrumb} />
       <div className="container mx-auto px-8 pb-6">
         {/* Product top */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Hình ảnh sản phẩm */}
           <div className="flex items-start space-x-8">
             {/* Hình nhỏ nằm bên trái */}
@@ -166,7 +195,7 @@ const ProductDetail = () => {
             <h1 className="text-2xl font-semibold mb-4 text-gray-800 border-b-2 border-dashed border-black pb-2">
               {product?.name}
             </h1>
-            <div className="flex space-x-6 items-center mb-4">
+            <div className="flex space-x-4 items-center mb-4">
               <p className="text-lg text-gray-600 border-r-2 pr-4 border-gray-300">
                 Loại sản phẩm:{" "}
                 <span className="text-primary font-medium">
@@ -176,20 +205,10 @@ const ProductDetail = () => {
               <div className="flex items-center">
                 <p className="text-lg text-gray-600">Đánh giá:</p>
                 <span className="ml-2 flex items-center">
-                  {Array.from({ length: 5 }, (_, index) => (
-                    <Star
-                      key={index}
-                      size={20}
-                      className={`${
-                        index < Math.floor(product?.rating || 5)
-                          ? "text-yellow-400"
-                          : "text-gray-300"
-                      }`}
-                    />
-                  ))}
+                  <Rate disabled allowHalf value={averageRating} />
                 </span>
                 <p className="ml-2 text-gray-500">
-                  ({product?.rating || 5} / 5 điểm đánh giá)
+                  ({averageRating} / 5 điểm đánh giá)
                 </p>
               </div>
             </div>
@@ -346,7 +365,13 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      <RatingSection productId={product?.id} />
+      <RatingSection
+        productId={product?.id}
+        reviews={reviews}
+        totalRatings={totalRatings}
+        averageRating={averageRating}
+        ratingsData={ratingsData}
+      />
 
       {/* <ProductList title="Sản phẩm tương tự" products={products} />
 

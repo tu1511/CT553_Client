@@ -9,14 +9,16 @@ import { Plus } from "lucide-react";
 import { formatDateTime } from "@helpers/formatDateTime";
 import { useLocation } from "react-router-dom";
 
-function RatingSection({ productId }) {
-  const [ratingsData, setRatingsData] = useState([0, 0, 0, 1, 1]);
-  const [averageRating, setAverageRating] = useState(4.5);
-  const [totalRatings, setTotalRatings] = useState(2);
+function RatingSection({
+  productId,
+  reviews,
+  totalRatings,
+  averageRating,
+  ratingsData,
+}) {
   const [rating, setRating] = useState(5);
   const [review, setReview] = useState("");
   const [fileList, setFileList] = useState([]);
-  const [reviews, setReviews] = useState([]);
   const [visibleComments, setVisibleComments] = useState(5);
 
   const accessToken = localStorage.getItem("accessToken");
@@ -28,19 +30,6 @@ function RatingSection({ productId }) {
   const selectedOrder = location.state?.order;
 
   console.log("Dữ liệu đơn hàng nhận được:", selectedOrder);
-
-  // Lấy danh sách đánh giá
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await reviewsService.getReviewByProductId(productId);
-        setReviews(response.metadata?.reviews || []);
-      } catch (error) {
-        console.error("Failed to fetch reviews: ", error);
-      }
-    };
-    fetchReviews();
-  }, [productId]);
 
   const handleSubmit = async () => {
     if (!rating || !review.trim()) {
@@ -223,12 +212,9 @@ function RatingSection({ productId }) {
 
                       {/* Hiển thị phản hồi bình luận nếu có */}
                       {comment?.replyByReview?.length > 0 && (
-                        <div className="mt-4 space-y-2">
+                        <div className="mt-4 space-y-2 p-3 bg-gray-100 rounded-lg shadow-sm">
                           {comment.replyByReview.map((reply, index) => (
-                            <div
-                              key={index}
-                              className="flex items-start gap-3 p-3 bg-gray-100 rounded-lg shadow-sm"
-                            >
+                            <div key={index} className="flex items-start gap-3">
                               <Avatar
                                 size={30}
                                 src={reply?.account?.avatar?.path}
@@ -252,6 +238,21 @@ function RatingSection({ productId }) {
                                   </span>
                                   {reply?.comment}
                                 </p>
+                                {comment?.replyByReview[0]?.reviewImage
+                                  ?.length > 0 && (
+                                  <div className="flex gap-2 mt-2">
+                                    {comment.replyByReview[0]?.reviewImage.map(
+                                      (img, index) => (
+                                        <img
+                                          key={index}
+                                          src={img?.image?.path}
+                                          alt="review"
+                                          className="w-40 h-40 object-cover rounded-lg shadow-md"
+                                        />
+                                      )
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           ))}
