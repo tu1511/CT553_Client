@@ -19,19 +19,18 @@ const CouponsSection = () => {
     fetchCoupons();
   }, []);
 
-  console.log("coupons", coupons);
   return (
     <section className="container mx-auto p-4">
       <HeaderLine title="Mã giảm giá" />
-      <div className="">
-        <div className="grid grid-cols-3 gap-6">
-          {coupons.map((coupon) => (
-            <VoucherCard
-              key={coupon.voucherId}
-              voucher={coupon}
-              checkCollected={null}
-            />
-          ))}
+      <div className="mt-4">
+        <div className="overflow-x-auto whitespace-nowrap pb-4">
+          <div className="flex gap-4 ">
+            {coupons.map((coupon) => (
+              <div key={coupon.voucherId} className="flex-shrink-0">
+                <VoucherCard voucher={coupon} checkCollected={null} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -22,6 +22,8 @@ const VoucherCard = ({ voucher, checkCollected }) => {
       console.error(error.data?.message);
       if (error.data?.message === "Coupon already collected") {
         toast.warn("Bạn đã thu thập coupon này rồi!");
+      } else if (error.data?.message === "Invalid token") {
+        toast.error("Vui lòng đăng nhập tài khoản để thu thập mã giảm giá!");
       }
     }
   };
@@ -35,7 +37,7 @@ const VoucherCard = ({ voucher, checkCollected }) => {
       : "#52c41a";
 
   return (
-    <div className="bg-white border border-primary rounded-lg p-6 flex flex-col justify-between transition-all hover:translate-y-[-2px] hover:shadow-2xl">
+    <div className="bg-white border w-[480px] border-primary rounded-lg p-6 my-1 flex flex-col justify-between transition-all hover:translate-y-[-2px] hover:shadow-2xl">
       {/* Header: Mã Voucher và Hạn sử dụng */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">

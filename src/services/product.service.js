@@ -47,6 +47,16 @@ class productService {
     });
     return response.data;
   }
+
+  // get recommended products
+  async getRecommended({ accessToken }) {
+    const response = await this.api.get("/recommend", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  }
 }
 
 export default new productService();

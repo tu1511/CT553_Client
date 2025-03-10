@@ -64,7 +64,7 @@ function RatingSection({
       ) {
         toast.error("Bạn đã đánh giá sản phẩm trong đơn hàng này rồi!");
       } else {
-        toast.error("Đánh giá sản phẩm thất bại!");
+        toast.error("Vui lòng mua sản phẩm trước khi đánh giá!");
       }
     }
 

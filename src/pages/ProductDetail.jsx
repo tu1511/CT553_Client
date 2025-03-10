@@ -25,13 +25,15 @@ const ProductDetail = () => {
   const [selectedVariant, setSelectedVariant] = useState();
   const [products, setProducts] = useState([]);
 
+  const accessToken = localStorage.getItem("accessToken");
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const data = await productService.getAll({
           // accessToken,
           type: "All",
-          limit: 4,
+          limit: 8,
         });
 
         setProducts(data.metadata?.products || []);
@@ -53,8 +55,11 @@ const ProductDetail = () => {
   const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
   const increment = () => setQuantity((prev) => prev + 1);
   const handleBuyNow = () => {
-    alert(`Mua ngay ${quantity} sản phẩm!`);
-    navigate("/dat-hang");
+    {
+      accessToken
+        ? navigate("/dat-hang")
+        : toast.warn("Vui lòng đăng nhập để mua sản phẩm!");
+    }
   };
   const handleAddToCart = () => {
     let discountPrice;
@@ -373,9 +378,9 @@ const ProductDetail = () => {
         ratingsData={ratingsData}
       />
 
-      {/* <ProductList title="Sản phẩm tương tự" products={products} />
+      <ProductList title="Sản phẩm tương tự" products={products} />
 
-      <InfoSection /> */}
+      <InfoSection />
     </>
   );
 };

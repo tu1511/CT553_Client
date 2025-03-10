@@ -64,7 +64,7 @@ const Footer = () => {
     { label: "Chính sách trả hàng hoàn tiền", to: "/chinh-sach/1" },
   ];
 
-  const supportServices = articles.slice(1, 6).map((item) => ({
+  const supportServices = articles.slice(0, 5).map((item) => ({
     label: item.title,
     to: `/tin-tuc/${item.slug}`,
   }));

@@ -26,6 +26,12 @@ class reviewService {
 
     return response.data;
   }
+
+  async getTopReviews() {
+    const response = await this.api.get("/top");
+
+    return response.data;
+  }
 }
 
 export default new reviewService();

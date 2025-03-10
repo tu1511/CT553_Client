@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import productService from "@services/product.service";
 import CouponsSection from "@components/HomePage/CouponsSection";
+import reviewsService from "@services/reviews.service";
 
 function HomePage() {
   const [products, setProducts] = useState([]);
@@ -18,7 +19,7 @@ function HomePage() {
         const data = await productService.getAll({
           // accessToken,
           type: "All",
-          limit: 4,
+          limit: 8,
         });
 
         setProducts(data.metadata?.products || []);
@@ -60,29 +61,33 @@ function HomePage() {
     },
   ];
 
-  const reviews = [
-    {
-      name: "Nguyễn Văn A",
-      avatar: "https://i.pravatar.cc/150?img=3",
-      rating: 5,
-      content: "Sản phẩm rất đẹp và chất lượng. Tôi rất hài lòng với dịch vụ!",
-      date: "2024-06-15",
-    },
-    {
-      name: "Trần Thị B",
-      avatar: "https://i.pravatar.cc/150?img=8",
-      rating: 4,
-      content: "Đóng gói chắc chắn, giao hàng nhanh. Chất lượng khá tốt!",
-      date: "2024-06-10",
-    },
-    {
-      name: "Phạm Văn C",
-      avatar: "https://i.pravatar.cc/150?img=10",
-      rating: 5,
-      content: "Rất tuyệt vời, đáng để mua. Sẽ giới thiệu cho bạn bè!",
-      date: "2024-06-05",
-    },
-  ];
+  const [topReviews, setTopReviews] = useState([]);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const accessToken = localStorage.getItem("accessToken");
+
+  useEffect(() => {
+    const fetchTopReviews = async () => {
+      try {
+        const response = await reviewsService.getTopReviews();
+        setTopReviews(response?.metadata);
+      } catch (error) {
+        console.error("Lỗi khi lấy đánh giá:", error);
+      }
+    };
+    fetchTopReviews();
+  }, []);
+
+  useEffect(() => {
+    const fetchRecommendedProducts = async () => {
+      try {
+        const response = await productService.getRecommended({ accessToken });
+        setRecommendedProducts(response?.metadata || []);
+      } catch (error) {
+        console.error("Lỗi khi lấy sản phẩm đề xuất:", error);
+      }
+    };
+    fetchRecommendedProducts();
+  }, [accessToken]);
 
   return (
     <div className="bg-white">
@@ -98,12 +103,18 @@ function HomePage() {
       {/* coupons section */}
       <CouponsSection />
 
+      {accessToken ? (
+        <ProductList
+          title="Sản phẩm dành cho bạn"
+          products={recommendedProducts}
+        />
+      ) : (
+        ""
+      )}
       {/* product list section */}
       <ProductList title="Sản phẩm yêu thích nhất" products={products} />
 
       <ProductList title="Sản phẩm mới nhất" products={products} />
-
-      {/* <ProductList title="Sản phẩm khuyến mãi" products={products} /> */}
 
       {/* hero banner section */}
       <section
@@ -137,7 +148,7 @@ function HomePage() {
         </div>
       </section>
 
-      <UserReview reviews={reviews} />
+      <UserReview reviews={topReviews} />
     </div>
   );
 }

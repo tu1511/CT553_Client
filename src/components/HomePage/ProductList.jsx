@@ -11,7 +11,7 @@ function ProductList({ title = "", products = [] }) {
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {/* Hiển thị tối đa 4 sản phẩm */}
-        {products.slice(0, 4).map((product) => (
+        {products.slice(0, 8).map((product) => (
           <ProductCard
             key={product.id}
             productLink={`/san-pham/${product?.slug}`}
@@ -30,11 +30,11 @@ function ProductList({ title = "", products = [] }) {
         ))}
       </div>
 
-      <div className=" flex justify-center items-center mt-8">
+      {/* <div className=" flex justify-center items-center mt-8">
         <button className="bg-white uppercase font-semibold border-black border-2 rounded-xl text-black hover:bg-black hover:text-white py-2 px-4 transition duration-300 ease-in-out">
           Xem tất cả {title}
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }
