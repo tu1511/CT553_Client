@@ -6,7 +6,7 @@ import orderService from "@services/order.service";
 import { EllipsisVertical } from "lucide-react";
 import { formatDateTime } from "@helpers/formatDateTime";
 import { render } from "react-dom";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import paymentService from "@services/payment.service";
 import HeaderLine from "@components/common/HeaderLine";
@@ -74,6 +74,8 @@ const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const accessToken = localStorage.getItem("accessToken");
 
@@ -239,7 +241,7 @@ const OrderHistory = () => {
           open={isModalOpen}
           onCancel={closeModal}
           footer={null}
-          width={1000}
+          width={1200}
           className="custom-modal"
         >
           <div className="space-y-4 p-4">
@@ -403,6 +405,45 @@ const OrderHistory = () => {
                   {toVietnamCurrencyFormat(selectedOrder.finalPrice)}
                 </span>
               </div>
+            </div>
+            <div className="flex justify-end mt-2">
+              {selectedOrder.currentStatus.name === "DELIVERED" &&
+                selectedOrder.payment.paymentStatus.name === "SUCCESS" && (
+                  <Button
+                    type="primary"
+                    style={{
+                      backgroundColor: "#c60018",
+                      borderColor: "#ffffff",
+                      color: "white",
+                    }}
+                    onClick={() => {
+                      navigate(
+                        `/san-pham/${selectedOrder.orderDetail[0].variant.product.slug}`,
+                        {
+                          state: { order: selectedOrder },
+                        }
+                      );
+                    }}
+                  >
+                    Đánh giá sản phẩm
+                  </Button>
+                )}
+              {selectedOrder.currentStatus.name === "AWAITING_CONFIRM" &&
+                selectedOrder.payment.paymentStatus.name !== "SUCCESS" && (
+                  <Button
+                    type="primary"
+                    style={{
+                      backgroundColor: "#c60018",
+                      borderColor: "#ffffff",
+                      color: "white",
+                    }}
+                    onClick={() => {
+                      handlePayment(selectedOrder.id);
+                    }}
+                  >
+                    Hủy đơn hàng
+                  </Button>
+                )}
             </div>
           </div>
         </Modal>

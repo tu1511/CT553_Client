@@ -6,8 +6,8 @@ import reviewsService from "@services/reviews.service";
 import ReviewSummary from "@components/ProductPage/ReviewSummary";
 import uploadService from "@services/upload.service";
 import { Plus } from "lucide-react";
-import orderService from "@services/order.service";
 import { formatDateTime } from "@helpers/formatDateTime";
+import { useLocation } from "react-router-dom";
 
 function RatingSection({ productId }) {
   const [ratingsData, setRatingsData] = useState([0, 0, 0, 1, 1]);
@@ -17,13 +17,17 @@ function RatingSection({ productId }) {
   const [review, setReview] = useState("");
   const [fileList, setFileList] = useState([]);
   const [reviews, setReviews] = useState([]);
-  const [filteredOrders, setFilteredOrders] = useState([]);
   const [visibleComments, setVisibleComments] = useState(5);
 
   const accessToken = localStorage.getItem("accessToken");
 
   const handleLoadMore = () => setVisibleComments((prev) => prev + 5);
   const handleShowLess = () => setVisibleComments(5);
+
+  const location = useLocation();
+  const selectedOrder = location.state?.order;
+
+  console.log("Dữ liệu đơn hàng nhận được:", selectedOrder);
 
   // Lấy danh sách đánh giá
   useEffect(() => {
@@ -38,65 +42,14 @@ function RatingSection({ productId }) {
     fetchReviews();
   }, [productId]);
 
-  // Lấy danh sách đơn hàng đã mua
-  const fetchOrders = useCallback(async () => {
-    if (!accessToken) return;
-    try {
-      const response = await orderService.getOrderByBuyId(accessToken, 0, 1000);
-      console.log("Orders response:", response);
-
-      const orderIds =
-        response.metadata?.orders?.map((order) => order.id) || [];
-      if (orderIds.length === 0) {
-        console.warn("Không tìm thấy đơn hàng hợp lệ!");
-        return;
-      }
-
-      fetchOrdersById(orderIds, productId);
-    } catch (error) {
-      console.error("Lỗi khi fetch orders:", error);
-    }
-  }, [accessToken]);
-
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
-
-  // Lấy chi tiết đơn hàng theo ID
-  const data = productId;
-  console.log("ProductId:", data);
-  const fetchOrdersById = async (orderIds, productId) => {
-    if (!orderIds.length || !accessToken || !productId) return;
-    console.log("Fetching orders cho productId:", productId);
-
-    try {
-      const responses = await Promise.all(
-        orderIds.map((id) => orderService.getOrderById(accessToken, id))
-      );
-
-      const allOrderDetails = responses.flatMap(
-        (res) => res.metadata?.orderDetail || []
-      );
-
-      const filteredData = allOrderDetails.filter(
-        (order) => order?.variant?.productId === productId
-      );
-
-      console.log("Filtered orders:", filteredData);
-      setFilteredOrders(filteredData);
-    } catch (error) {
-      console.error("Lỗi khi fetch chi tiết đơn hàng:", error);
-    }
-  };
-
   const handleSubmit = async () => {
     if (!rating || !review.trim()) {
       return toast.error("Vui lòng chọn số sao và nhập nhận xét!");
     }
 
     const reviewData = {
-      orderId: filteredOrders[0]?.orderId,
-      variantId: filteredOrders[0]?.variantId,
+      orderId: selectedOrder?.id,
+      variantId: selectedOrder?.orderDetail[0]?.variantId,
       productId,
       rating,
       comment: review,
@@ -110,6 +63,7 @@ function RatingSection({ productId }) {
       toast.success("Đánh giá của bạn đã được gửi thành công!");
 
       // Reset form sau khi gửi đánh giá
+
       setReview("");
       setRating(5);
       setFileList([]);
@@ -126,7 +80,9 @@ function RatingSection({ productId }) {
     }
 
     // Refresh lại danh sách đánh giá
-    const response = await reviewsService.getReviewByProductId(data);
+    const response = await reviewsService.getReviewByProductId(
+      selectedOrder?.orderDetail[0]?.variant?.productId
+    );
     setReviews(response.metadata?.reviews ? response.metadata.reviews : []);
   };
 
@@ -201,22 +157,24 @@ function RatingSection({ productId }) {
               </div>
             )}
           </Upload>
-          <Button
-            type="primary"
-            onClick={handleSubmit}
-            style={{
-              backgroundColor: "#c60018",
-              borderColor: "#ffffff",
-              color: "white",
-            }}
-          >
-            Đánh giá ngay
-          </Button>
+          <div className="mt-4">
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              style={{
+                backgroundColor: "#c60018",
+                borderColor: "#ffffff",
+                color: "white",
+              }}
+            >
+              Đánh giá ngay
+            </Button>
+          </div>
         </div>
         {reviews && reviews.length > 0 && (
           <List
             className="mt-8"
-            dataSource={reviews.slice(0, visibleComments)}
+            dataSource={reviews.slice(0, visibleComments).reverse()}
             renderItem={(comment) => (
               <List.Item>
                 <List.Item.Meta
