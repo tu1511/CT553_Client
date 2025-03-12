@@ -72,7 +72,7 @@ function RatingSection({
     const response = await reviewsService.getReviewByProductId(
       selectedOrder?.orderDetail[0]?.variant?.productId
     );
-    setReviews(response.metadata?.reviews ? response.metadata.reviews : []);
+    setReview(response.metadata?.reviews ? response.metadata.reviews : []);
   };
 
   const handleImageUpload = async ({ file, fileList: newFileList }) => {

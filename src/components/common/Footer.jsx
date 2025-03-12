@@ -15,30 +15,9 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "antd";
-import { toast } from "react-toastify";
 import articleService from "@services/article.service";
 
 const Footer = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  // Hiển thị modal
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  // Đóng modal
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  // Xử lý khi submit form
-  const handleSubmit = (data) => {
-    console.log("Phản hồi:", data);
-    toast.success("Phản hồi đã được gửi thành công!");
-    setIsModalVisible(false);
-  };
-
   const [articles, setArticles] = useState([]);
 
   useEffect(() => {
@@ -55,14 +34,6 @@ const Footer = () => {
     };
     fetchArticles();
   }, []);
-
-  const customerServices = [
-    { label: "Hướng dẫn chọn size", to: "/chinh-sach/1" },
-    { label: "Hướng dẫn mua hàng online", to: "/chinh-sach/1" },
-    { label: "Chính sách giao hàng", to: "/chinh-sach/1" },
-    { label: "Chính sách quyền riêng tư", to: "/chinh-sach/1" },
-    { label: "Chính sách trả hàng hoàn tiền", to: "/chinh-sach/1" },
-  ];
 
   const supportServices = articles.slice(0, 5).map((item) => ({
     label: item.title,
@@ -90,6 +61,7 @@ const Footer = () => {
       text: "Từ 8:00 đến 17:00 hàng ngày",
     },
   ];
+
   const features = [
     {
       id: 1,
@@ -188,54 +160,37 @@ const Footer = () => {
               </ul>
             </div>
 
-            {/* Customer Service */}
+            {/* map address */}
+            {/* Vị trí cửa hàng */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg text-gray-700">
-                DỊCH VỤ KHÁCH HÀNG
+              <h3 className="font-semibold text-lg uppercase text-gray-700">
+                Vị trí cửa hàng
               </h3>
-              <ul className="space-y-2">
-                {customerServices.map((service, index) => (
-                  <li key={index}>
-                    <Link
-                      to={service.to}
-                      className="text-black hover:text-primary"
-                    >
-                      {service.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <div className="w-full max-w-md mx-auto rounded-lg overflow-hidden shadow-lg border border-gray-300">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.8415184425216!2d105.76803500992727!3d10.029933690035627!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31a0895a51d60719%3A0x9d76b0035f6d53d0!2zxJDhuqFpIGjhu41jIEPhuqduIFRoxqE!5e0!3m2!1svi!2s!4v1741752309262!5m2!1svi!2s"
+                  width="100%"
+                  height="200"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                ></iframe>
+              </div>
             </div>
 
-            {/* Feedback */}
+            {/* Ý kiến đóng góp */}
             <div className="space-y-4">
               <h3 className="font-semibold text-lg text-gray-700">
                 Ý KIẾN ĐÓNG GÓP
               </h3>
-              <p className="text-black font-base italic">
-                Silver Charm luôn mong nhận được ý kiến đóng góp từ bạn để nâng
-                cấp dịch vụ và sản phẩm tốt hơn. <br /> Nếu bạn có ý kiến, đừng
-                ngần ngại đóng góp cho Silver Charm nhé. Silver Charm xin cảm
-                ơn!
+              <p className="text-black font-base italic w-full text-justify">
+                Silver Charm luôn mong muốn mang đến cho khách hàng những trải
+                nghiệm tốt nhất về sản phẩm và dịch vụ. Chúng tôi rất trân trọng
+                từng ý kiến đóng góp của bạn để không ngừng cải tiến và phát
+                triển. <br /> Mọi góp ý của bạn có thể gửi qua email, gọi trực
+                tiếp hoặc để lại phản hồi trên website. Silver Charm xin chân
+                thành cảm ơn sự ủng hộ của bạn!
               </p>
-
-              <Button
-                type="primary"
-                onClick={showModal}
-                style={{
-                  backgroundColor: "#c60018",
-                  borderColor: "#ffffff",
-                  color: "white",
-                }}
-              >
-                Gửi ý kiến
-              </Button>
-              {/* Feedback Modal */}
-              <FeedbackModal
-                visible={isModalVisible}
-                onCancel={handleCancel}
-                onSubmit={handleSubmit}
-              />
             </div>
           </div>
         </div>

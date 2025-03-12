@@ -160,6 +160,18 @@ const ProductPage = () => {
     return 0; // Không sắp xếp
   });
 
+  const calculateAverageRating = (reviews = []) => {
+    const validReviews = reviews.filter(
+      (review) => review.rating !== null && review.rating !== undefined
+    );
+    if (validReviews.length === 0) return 0;
+    const totalRating = validReviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
+    return totalRating / validReviews.length;
+  };
+
   return (
     <>
       <Breadcrumbs items={breadcrumb} />
@@ -188,7 +200,7 @@ const ProductPage = () => {
                 name={product.name || "Sản phẩm không có tên"}
                 price={product?.variants?.[0]?.price}
                 discountPercentage={product?.productDiscount[0]?.discountValue}
-                ratings={product.ratings || 5}
+                ratings={calculateAverageRating(product.reviews)}
                 id={product.id}
                 buyed={product.soldNumber || 0}
               />

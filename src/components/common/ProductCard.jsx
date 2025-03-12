@@ -93,7 +93,7 @@ function ProductCard({
 
         {/* Đánh giá */}
         <div className="flex items-center space-x-1 mb-4">
-          <Rate disabled defaultValue={ratings} />
+          <Rate disabled allowHalf defaultValue={ratings} />
         </div>
 
         {/* Thêm vào giỏ hàng và các nút hành động */}

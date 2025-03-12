@@ -3,6 +3,7 @@ import authSlice from "@redux/slices/authSlice";
 import accountSlice from "@redux/slices/accountSlice";
 import addressSlice from "@redux/slices/addressSlice";
 import cartSlice from "@redux/slices/cartSlice";
+import productSlice from "@redux/slices/productSlide";
 
 const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
     account: accountSlice,
     address: addressSlice,
     cart: cartSlice,
+    products: productSlice,
   },
 });
 

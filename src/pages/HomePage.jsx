@@ -1,34 +1,25 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { BadgeCheck, Gift, Share2, ThumbsUp } from "lucide-react";
 import CarouselComponent from "@components/HomePage/CarouselComponent";
 import FeatureCards from "@components/common/FeatureCards";
 import ProductList from "@components/HomePage/ProductList";
 import TrendingSearch from "@components/HomePage/TrendingSearch";
 import UserReview from "@components/HomePage/UserReview";
-import { BadgeCheck, Gift, Share2, ThumbsUp } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import productService from "@services/product.service";
 import CouponsSection from "@components/HomePage/CouponsSection";
+import productService from "@services/product.service";
 import reviewsService from "@services/reviews.service";
+import orderService from "@services/order.service";
 
 function HomePage() {
-  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [topReviews, setTopReviews] = useState([]);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [newProducts, setNewProducts] = useState([]);
+  const [trendingProducts, setTrendingProducts] = useState([]);
+  const [saleProducts, setSaleProducts] = useState([]);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await productService.getAll({
-          // accessToken,
-          type: "All",
-          limit: 8,
-        });
-
-        setProducts(data.metadata?.products || []);
-      } catch (error) {
-        console.error("Lỗi khi lấy sản phẩm:", error);
-      }
-    };
-    fetchProducts();
-  }, []);
+  const accessToken = localStorage.getItem("accessToken");
 
   const features = [
     {
@@ -61,49 +52,67 @@ function HomePage() {
     },
   ];
 
-  const [topReviews, setTopReviews] = useState([]);
-  const [recommendedProducts, setRecommendedProducts] = useState([]);
-  const accessToken = localStorage.getItem("accessToken");
-
   useEffect(() => {
-    const fetchTopReviews = async () => {
+    const fetchData = async () => {
       try {
-        const response = await reviewsService.getTopReviews();
-        setTopReviews(response?.metadata);
+        const orderPromise = accessToken
+          ? orderService.getOrderByBuyId(accessToken, 0, 1000)
+          : Promise.resolve({ metadata: { orders: [] } });
+        const newestProductsPromise = productService.getAll({
+          type: "Newest",
+          limit: 8,
+        });
+        const trendingProductsPromise = productService.getAll({
+          type: "Trending",
+          limit: 8,
+        });
+        const saleProductsPromise = productService.getAll({
+          type: "Sales",
+          limit: 8,
+        });
+        const topReviewsPromise = reviewsService.getTopReviews();
+        const recommendedProductsPromise = accessToken
+          ? productService.getRecommended({ accessToken })
+          : Promise.resolve({ metadata: [] });
+
+        const [
+          orderRes,
+          newProductsRes,
+          trendingProductsRes,
+          topReviewsRes,
+          recommendedRes,
+          saleProductsRes,
+        ] = await Promise.all([
+          orderPromise,
+          newestProductsPromise,
+          trendingProductsPromise,
+          topReviewsPromise,
+          recommendedProductsPromise,
+          saleProductsPromise,
+        ]);
+
+        setOrders(orderRes.metadata?.orders || []);
+        setNewProducts(newProductsRes.metadata?.products || []);
+        setTrendingProducts(trendingProductsRes.metadata?.products || []);
+        setTopReviews(topReviewsRes?.metadata || []);
+        setRecommendedProducts(recommendedRes?.metadata || []);
+        setSaleProducts(saleProductsRes.metadata?.products || []);
       } catch (error) {
-        console.error("Lỗi khi lấy đánh giá:", error);
+        console.error("Lỗi khi lấy dữ liệu:", error);
       }
     };
-    fetchTopReviews();
-  }, []);
 
-  useEffect(() => {
-    const fetchRecommendedProducts = async () => {
-      try {
-        const response = await productService.getRecommended({ accessToken });
-        setRecommendedProducts(response?.metadata || []);
-      } catch (error) {
-        console.error("Lỗi khi lấy sản phẩm đề xuất:", error);
-      }
-    };
-    fetchRecommendedProducts();
+    fetchData();
   }, [accessToken]);
 
   return (
     <div className="bg-white">
-      {/* carousel section */}
       <CarouselComponent />
-
-      {/* feature section */}
       <FeatureCards features={features} />
-
-      {/* trending search section */}
       <TrendingSearch />
-
-      {/* coupons section */}
       <CouponsSection />
 
-      {accessToken ? (
+      {accessToken && orders.length > 0 ? (
         <ProductList
           title="Sản phẩm dành cho bạn"
           products={recommendedProducts}
@@ -111,34 +120,24 @@ function HomePage() {
       ) : (
         ""
       )}
-      {/* product list section */}
-      <ProductList title="Sản phẩm yêu thích nhất" products={products} />
+      <ProductList title="Sản phẩm mới nhất" products={newProducts} />
+      <ProductList title="Sản phẩm nổi bật" products={trendingProducts} />
+      <ProductList title="Sản phẩm đang khuyến mãi " products={saleProducts} />
 
-      <ProductList title="Sản phẩm mới nhất" products={products} />
-
-      {/* hero banner section */}
       <section
         className="mt-4 relative w-full h-[250px] bg-cover bg-center"
         style={{ backgroundImage: `url('/src/assets/banner/hero.png')` }}
       >
-        {/* Overlay */}
         <div className="absolute inset-0 bg-white bg-opacity-20"></div>
-
-        {/* Content */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center md:px-8">
-          {/* Title */}
           <h1 className="text-2xl md:text-4xl font-bold text-black mb-4">
             Silver Charm - Trang Sức Cao Cấp
           </h1>
-
-          {/* Description */}
           <p className="text-sm md:text-lg text-black max-w-3xl leading-relaxed mb-6">
             Đến với Silver Charm, trang sức không chỉ là một phụ kiện - đó là
             hiện thân của niềm đam mê, tình yêu của chúng tôi, và cuối cùng, là
             món quà của Silver Charm dành cho bạn.
           </p>
-
-          {/* Button */}
           <Link
             to="/ve-chung-toi"
             className="bg-white uppercase font-semibold border-black border-2 rounded-xl text-black hover:bg-black hover:text-white py-2 px-4 transition duration-300 ease-in-out"
