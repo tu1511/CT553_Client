@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import DropdownMenu from "@components/common/DropdownMenu";
 import categoryService from "@services/category.service";
+import policyService from "@services/policy.service";
 
 const Navbar = () => {
   const [categories, setCategories] = useState([]);
+  const [policies, setPolicies] = useState([]);
   const accessToken = localStorage.getItem("accessToken");
 
   useEffect(() => {
@@ -36,6 +38,29 @@ const Navbar = () => {
     })),
   }));
 
+  useEffect(() => {
+    const fetchPolicies = async () => {
+      try {
+        const response = await policyService.getAll();
+        if (response?.metadata) {
+          setPolicies(response.metadata);
+        } else {
+          console.warn("No metadata found in response");
+        }
+      } catch (error) {
+        console.error("Failed to fetch policies: ", error);
+      }
+    };
+
+    fetchPolicies();
+  }, []);
+
+  const policyMenuItems = policies.map((policy) => ({
+    label: policy.title,
+    key: policy.slug,
+    link: `/chinh-sach/${policy.slug}`,
+  }));
+
   const navbar = [
     { name: "Trang chủ", link: "/", menuItems: [] },
     {
@@ -48,23 +73,7 @@ const Navbar = () => {
     {
       name: "Chính sách",
       link: "/chinh-sach",
-      menuItems: [
-        {
-          label: "Chính sách thanh toán",
-          key: "payment-policy",
-          link: "/chinh-sach-thanh-toan",
-        },
-        {
-          label: "Chính sách đổi trả",
-          key: "return-policy",
-          link: "/chinh-sach-doi-tra",
-        },
-        {
-          label: "Chính sách vận chuyển",
-          key: "shipping-policy",
-          link: "/chinh-sach-van-chuyen",
-        },
-      ],
+      menuItems: policyMenuItems, // Sử dụng dữ liệu động từ API
     },
     { name: "Về chúng tôi", link: "/ve-chung-toi", menuItems: [] },
   ];

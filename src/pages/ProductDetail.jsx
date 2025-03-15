@@ -120,6 +120,7 @@ const ProductDetail = () => {
         const res = response?.metadata || [];
         setBreadcrumb([
           { label: "Trang chủ", path: "/" },
+          { label: "Trang sức", path: "san-pham" },
           ...res.map((item) => ({
             label: item.name,
             path: item.slug,

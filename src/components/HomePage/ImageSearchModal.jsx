@@ -58,7 +58,7 @@ const ImageSearchModal = ({ visible, onClose }) => {
       setIsSearching(false);
       setUploadedFile(null); // Clear the uploaded file
       onClose(); // Close the modal
-    }, 3000);
+    }, 2000);
   };
 
   return (

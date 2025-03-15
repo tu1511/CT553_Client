@@ -19,6 +19,11 @@ function ProductCard({
     ? price - (price * discountPercentage) / 100
     : price;
 
+  const cart = localStorage.getItem("cart")
+    ? JSON.parse(localStorage.getItem("cart"))
+    : [];
+  const productIds = cart.map((product) => product?.product?.id);
+
   // Hàm lưu sản phẩm vào danh sách đã xem
   const handleViewProduct = () => {
     const viewedProduct = {
@@ -101,10 +106,20 @@ function ProductCard({
           <span className="font-semibold text-gray-800 dark:text-gray-300">
             Đã bán: {buyed}
           </span>
-          <ShoppingCart
-            size={24}
-            className="cursor-pointer text-gray-700 dark:text-gray-400 hover:text-primary transition-colors duration-300"
-          />
+          {
+            // Nếu sản phẩm đã có trong giỏ hàng thì ẩn nút thêm vào giỏ hàng
+            productIds.includes(id) ? (
+              <ShoppingCart
+                size={24}
+                className="cursor-pointers transition-colors duration-300 text-primary"
+              />
+            ) : (
+              <ShoppingCart
+                size={24}
+                className="cursor-pointer text-gray-700 dark:text-gray-400 hover:text-primary transition-colors duration-300"
+              />
+            )
+          }
         </div>
       </div>
     </Link>

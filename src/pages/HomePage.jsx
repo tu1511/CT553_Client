@@ -109,7 +109,7 @@ function HomePage() {
     <div className="bg-white">
       <CarouselComponent />
       <FeatureCards features={features} />
-      <TrendingSearch />
+      {/* <TrendingSearch /> */}
       <CouponsSection />
 
       {accessToken && orders.length > 0 ? (

@@ -83,7 +83,7 @@ const routes = [
   },
   {
     id: "chinhsach",
-    path: "/chinh-sach/:id",
+    path: "/chinh-sach/:slug",
     element: <PolicyPage />,
   },
   {

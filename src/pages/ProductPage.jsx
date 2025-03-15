@@ -1,57 +1,65 @@
 import { useEffect, useMemo, useState } from "react";
 import HeaderLine from "@components/common/HeaderLine";
-// import ProductList from "@components/HomePage/ProductList";
-import FilterComponent from "@components/ProductPage/FilterComponent";
 import ProductCard from "@components/common/ProductCard";
 import productService from "@services/product.service";
 import Breadcrumbs from "@components/common/Breadcrumbs";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import categoryService from "@services/category.service";
-import { Pagination } from "antd";
+import { Pagination, Select, Slider } from "antd";
+
+const PRODUCT_NEWEST = "Newest";
+const PRODUCT_TRENDING = "Trending";
+const PRODUCT_ALL = "All";
+const PRODUCT_SALES = "Sales";
 
 const ProductPage = () => {
   const [filters, setFilters] = useState({
-    type: "",
-    material: "",
-    gender: "",
-    priceRange: "",
-    searchText: "",
-    sortBy: "",
+    type: PRODUCT_ALL,
+    filterMinPrice: 0,
+    filterMaxPrice: 3000000,
   });
 
   const [products, setProducts] = useState([]);
-  const accessToken = localStorage.getItem("accessToken"); // Không nên đặt trong useEffect
+  const [totalPage, setTotalPage] = useState(1);
+  const accessToken = localStorage.getItem("accessToken");
 
   const location = useLocation();
   const navigate = useNavigate();
-  const [totalPage, setTotalPage] = useState(1);
   const query = useMemo(
     () => new URLSearchParams(location.search),
     [location.search]
   );
   const page = parseInt(query.get("page") || "1", 10);
 
-  const handlePageChange = (page) => {
-    navigate(`?page=${page}`);
-  };
-
-  // console.log(products[0]);
   const { slug } = useParams();
-  const [category, setCategory] = useState(null);
 
+  useEffect(() => {
+    if (slug === "san-pham") {
+      setCategory(null);
+      return;
+    }
+  }, [slug]);
+  const [category, setCategory] = useState(null);
   const [breadcrumb, setBreadcrumb] = useState([]);
 
   useEffect(() => {
     const fetchBreadcrumb = async () => {
-      try {
-        const response = await categoryService.getBreadcrumbFromCategory(
-          category?.id
-        );
-        console.log(response);
-        const res = response?.metadata || [];
+      if (!category?.id) {
         setBreadcrumb([
           { label: "Trang chủ", path: "/" },
-          ...res.map((item) => ({
+          { label: "Trang sức", path: "san-pham" },
+        ]);
+        return;
+      }
+
+      try {
+        const response = await categoryService.getBreadcrumbFromCategory(
+          category.id
+        );
+        setBreadcrumb([
+          { label: "Trang chủ", path: "/" },
+          { label: "Trang sức", path: "san-pham" },
+          ...(response?.metadata || []).map((item) => ({
             label: item.name,
             path: item.slug,
           })),
@@ -73,8 +81,6 @@ const ProductPage = () => {
         });
         if (response?.metadata) {
           setCategory(response.metadata);
-        } else {
-          console.warn("No metadata found in response");
         }
       } catch (error) {
         console.error("Failed to fetch category: ", error);
@@ -84,19 +90,22 @@ const ProductPage = () => {
     fetchCategory();
   }, [accessToken, slug]);
 
+  console.log("filterMin", filters.filterMinPrice);
+  console.log("filterMax", filters.filterMaxPrice);
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const data = await productService.getAll({
-          // accessToken,
-          type: "All",
+          type: filters.type,
           limit: 12,
-          page: page,
+          page,
           categoryIds: category?.id ? [category?.id] : [],
+          filterMinPrice: filters.filterMinPrice,
+          filterMaxPrice: filters.filterMaxPrice,
         });
 
         setTotalPage(data?.metadata?.pagination?.totalPages);
-
         setProducts(data.metadata?.products || []);
       } catch (error) {
         console.error("Lỗi khi lấy sản phẩm:", error);
@@ -104,67 +113,17 @@ const ProductPage = () => {
     };
 
     fetchProducts();
-  }, [accessToken, category, page]);
+  }, [accessToken, category, page, filters]);
 
-  // Handle filter changes
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
+    setFilters((prevFilters) => ({ ...prevFilters, ...newFilters }));
   };
-
-  // Apply filters to products
-  const filteredProducts = products.filter((product) => {
-    const { type, material, gender, priceRange, searchText } = filters;
-
-    // Lọc theo type (phải kiểm tra product.type thay vì name)
-    if (type && product.type !== type) {
-      return false;
-    }
-
-    // Lọc theo chất liệu
-    if (material && product.material !== material) {
-      return false;
-    }
-
-    // Lọc theo giới tính
-    if (gender && product.gender !== gender) {
-      return false;
-    }
-
-    // Lọc theo khoảng giá (kiểm tra tránh lỗi split)
-    if (priceRange) {
-      const range = priceRange.split("-").map(Number);
-      if (
-        range.length === 2 &&
-        (product.price < range[0] || product.price > range[1])
-      ) {
-        return false;
-      }
-    }
-
-    // Lọc theo tên sản phẩm
-    if (
-      searchText &&
-      !product.name.toLowerCase().includes(searchText.toLowerCase())
-    ) {
-      return false;
-    }
-
-    return true;
-  });
-
-  // Sort products based on filters.sortBy
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (filters.sortBy === "priceAsc") return a.price - b.price;
-    if (filters.sortBy === "priceDesc") return b.price - a.price;
-    if (filters.sortBy === "newest") return b.id - a.id; // Sắp xếp mới nhất
-    return 0; // Không sắp xếp
-  });
 
   const calculateAverageRating = (reviews = []) => {
     const validReviews = reviews.filter(
       (review) => review.rating !== null && review.rating !== undefined
     );
-    if (validReviews.length === 0) return 0;
+    if (validReviews.length === 0) return 0; // Mặc định 5 nếu không có rating hợp lệ
     const totalRating = validReviews.reduce(
       (sum, review) => sum + review.rating,
       0
@@ -176,44 +135,74 @@ const ProductPage = () => {
     <>
       <Breadcrumbs items={breadcrumb} />
       <div className="container mx-auto p-8">
-        {/* Header */}
         <HeaderLine title="Sản phẩm của chúng tôi" />
 
-        {/* Filter Section */}
-        <FilterComponent
-          filters={filters}
-          onFilterChange={handleFilterChange}
-        />
-
-        <div className="container mx-auto px-8 py-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {/* Hiển thị tối đa 4 sản phẩm */}
-            {sortedProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                productLink={`/san-pham/${product?.slug}`}
-                image={
-                  Array.isArray(product.images) && product.images.length > 0
-                    ? product?.images[0]?.image?.path
-                    : "https://via.placeholder.com/150"
-                }
-                name={product.name || "Sản phẩm không có tên"}
-                price={product?.variants?.[0]?.price}
-                discountPercentage={product?.productDiscount[0]?.discountValue}
-                ratings={calculateAverageRating(product.reviews)}
-                id={product.id}
-                buyed={product.soldNumber || 0}
-              />
-            ))}
+        {/* Bộ lọc sản phẩm */}
+        <div className="flex justify-end gap-10 items-center mb-8">
+          {/* Thanh trượt lọc giá */}
+          <div className="w-64">
+            <Slider
+              range
+              min={0}
+              max={3000000}
+              step={10000}
+              value={[filters.filterMinPrice, filters.filterMaxPrice]}
+              onChange={(value) =>
+                handleFilterChange({
+                  filterMinPrice: value[0],
+                  filterMaxPrice: value[1],
+                })
+              }
+            />
+            <div className="text-center text-sm">
+              Giá: {filters.filterMinPrice.toLocaleString()} -{" "}
+              {filters.filterMaxPrice.toLocaleString()} VND
+            </div>
           </div>
+          {/* Lọc theo loại sản phẩm */}
+          <Select
+            className="w-48"
+            value={filters.type}
+            onChange={(value) => handleFilterChange({ type: value })}
+            placeholder="Chọn danh mục"
+          >
+            <Select.Option value={PRODUCT_ALL}>Mặc định</Select.Option>
+            <Select.Option value={PRODUCT_NEWEST}>Mới nhất</Select.Option>
+            <Select.Option value={PRODUCT_TRENDING}>
+              Sản phẩm bán chạy
+            </Select.Option>
+            <Select.Option value={PRODUCT_SALES}>
+              Sản phẩm giảm giá
+            </Select.Option>
+          </Select>
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              productLink={`/san-pham/${product?.slug}`}
+              image={
+                product?.images?.[0]?.image?.path ||
+                "https://via.placeholder.com/150"
+              }
+              name={product.name || "Sản phẩm không có tên"}
+              price={product?.variants?.[0]?.price}
+              discountPercentage={product?.productDiscount?.[0]?.discountValue}
+              ratings={calculateAverageRating(product?.reviews)}
+              id={product.id}
+              buyed={product.soldNumber || 0}
+            />
+          ))}
+        </div>
+
         <div className="flex justify-center mt-8">
           <Pagination
             current={page}
-            total={totalPage * 10} // Tổng số trang * 10 (Ant Design yêu cầu giá trị này đại diện cho số mục)
-            pageSize={12} // Số mục mỗi trang
-            onChange={handlePageChange}
-            showSizeChanger={false} // Ẩn thay đổi kích thước trang
+            total={totalPage * 10}
+            pageSize={12}
+            onChange={(page) => navigate(`?page=${page}`)}
+            showSizeChanger={false}
           />
         </div>
       </div>
