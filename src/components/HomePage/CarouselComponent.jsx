@@ -1,16 +1,7 @@
 import { Carousel } from "antd";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import banner1 from "/src/assets/banner/1.jpg"; // Import ảnh trực tiếp
-import banner2 from "/src/assets/banner/2.jpg";
-import banner3 from "/src/assets/banner/3.jpg";
-import banner4 from "/src/assets/banner/4.jpg";
-
-const images = [
-  { id: 1, src: banner1, alt: "Elegant Jewelry" },
-  { id: 2, src: banner2, alt: "Stylish Collection" },
-  { id: 3, src: banner3, alt: "Premium Quality" },
-  { id: 4, src: banner4, alt: "Exclusive Design" },
-];
+import { useEffect, useState } from "react";
+import bannerService from "@services/banner.service";
 
 // eslint-disable-next-line react/prop-types
 const ArrowButton = ({ direction, onClick }) => (
@@ -25,6 +16,23 @@ const ArrowButton = ({ direction, onClick }) => (
 );
 
 const CarouselComponent = () => {
+  const [banners, setBanners] = useState([]);
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const response = await bannerService.getAll();
+        console.log("response", response);
+        setBanners(response.metadata);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchBanners();
+  }, []);
+
+  console.log("banners", banners);
   return (
     <div className="relative">
       <Carousel
@@ -34,10 +42,10 @@ const CarouselComponent = () => {
         prevArrow={<ArrowButton direction="left" />}
         nextArrow={<ArrowButton direction="right" />}
       >
-        {images.map((image) => (
-          <div key={image.id}>
+        {banners.map((image) => (
+          <div key={image.priority}>
             <img
-              src={image.src}
+              src={image?.image?.path}
               alt={image.alt}
               className="w-full h-[75vh] object-cover"
             />
