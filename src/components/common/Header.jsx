@@ -13,7 +13,6 @@ import { setCredentials } from "@redux/slices/authSlice";
 import { getLoggedInUser } from "@redux/thunk/accountThunk";
 import DropdownCus from "@components/common/DropDownCus";
 import { getCart } from "@redux/thunk/cartThunk";
-import productService from "@services/product.service";
 import { toast } from "react-toastify";
 
 const Header = () => {
@@ -70,6 +69,7 @@ const Header = () => {
 
   const dispatch = useDispatch();
   const user = useSelector((state) => state.account.account);
+  const { shopInfo } = useSelector((state) => state.shopInfo);
 
   const accessToken = localStorage.getItem("accessToken");
   useEffect(() => {
@@ -106,14 +106,9 @@ const Header = () => {
     window.location.href = "/";
   };
 
-  // const cart = useSelector((state) => state.cart.cart);
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
   const totalProducts = Array.isArray(cart) ? cart.length : 0;
-
-  // console.log(totalProducts);
-  // const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-  // console.log(totalQuantity);
 
   useEffect(() => {
     let messageIndex = 0;
@@ -182,12 +177,12 @@ const Header = () => {
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-3">
           <Link to="/" className="flex items-center space-x-3">
             <img
-              src="/src/assets/logo.png"
+              src={shopInfo?.logo?.path}
               alt="Logo"
-              className="h-14 w-auto"
+              className="h-14 w-auto rounded-xl"
             />
-            <span className="font-bold text-2xl text-gray-800">
-              Silver Charm
+            <span className="font-bold text-2xl text-primary">
+              {shopInfo?.name}
             </span>
           </Link>
 

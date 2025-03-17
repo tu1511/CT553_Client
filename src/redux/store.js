@@ -4,6 +4,7 @@ import accountSlice from "@redux/slices/accountSlice";
 import addressSlice from "@redux/slices/addressSlice";
 import cartSlice from "@redux/slices/cartSlice";
 import productSlice from "@redux/slices/productSlide";
+import shopInfoSlice from "@redux/slices/shopInfoSLice";
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     address: addressSlice,
     cart: cartSlice,
     products: productSlice,
+    shopInfo: shopInfoSlice,
   },
 });
 

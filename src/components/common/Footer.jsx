@@ -1,5 +1,4 @@
 import FeatureCards from "@components/common/FeatureCards";
-import FeedbackModal from "@components/common/FeedbackModal";
 import {
   ArchiveRestore,
   Clock,
@@ -16,9 +15,21 @@ import {
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import articleService from "@services/article.service";
+import { useDispatch, useSelector } from "react-redux";
+import { getInfo } from "@redux/thunk/shopInfoThunk";
 
 const Footer = () => {
+  const dispatch = useDispatch();
+
+  const { shopInfo } = useSelector((state) => state.shopInfo);
+
+  useEffect(() => {
+    dispatch(getInfo());
+  }, [dispatch]);
+
   const [articles, setArticles] = useState([]);
+
+  console.log(shopInfo);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -49,16 +60,19 @@ const Footer = () => {
   const contactInfo = [
     {
       icon: <MapPin className="text-primary" />,
-      text: "Đường 3/2, Ninh Kiều, Cần Thơ",
+      text: shopInfo?.detailAddress,
     },
-    { icon: <Phone className="text-primary" />, text: "+84 845 969 757" },
+    {
+      icon: <Phone className="text-primary" />,
+      text: shopInfo?.phone,
+    },
     {
       icon: <Mail className="text-primary" />,
-      text: "minhtu15112k3@gmail.com",
+      text: shopInfo?.email,
     },
     {
       icon: <Clock className="text-primary" />,
-      text: "Từ 8:00 đến 17:00 hàng ngày",
+      text: shopInfo?.workingTime,
     },
   ];
 
@@ -103,12 +117,12 @@ const Footer = () => {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <img
-                  src="/src/assets/logo.png"
+                  src={shopInfo?.logo?.path}
                   alt="Logo"
                   className="h-12 rounded-xl"
                 />
                 <span className="text-2xl font-semibold text-primary">
-                  Silver Charm
+                  {shopInfo?.name}
                 </span>
               </div>
 
@@ -184,12 +198,7 @@ const Footer = () => {
                 Ý KIẾN ĐÓNG GÓP
               </h3>
               <p className="text-black font-base italic w-full text-justify">
-                Silver Charm luôn mong muốn mang đến cho khách hàng những trải
-                nghiệm tốt nhất về sản phẩm và dịch vụ. Chúng tôi rất trân trọng
-                từng ý kiến đóng góp của bạn để không ngừng cải tiến và phát
-                triển. <br /> Mọi góp ý của bạn có thể gửi qua email, gọi trực
-                tiếp hoặc để lại phản hồi trên website. Silver Charm xin chân
-                thành cảm ơn sự ủng hộ của bạn!
+                {shopInfo?.slogan}
               </p>
             </div>
           </div>
