@@ -7,7 +7,7 @@ import TableComponent from "@components/common/TableComponent"; // Import TableC
 import { useDispatch } from "react-redux";
 import { deleteItem, getCart, updateQuantity } from "@redux/thunk/cartThunk";
 import { toast } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const { Text } = Typography;
 
@@ -15,6 +15,8 @@ const CartPage = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+
+  const accessToken = localStorage.getItem("accessToken");
 
   const dispatch = useDispatch();
   // const navigate = useNavigate();
@@ -96,6 +98,11 @@ const CartPage = () => {
 
   // console.log(cartItems);
   const handleOrderNow = () => {
+    if (!accessToken) {
+      toast.warning("Vui lòng đăng nhập để đặt hàng!");
+      return;
+    }
+
     if (selectedItems && selectedItems.length === 0) {
       toast.error("Vui lòng chọn ít nhất một sản phẩm để đặt hàng!");
       return;

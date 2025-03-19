@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Form, Input, Button } from "antd";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   changePasswordThunk,
   getLoggedInUser,
@@ -10,22 +10,14 @@ import HeaderLine from "@components/common/HeaderLine";
 
 const PasswordChangeForm = () => {
   const dispatch = useDispatch(); // Giả sử dùng Redux để dispatch action
-  const user = {
-    id: 1,
-    username: "user@example.com",
-    loginMethod: "normal", // Thay đổi thành "google" hoặc "normal" để thử nghiệm
-  };
+
+  const userData = useSelector((state) => state.account.account);
+
+  console.log("userData", userData);
   const [form] = Form.useForm();
-  const [isGoogleLogin, setIsGoogleLogin] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (user?.loginMethod === "google") {
-      setIsGoogleLogin(true);
-    }
-  }, [user]);
 
   const accessToken = localStorage.getItem("accessToken");
 
@@ -65,9 +57,9 @@ const PasswordChangeForm = () => {
 
   return (
     <>
-      {isGoogleLogin ? (
+      {userData?.isGoogleLogin === true ? (
         <div className="p-8">
-          <p className="text-gray-800">
+          <p className="text-primary italic text-center">
             Bạn không thể thay đổi mật khẩu khi đăng nhập bằng Google.
           </p>
         </div>

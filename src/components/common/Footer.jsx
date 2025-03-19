@@ -29,8 +29,6 @@ const Footer = () => {
 
   const [articles, setArticles] = useState([]);
 
-  console.log(shopInfo);
-
   useEffect(() => {
     const fetchArticles = async () => {
       try {

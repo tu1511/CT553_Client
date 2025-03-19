@@ -3,7 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography } from "antd";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { loginThunk } from "@redux/thunk/authThunk"; // Import your Redux thunk
+import { loginThunk } from "@redux/thunk/authThunk";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleAuthProvider } from "@config/firebaseConfig";
+import authService from "@services/auth.service";
 
 const { Title, Text } = Typography;
 
@@ -16,12 +19,8 @@ const LoginPage = () => {
   const onSuccess = async (values) => {
     try {
       setLoading(true);
-      // Dispatch the login action
       await dispatch(loginThunk(values));
-
       toast.success("Đăng nhập thành công!");
-
-      // Redirect to homepage or another route after successful login
       navigate("/");
     } catch (error) {
       const message =
@@ -34,10 +33,48 @@ const LoginPage = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      const result = await signInWithPopup(auth, googleAuthProvider);
+      const user = result.user;
+
+      console.log("Thông tin đăng nhập Google:", user);
+
+      // Gửi token lên backend để xác thực nếu cần
+      const userData = {
+        email: user.email,
+        fullName: user.displayName,
+        phone: user.phoneNumber || "",
+        avatarURL: user.photoURL,
+      };
+
+      const response = await authService.signInWithGoogle(userData);
+
+      console.log("Dữ liệu trả về từ API:", response);
+
+      localStorage.setItem(
+        "accessToken",
+        response?.metadata?.tokens?.accessToken
+      );
+
+      toast.success("Đăng nhập bằng Google thành công!");
+      navigate("/");
+    } catch (error) {
+      console.error("Lỗi đăng nhập Google:", error?.data?.message);
+      if (error?.data?.message === "Account is blocked") {
+        toast.error("Tài khoản của bạn đã bị khóa!");
+      } else {
+        toast.error("Đăng nhập bằng Google thất bại!");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="flex max-w-4xl w-full bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Hình minh họa */}
         <div className="hidden lg:block w-1/2 bg-secondary p-4">
           <img
             src="/src/assets/login.png"
@@ -45,15 +82,16 @@ const LoginPage = () => {
             className="w-full h-full object-cover"
           />
         </div>
-
-        {/* Form đăng nhập */}
         <div className="w-full lg:w-1/2 p-8">
           <Title level={2} className="text-center">
             Đăng Nhập
           </Title>
-
-          <Form form={form} layout="vertical" onFinish={onSuccess}>
-            {/* Email */}
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onSuccess}
+            className="space-y-4"
+          >
             <Form.Item
               label="Email"
               name="email"
@@ -67,8 +105,6 @@ const LoginPage = () => {
             >
               <Input />
             </Form.Item>
-
-            {/* Mật khẩu */}
             <Form.Item
               label="Mật khẩu"
               name="password"
@@ -76,8 +112,6 @@ const LoginPage = () => {
             >
               <Input.Password />
             </Form.Item>
-
-            {/* Nút đăng nhập */}
             <Form.Item>
               <Button
                 type="primary"
@@ -93,10 +127,25 @@ const LoginPage = () => {
                 Đăng Nhập
               </Button>
             </Form.Item>
+            <div className="text-center mt-2">hoặc</div>
+            <div className="flex justify-center mt-4">
+              <Button
+                className="w-full flex items-center justify-center bg-white border border-gray-300 hover:border-gray-500 hover:shadow-md p-3 rounded-full transition duration-300"
+                onClick={handleGoogleLogin}
+                disabled={loading}
+              >
+                <img
+                  src="https://img.icons8.com/color/48/google-logo.png"
+                  className="w-6 h-6 mr-2"
+                  alt="Google logo"
+                />
+                <span className="font-medium text-gray-700">
+                  Đăng nhập bằng Google
+                </span>
+              </Button>
+            </div>
           </Form>
-
-          {/* Link đăng ký */}
-          <div className="text-center">
+          <div className="text-center mt-2">
             <Text>
               Chưa có tài khoản?{" "}
               <Link to="/dang-ky" className="text-blue-500 hover:text-primary">
