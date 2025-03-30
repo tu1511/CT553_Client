@@ -18,6 +18,12 @@ function RatingSection({
 }) {
   const [rating, setRating] = useState(5);
   const [review, setReview] = useState("");
+  const [reviewsProduct, setReviewsProduct] = useState(() => [...reviews]);
+  useEffect(() => {
+    setReviewsProduct([...reviews]);
+  }, [reviews]);
+  console.log("reviewsProduct", reviewsProduct);
+  console.log("reviews", reviews);
   const [fileList, setFileList] = useState([]);
   const [visibleComments, setVisibleComments] = useState(5);
 
@@ -52,7 +58,6 @@ function RatingSection({
       toast.success("Đánh giá của bạn đã được gửi thành công!");
 
       // Reset form sau khi gửi đánh giá
-
       setReview("");
       setRating(5);
       setFileList([]);
@@ -72,7 +77,9 @@ function RatingSection({
     const response = await reviewsService.getReviewByProductId(
       selectedOrder?.orderDetail[0]?.variant?.productId
     );
-    setReview(response.metadata?.reviews ? response.metadata.reviews : []);
+    setReviewsProduct(
+      response.metadata?.reviews ? response.metadata.reviews : []
+    );
   };
 
   const handleImageUpload = async ({ file, fileList: newFileList }) => {
@@ -160,10 +167,10 @@ function RatingSection({
             </Button>
           </div>
         </div>
-        {reviews && reviews.length > 0 && (
+        {reviewsProduct && reviewsProduct.length > 0 && (
           <List
             className="mt-8"
-            dataSource={reviews.slice(0, visibleComments).reverse()}
+            dataSource={reviewsProduct.slice(0, visibleComments).reverse()}
             renderItem={(comment) => (
               <List.Item>
                 <List.Item.Meta

@@ -1,5 +1,6 @@
 import Footer from "@components/common/Footer";
 import Header from "@components/common/Header";
+import MessengerChat from "@components/common/MessengerChat";
 import { FloatButton } from "antd";
 import { ArrowBigUp } from "lucide-react";
 import PropTypes from "prop-types";
@@ -18,10 +19,11 @@ const MainLayout = ({ children }) => {
         className="custom-backtop"
         style={{
           right: 100,
-          bottom: 50,
+          bottom: 30,
           zIndex: 1000,
         }}
       />
+      <MessengerChat />
       <Footer />
     </div>
   );

@@ -32,7 +32,6 @@ const CarouselComponent = () => {
     fetchBanners();
   }, []);
 
-  console.log("banners", banners);
   return (
     <div className="relative">
       <Carousel

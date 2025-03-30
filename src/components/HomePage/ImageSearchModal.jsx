@@ -112,25 +112,26 @@ const ImageSearchModal = ({ visible, onClose }) => {
                 onClick={handleRemove}
               />
             </div>
-            <Button
-              type="primary"
-              onClick={handleSearch}
-              style={{
-                width: "100%",
-                backgroundColor: "#c60018",
-                borderColor: "#ffffff",
-                color: "white",
-              }}
-              disabled={isSearching}
-            >
-              {isSearching ? (
-                <div className="w-6 h-6 border-8 border-white border-dotted rounded-full animate-spin"></div>
-              ) : (
-                "Tìm kiếm"
-              )}
-            </Button>
           </>
         )}
+        <Button
+          type="primary"
+          onClick={handleSearch}
+          style={{
+            width: "100%",
+            backgroundColor: "#c60018",
+            borderColor: "#ffffff",
+            color: "white",
+            marginTop: "1rem",
+          }}
+          disabled={isSearching}
+        >
+          {isSearching ? (
+            <div className="w-6 h-6 border-8 border-white border-dotted rounded-full animate-spin"></div>
+          ) : (
+            "Tìm kiếm"
+          )}
+        </Button>
       </div>
     </Modal>
   );

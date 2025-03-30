@@ -105,6 +105,10 @@ function HomePage() {
     fetchData();
   }, [accessToken]);
 
+  const recommendedProductsHehe = recommendedProducts.filter(
+    (product) => product !== null
+  );
+
   return (
     <div className="bg-white">
       <CarouselComponent />
@@ -115,7 +119,7 @@ function HomePage() {
       {accessToken && orders.length > 0 ? (
         <ProductList
           title="Sản phẩm dành cho bạn"
-          products={recommendedProducts}
+          products={recommendedProductsHehe}
         />
       ) : (
         ""

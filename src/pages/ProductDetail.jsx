@@ -370,6 +370,7 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+      <ProductList title="Sản phẩm tương tự" products={products} />
 
       <RatingSection
         productId={product?.id}
@@ -378,8 +379,6 @@ const ProductDetail = () => {
         averageRating={averageRating}
         ratingsData={ratingsData}
       />
-
-      <ProductList title="Sản phẩm tương tự" products={products} />
 
       <InfoSection />
     </>

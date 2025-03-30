@@ -104,9 +104,12 @@ const ProductPage = () => {
           filterMinPrice: filters.filterMinPrice,
           filterMaxPrice: filters.filterMaxPrice,
         });
-
+        const visibleProducts =
+          data.metadata?.products?.filter(
+            (product) => product.visible !== false
+          ) || [];
+        setProducts(visibleProducts);
         setTotalPage(data?.metadata?.pagination?.totalPages);
-        setProducts(data.metadata?.products || []);
       } catch (error) {
         console.error("Lỗi khi lấy sản phẩm:", error);
       }

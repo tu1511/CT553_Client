@@ -169,7 +169,7 @@ const AddressFormDialog = ({ open, onClose, addressData }) => {
             color: "white",
           }}
         >
-          Tạo địa chỉ
+          {addressData ? "Cập nhật" : "Tạo địa chỉ"}
         </Button>,
       ]}
       width={750}
