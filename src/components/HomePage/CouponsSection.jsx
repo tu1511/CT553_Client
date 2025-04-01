@@ -19,6 +19,10 @@ const CouponsSection = () => {
     fetchCoupons();
   }, []);
 
+  if (coupons.length === 0) {
+    return null;
+  }
+
   return (
     <section className="container mx-auto p-4">
       <HeaderLine title="Mã giảm giá" />

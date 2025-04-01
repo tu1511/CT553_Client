@@ -99,7 +99,7 @@ const ProductPage = () => {
         const data = await productService.getAll({
           type: filters.type,
           limit: 12,
-          page,
+          page: page,
           categoryIds: category?.id ? [category?.id] : [],
           filterMinPrice: filters.filterMinPrice,
           filterMaxPrice: filters.filterMaxPrice,
@@ -108,6 +108,7 @@ const ProductPage = () => {
           data.metadata?.products?.filter(
             (product) => product.visible !== false
           ) || [];
+
         setProducts(visibleProducts);
         setTotalPage(data?.metadata?.pagination?.totalPages);
       } catch (error) {
@@ -202,7 +203,7 @@ const ProductPage = () => {
         <div className="flex justify-center mt-8">
           <Pagination
             current={page}
-            total={totalPage * 10}
+            total={totalPage * 12}
             pageSize={12}
             onChange={(page) => navigate(`?page=${page}`)}
             showSizeChanger={false}

@@ -101,7 +101,7 @@ const Header = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("viewedProducts");
-
+    localStorage.removeItem("cart");
     // Chuyển hướng về trang chủ
     window.location.href = "/";
   };
