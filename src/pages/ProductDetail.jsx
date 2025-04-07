@@ -54,13 +54,53 @@ const ProductDetail = () => {
   };
   const decrement = () => setQuantity((prev) => Math.max(1, prev - 1));
   const increment = () => setQuantity((prev) => prev + 1);
+
   const handleBuyNow = () => {
-    {
-      accessToken
-        ? navigate("/dat-hang")
-        : toast.warn("Vui lòng đăng nhập để mua sản phẩm!");
+    if (!accessToken) {
+      toast.warn("Vui lòng đăng nhập để mua sản phẩm!");
+      return;
     }
+
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const updatedCart = cart.map((item) => ({
+      ...item,
+      isChecked: false,
+    }));
+
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+    let discountPrice = 0;
+
+    if (product.productDiscount && product.productDiscount.length > 0) {
+      const { discountValue } = product.productDiscount[0];
+      discountPrice = (selectedVariant.price * discountValue) / 100;
+    }
+
+    const finalPrice = selectedVariant.price - discountPrice;
+
+    console.log("cartItem", {
+      variant: selectedVariant,
+      quantity: quantity,
+      product: product,
+      finalPricePerOne: finalPrice,
+    });
+
+    dispatch(
+      addToCart({
+        data: {
+          variant: selectedVariant,
+          quantity: quantity,
+          isChecked: true,
+          product: product,
+          finalPricePerOne: finalPrice,
+        },
+      })
+    );
+
+    toast.success("Chuyển sang trang đặt hàng!");
+    navigate("/dat-hang");
   };
+
   const handleAddToCart = () => {
     let discountPrice;
     if (!product.productDiscount || product.productDiscount.length === 0) {

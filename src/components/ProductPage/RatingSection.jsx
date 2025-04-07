@@ -22,8 +22,7 @@ function RatingSection({
   useEffect(() => {
     setReviewsProduct([...reviews]);
   }, [reviews]);
-  console.log("reviewsProduct", reviewsProduct);
-  console.log("reviews", reviews);
+
   const [fileList, setFileList] = useState([]);
   const [visibleComments, setVisibleComments] = useState(5);
 
@@ -34,8 +33,6 @@ function RatingSection({
 
   const location = useLocation();
   const selectedOrder = location.state?.order;
-
-  console.log("Dữ liệu đơn hàng nhận được:", selectedOrder);
 
   const handleSubmit = async () => {
     if (!rating || !review.trim()) {
@@ -50,8 +47,6 @@ function RatingSection({
       comment: review,
       uploadedImageIds: fileList.map((file) => file.uid) || [],
     };
-
-    console.log("Dữ liệu đánh giá:", reviewData);
 
     try {
       await reviewsService.createReview(accessToken, reviewData);
