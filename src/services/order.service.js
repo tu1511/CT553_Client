@@ -50,6 +50,24 @@ class OrderService {
       console.error("Error getting order by id:", error);
     }
   }
+
+  // cancel order by id
+  async cancelOrderById(accessToken, orderId) {
+    try {
+      const response = await this.api.put(
+        `/cancel/${orderId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error cancelling order by id:", error);
+    }
+  }
 }
 
 export default new OrderService();

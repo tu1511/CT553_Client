@@ -380,7 +380,7 @@ const ProductDetail = () => {
         ratingsData={ratingsData}
       />
 
-      <InfoSection />
+      {/* <InfoSection /> */}
     </>
   );
 };

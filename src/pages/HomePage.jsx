@@ -109,6 +109,8 @@ function HomePage() {
     (product) => product !== null
   );
 
+  console.log("recommendedProductsHehe", recommendedProducts);
+
   return (
     <div className="bg-white">
       <CarouselComponent />

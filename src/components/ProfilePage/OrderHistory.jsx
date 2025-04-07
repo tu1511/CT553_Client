@@ -78,20 +78,15 @@ const OrderHistory = () => {
   const navigate = useNavigate();
 
   const accessToken = localStorage.getItem("accessToken");
-
+  const fetchOrders = async () => {
+    try {
+      const response = await orderService.getOrderByBuyId(accessToken, 0, 1000);
+      setOrders(response.metadata?.orders || []);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await orderService.getOrderByBuyId(
-          accessToken,
-          0,
-          1000
-        );
-        setOrders(response.metadata?.orders || []);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      }
-    };
     fetchOrders();
   }, [accessToken]);
 
@@ -205,6 +200,18 @@ const OrderHistory = () => {
     }
   };
 
+  const handleCancel = async (orderId) => {
+    try {
+      await orderService.cancelOrderById(accessToken, orderId);
+      toast.success("Đơn hàng đã được hủy thành công.");
+      fetchOrders();
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error canceling order:", error);
+      toast.error("Lỗi khi hủy đơn hàng, vui lòng thử lại.");
+    }
+  };
+
   return (
     <div className="container mx-auto px-8">
       <HeaderLine title="Lịch sử đơn hàng" />
@@ -289,6 +296,17 @@ const OrderHistory = () => {
                   }`}
                 >
                   {PAYMENT_STATUS_MAP[selectedOrder.payment.paymentStatus.name]}
+                </span>
+              </p>
+              <p>
+                <strong className="text-gray-900">Trạng thái đơn hàng:</strong>{" "}
+                <span
+                  className={`px-2 py-1 rounded-full ${
+                    statusClasses[selectedOrder?.currentStatus?.name] ||
+                    "text-gray-600 bg-gray-200"
+                  }`}
+                >
+                  {STATUS_MAP[selectedOrder?.currentStatus?.name]}
                 </span>
               </p>
               {selectedOrder.payment.paymentStatus.name !== "SUCCESS" &&
@@ -428,22 +446,21 @@ const OrderHistory = () => {
                     Đánh giá sản phẩm
                   </Button>
                 )}
-              {selectedOrder.currentStatus.name === "AWAITING_CONFIRM" &&
-                selectedOrder.payment.paymentStatus.name !== "SUCCESS" && (
-                  <Button
-                    type="primary"
-                    style={{
-                      backgroundColor: "#c60018",
-                      borderColor: "#ffffff",
-                      color: "white",
-                    }}
-                    onClick={() => {
-                      handlePayment(selectedOrder.id);
-                    }}
-                  >
-                    Hủy đơn hàng
-                  </Button>
-                )}
+              {selectedOrder.currentStatus.name === "AWAITING_CONFIRM" && (
+                <Button
+                  type="primary"
+                  style={{
+                    backgroundColor: "#c60018",
+                    borderColor: "#ffffff",
+                    color: "white",
+                  }}
+                  onClick={() => {
+                    handleCancel(selectedOrder.id);
+                  }}
+                >
+                  Hủy đơn hàng
+                </Button>
+              )}
             </div>
           </div>
         </Modal>

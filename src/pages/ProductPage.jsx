@@ -20,8 +20,10 @@ const ProductPage = () => {
   });
 
   const [products, setProducts] = useState([]);
-  const [totalPage, setTotalPage] = useState(1);
   const accessToken = localStorage.getItem("accessToken");
+
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -104,13 +106,18 @@ const ProductPage = () => {
           filterMinPrice: filters.filterMinPrice,
           filterMaxPrice: filters.filterMaxPrice,
         });
+
+        setTotalProducts(data?.metadata?.pagination?.totalProducts || 0);
+        setTotalPages(data?.metadata?.pagination?.totalPages || 0);
+
+        console.log("data", data);
         const visibleProducts =
           data.metadata?.products?.filter(
             (product) => product.visible !== false
           ) || [];
 
         setProducts(visibleProducts);
-        setTotalPage(data?.metadata?.pagination?.totalPages);
+        setTotalPages(data?.metadata?.pagination?.totalPages);
       } catch (error) {
         console.error("Lỗi khi lấy sản phẩm:", error);
       }
@@ -203,7 +210,7 @@ const ProductPage = () => {
         <div className="flex justify-center mt-8">
           <Pagination
             current={page}
-            total={totalPage * 12}
+            total={totalPages * 12}
             pageSize={12}
             onChange={(page) => navigate(`?page=${page}`)}
             showSizeChanger={false}
